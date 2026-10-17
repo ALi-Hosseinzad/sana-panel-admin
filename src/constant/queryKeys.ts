@@ -1,6 +1,11 @@
 export const QUERY_KEYS = {
   PROFILE: ['profile'],
-  BASE_INFO: ['base-info'],
+  BASE_INFO: {
+    GENERAL: ['base-info', 'general'],
+    MURABAHA_RATES: ['base-info', 'murabaha-rates'],
+    TERMS: ['base-info', 'terms'],
+    USABLE_MATRIX: ['base-info', 'usable-matrix'],
+  },
   LOOKUPS: {
     CANCEL_REASONS: ['lookups', 'cancel-reasons'],
     REJECT_REASONS: ['lookups', 'reject-reasons'],

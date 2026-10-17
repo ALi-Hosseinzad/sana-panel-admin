@@ -1,5 +1,12 @@
-import { MOCK_BASE_INFO, MOCK_COMPANIES, MOCK_USERS } from '@/constant/mock';
-import { type BaseInfo } from '@/features/base-info/types';
+import {
+  MOCK_COMPANIES,
+  MOCK_GENERAL_SETTINGS,
+  MOCK_LOOKUPS,
+  MOCK_MURABAHA_RATES,
+  MOCK_TERMS,
+  MOCK_USABLE_VALUES,
+  MOCK_USERS,
+} from '@/constant/mock';
 import type { PlanOption } from '@/services/lookup/types';
 
 /**
@@ -7,12 +14,18 @@ import type { PlanOption } from '@/services/lookup/types';
  * با رفرش صفحه به مقادیر اولیه constant/mock برمی‌گردد.
  */
 export const db = {
-  baseInfo: structuredClone(MOCK_BASE_INFO) as BaseInfo,
+  settings: structuredClone(MOCK_GENERAL_SETTINGS),
+  murabahaRates: [...MOCK_MURABAHA_RATES],
+  terms: [...MOCK_TERMS],
+  usable: structuredClone(MOCK_USABLE_VALUES),
+  lookups: structuredClone(MOCK_LOOKUPS),
   companies: structuredClone(MOCK_COMPANIES),
   /** نام فایل‌های آپلودشده بر اساس شناسه */
   files: new Map<string, string>(),
   sequence: 100,
 };
+
+export type LookupName = keyof typeof db.lookups;
 
 export const nextId = (prefix: string) => {
   db.sequence += 1;
@@ -21,6 +34,9 @@ export const nextId = (prefix: string) => {
 
 export const fileOf = (id: string) => ({ id, name: db.files.get(id) ?? id });
 
+export const lookupTitle = (name: LookupName, id: string) =>
+  db.lookups[name].find((item) => item.id === id)?.title;
+
 export const today = () => new Date().toISOString().slice(0, 10);
 
 export const findUserByToken = (authorization: string | null) => {
@@ -28,14 +44,22 @@ export const findUserByToken = (authorization: string | null) => {
   return MOCK_USERS.find((user) => user.token === token);
 };
 
+/** اندازه جدول درصد قابل استفاده را با تعداد مدت‌ها و نرخ‌ها هماهنگ می‌کند */
+export const resizeUsable = () => {
+  const columns = db.murabahaRates.length + 1;
+  db.usable = db.terms.map((_term, row) =>
+    Array.from({ length: columns }, (_value, column) => db.usable[row]?.[column] ?? 0),
+  );
+};
+
 /** طرح‌های قابل انتخاب از روی اطلاعات پایه ساخته می‌شوند (همان کاری که بک‌اند انجام می‌دهد) */
 export const buildPlanOptions = (): PlanOption[] => {
-  const { terms, murabahaRates, qarzRate, usable } = db.baseInfo;
+  const { terms, murabahaRates, usable } = db;
   const qarz = terms.map((term, termIndex) => ({
     id: `qarz-${termIndex}`,
     type: 'qarz' as const,
     typeTitle: 'قرض‌الحسنه',
-    rate: qarzRate,
+    rate: db.settings.qarzRate,
     term,
     usable: usable[termIndex]?.[0] ?? 0,
   }));
@@ -51,6 +75,3 @@ export const buildPlanOptions = (): PlanOption[] => {
   );
   return [...qarz, ...murabaha];
 };
-
-export const toLookup = (list: string[]) =>
-  list.map((title, index) => ({ id: String(index), title }));

@@ -5,7 +5,12 @@ export const ENDPOINTS = {
     LOGOUT: '/auth/logout',
     PROFILE: '/auth/profile',
   },
-  BASE_INFO: '/base-info',
+  BASE_INFO: {
+    GENERAL: '/base-info/general',
+    MURABAHA_RATES: '/base-info/murabaha-rates',
+    TERMS: '/base-info/terms',
+    USABLE_MATRIX: '/base-info/usable-matrix',
+  },
   FILES: {
     UPLOAD: '/files',
   },
@@ -16,6 +21,8 @@ export const ENDPOINTS = {
     AVG_DOC_TYPES: '/lookups/avg-doc-types',
     PLANS: '/lookups/plans',
     COMPANIES: '/lookups/companies',
+    /** آدرس یک آیتم از لیست (برای ویرایش/حذف) */
+    ITEM: (listPath: string, id: string) => `${listPath}/${id}`,
   },
   COMPANIES: {
     LIST: '/companies',

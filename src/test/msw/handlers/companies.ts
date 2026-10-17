@@ -11,7 +11,7 @@ import {
   type SaveAveragesPayload,
 } from '@/features/companies/types';
 
-import { buildPlanOptions, db, fileOf, findUserByToken, nextId, toLookup, today } from '../db';
+import { buildPlanOptions, db, fileOf, findUserByToken, lookupTitle, nextId, today } from '../db';
 import { api } from '../utils';
 
 const notFound = () => HttpResponse.json({ message: 'شرکت یافت نشد.' }, { status: 404 });
@@ -51,7 +51,7 @@ const buildAverages = (company: MockCompany): MonthlyAverage[] => {
     ? plans.reduce((sum, plan) => sum + plan.usable, 0) / plans.length
     : 0;
   const multiplier =
-    db.baseInfo.sepahEnabled && company.sepahSalary ? db.baseInfo.sepahMultiplier : 1;
+    db.settings.sepahEnabled && company.sepahSalary ? db.settings.sepahMultiplier : 1;
 
   let cumulative = 0;
   return company.averages.map((average, index) => {
@@ -135,9 +135,7 @@ export const companyHandlers = [
     const body = (await request.json()) as CancelContractPayload;
     company.status = 'cancelled';
     company.cancelDate = body.cancelDate;
-    company.cancelReason = toLookup(db.baseInfo.cancelReasons).find(
-      (reason) => reason.id === body.reasonId,
-    )?.title;
+    company.cancelReason = lookupTitle('cancelReasons', body.reasonId);
     return new HttpResponse(null, { status: 204 });
   }),
 
@@ -159,8 +157,7 @@ export const companyHandlers = [
       id: nextId('d'),
       createdAt: today(),
       months: body.items.map((item) => item.month),
-      docType:
-        toLookup(db.baseInfo.avgDocTypes).find((type) => type.id === body.docTypeId)?.title ?? '—',
+      docType: lookupTitle('avgDocTypes', body.docTypeId) ?? '—',
       file: fileOf(body.fileId),
       note: body.note,
       createdBy: userName(request),

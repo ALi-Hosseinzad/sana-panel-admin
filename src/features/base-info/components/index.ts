@@ -1,5 +1,4 @@
-export { GeneralFields } from './GeneralFields';
-export { NumberListFields } from './NumberListFields';
-export { TextListField } from './TextListField';
-export { UsableMatrix } from './UsableMatrix';
-export { ConfirmChangesModal } from './ConfirmChangesModal';
+export { GeneralSettingsCard } from './GeneralSettingsCard';
+export { LookupListCard } from './LookupListCard';
+export { NumberListCard } from './NumberListCard';
+export { UsableMatrixCard } from './UsableMatrixCard';
