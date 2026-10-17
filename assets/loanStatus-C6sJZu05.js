@@ -1,0 +1,1 @@
+import"./status-chip-DyfpD9Pa.js";var e={pending_manager:{title:`در انتظار تأیید مدیر شرکت`,tone:`warning`},rejected_manager:{title:`رد شده توسط مدیر شرکت`,tone:`error`},pending_credit:{title:`در انتظار`,tone:`warning`},approved:{title:`تأیید شده`,tone:`success`},rejected:{title:`رد شده`,tone:`error`}};export{e as t};

@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-6T51qTA-.js";import{t}from"./card-Y1NAH-f5.js";import{l as n}from"./index-CI8pPIeg.js";var r=e(),i=()=>(0,r.jsx)(t,{children:(0,r.jsx)(n,{status:`info`,title:`به پنل سانا خوش آمدید`,subTitle:`محتوای این بخش هنوز ساخته نشده است.`})});export{i as HomePage};

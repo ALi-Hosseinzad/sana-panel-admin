@@ -1,0 +1,1 @@
+import{t as e}from"./http-P2-c3z1d.js";import{n as t}from"./client-qLtgTwAX.js";var n=n=>e.upload(t.FILES.UPLOAD,{file:n}),r=async e=>e?e instanceof File?n(e):e:null;export{r as t};
