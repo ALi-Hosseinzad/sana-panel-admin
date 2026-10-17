@@ -1,7 +1,7 @@
 import 'react-multi-date-picker/styles/backgrounds/bg-dark.css';
 
-import { Form } from 'antd';
-import { useMemo } from 'react';
+import { FormItemInputContext } from 'antd/es/form/context';
+import { useContext, useMemo } from 'react';
 import type DateObject from 'react-date-object';
 import persian from 'react-date-object/calendars/persian';
 import persian_fa from 'react-date-object/locales/persian_fa';
@@ -81,7 +81,8 @@ export const DateInput = ({
   pickerProps,
 }: DateInputProps) => {
   const themeMode = useThemeStore((state) => state.mode);
-  const { status } = Form.Item.useStatus();
+  // وضعیت خطای FormItem (بیرون از FormItem مقدار ندارد و هشداری هم نمی‌دهد)
+  const { status } = useContext(FormItemInputContext);
 
   const plugins = useMemo(() => {
     const list = [];

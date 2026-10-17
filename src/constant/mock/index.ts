@@ -8,3 +8,4 @@ export {
 } from './baseInfo';
 export { MOCK_COMPANIES, type MockCompany } from './companies';
 export { MOCK_STAFF, type MockStaff } from './staff';
+export { MOCK_LOAN_REQUESTS, type MockLoanRequest } from './loanRequests';

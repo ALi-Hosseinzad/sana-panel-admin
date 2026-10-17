@@ -31,6 +31,14 @@ export const ENDPOINTS = {
     AVERAGES: (id: string) => `/companies/${id}/averages`,
     AVERAGE_DOCS: (id: string) => `/companies/${id}/average-docs`,
   },
+  CREDIT: {
+    /** وضعیت مجاز بودن شرکت برای تخصیص وام در تاریخ مبنا */
+    ELIGIBILITY: (companyId: string) => `/companies/${companyId}/credit/eligibility`,
+    /** مانده اعتبار ماه: میانگین‌ها و اعتبار هر طرح */
+    SUMMARY: (companyId: string) => `/companies/${companyId}/credit/summary`,
+    /** درخواست‌های وام شرکت (لیست / ثبت) */
+    LOAN_REQUESTS: (companyId: string) => `/companies/${companyId}/loan-requests`,
+  },
   STAFF: {
     LIST: (companyId: string) => `/companies/${companyId}/staff`,
     DETAIL: (companyId: string, id: string) => `/companies/${companyId}/staff/${id}`,

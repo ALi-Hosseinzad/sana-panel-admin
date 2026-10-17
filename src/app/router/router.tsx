@@ -5,6 +5,7 @@ import { ROUTES } from '@/constant/routes';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { BaseInfoPage } from '@/features/base-info/pages/BaseInfoPage';
 import { CompaniesPage } from '@/features/companies/pages/CompaniesPage';
+import { CreditPage } from '@/features/credit/pages/CreditPage';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { StaffPage } from '@/features/staff/pages/StaffPage';
 
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.BASE_INFO, element: <BaseInfoPage /> },
       { path: ROUTES.COMPANIES, element: <CompaniesPage /> },
       { path: ROUTES.STAFF, element: <StaffPage /> },
+      { path: ROUTES.CREDIT, element: <CreditPage /> },
       // صفحات هر بخش بعداً در features ساخته و اینجا اضافه می‌شوند
       { path: '*', element: <HomePage /> },
     ],

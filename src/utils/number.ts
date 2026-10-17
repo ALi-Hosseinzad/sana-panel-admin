@@ -1,4 +1,4 @@
-import { toEnglishDigits } from './date';
+import { toEnglishDigits, toPersianDigits } from './date';
 
 const groupThousands = (integer: string) => {
   const negative = integer.startsWith('-');
@@ -22,3 +22,6 @@ export const formatAmount = (value: number | string | null | undefined) => {
 /** حذف جداکننده و تبدیل ارقام فارسی */
 export const parseAmount = (value: string | undefined) =>
   toEnglishDigits(value ?? '').replace(/[^\d.-]/g, '');
+
+/** نمایش مبلغ ریالی با ارقام فارسی (مثل «۱,۵۰۰,۰۰۰ ریال») */
+export const formatRial = (value: number) => `${toPersianDigits(formatAmount(value))} ریال`;
