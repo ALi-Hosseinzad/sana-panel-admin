@@ -6,19 +6,15 @@
 
 ```bash
 npm install
-npm run dev          # محیط development  (https://localhost:5173)
+npm run dev          # محیط development  (http://localhost:5173)
 npm run dev:stage    # محیط staging
 npm run build        # بیلد production
 npm run build:stage  # بیلد staging
 ```
 
-همه محیط‌ها روی **https** اجرا می‌شوند. به‌صورت پیش‌فرض یک گواهی self-signed ساخته می‌شود.
-برای اینکه مرورگر به گواهی اعتماد کند (و Service Worker ماک‌ها کار کند) یک بار
-[mkcert](https://github.com/FiloSottile/mkcert) را نصب و اجرا کنید:
-
-```bash
-npm run cert   # گواهی محلی در پوشه .cert ساخته می‌شود و Vite خودکار از آن استفاده می‌کند
-```
+> **HTTPS فعلاً غیرفعال است** و پروژه روی `http://localhost:5173` اجرا می‌شود.
+> تنظیمات https و گواهی در `vite.config.ts`، `playwright.config.ts` و `src/config/env.ts` کامنت شده‌اند
+> و هنگام دیپلوی واقعی دوباره بررسی و فعال می‌شوند.
 
 در محیط development دیتای ماک (MSW) فعال است. کاربر نمونه: `admin / admin` یا `branch / branch`.
 
@@ -37,12 +33,12 @@ npm run cert   # گواهی محلی در پوشه .cert ساخته می‌شو�
 
 فایل‌های `.env.development`، `.env.staging` و `.env.production`:
 
-| متغیر               | توضیح                  |
-| ------------------- | ---------------------- |
-| `VITE_API_BASE_URL` | آدرس API (همیشه https) |
-| `VITE_API_TIMEOUT`  | تایم‌اوت درخواست (ms)  |
-| `VITE_ENABLE_MOCK`  | فعال بودن ماک MSW      |
-| `VITE_APP_TITLE`    | عنوان سامانه           |
+| متغیر               | توضیح                 |
+| ------------------- | --------------------- |
+| `VITE_API_BASE_URL` | آدرس API              |
+| `VITE_API_TIMEOUT`  | تایم‌اوت درخواست (ms) |
+| `VITE_ENABLE_MOCK`  | فعال بودن ماک MSW     |
+| `VITE_APP_TITLE`    | عنوان سامانه          |
 
 ## ساختار پوشه‌ها
 

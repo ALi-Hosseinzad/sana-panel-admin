@@ -20,8 +20,7 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "prepare": "husky",
-    "cert": "mkdir -p .cert && mkcert -install && mkcert -key-file .cert/key.pem -cert-file .cert/cert.pem localhost 127.0.0.1 ::1"
+    "prepare": "husky"
   },
   "dependencies": {
     "@ant-design/charts": "^2.6.7",
