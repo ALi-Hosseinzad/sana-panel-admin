@@ -1,3 +1,5 @@
+import { type ReactNode } from 'react';
+
 import { FormItem } from '@/component/form';
 import { FileInput, SelectInput, TextAreaInput } from '@/component/input';
 import { FormModal } from '@/component/modal';
@@ -17,6 +19,8 @@ interface DecisionModalProps {
   target: DecisionTarget | null;
   /** اگر داده شود، در حالت رد انتخاب دلیل اجباری است */
   rejectReasons?: LookupItem[];
+  /** فیلدهای اضافه در حالت تأیید (مثل مرحله پس از تأیید) */
+  approveFields?: ReactNode;
   onSubmit: (values: DecisionFormValues) => Promise<unknown>;
   onClose: () => void;
 }
@@ -29,7 +33,13 @@ const describe = (requests: DecisionRequestInfo[]) => {
 };
 
 /** مودال ثبت تصمیم (تأیید / رد) برای یک یا چند درخواست */
-export const DecisionModal = ({ target, rejectReasons, onSubmit, onClose }: DecisionModalProps) => {
+export const DecisionModal = ({
+  target,
+  rejectReasons,
+  approveFields,
+  onSubmit,
+  onClose,
+}: DecisionModalProps) => {
   const isReject = target?.type === 'reject';
   const isGroup = (target?.requests.length ?? 0) > 1;
 
@@ -57,6 +67,7 @@ export const DecisionModal = ({ target, rejectReasons, onSubmit, onClose }: Deci
           />
         </FormItem>
       )}
+      {!isReject && approveFields}
       <FormItem name="note" label="توضیحات (اختیاری)">
         <TextAreaInput maxLength={500} />
       </FormItem>

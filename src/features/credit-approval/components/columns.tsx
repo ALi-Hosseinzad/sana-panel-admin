@@ -10,8 +10,6 @@ import { formatRial } from '@/utils/number';
 
 import { type CreditApprovalItem } from '../types';
 
-import { PostStageSelect } from './PostStageSelect';
-
 const toJalali = (value: string | null) =>
   value ? formatJalali(value, undefined, { persianDigits: true }) : '—';
 
@@ -44,11 +42,6 @@ export const buildColumns = (
     render: (status: CreditApprovalItem['status']) => (
       <StatusChip tone={LOAN_STATUS[status].tone}>{LOAN_STATUS[status].title}</StatusChip>
     ),
-  },
-  {
-    title: 'مرحله پس از تأیید',
-    key: 'postStage',
-    render: (_value, row) => (row.status === 'approved' ? <PostStageSelect request={row} /> : '—'),
   },
   {
     title: 'عملیات',

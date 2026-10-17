@@ -52,7 +52,6 @@ export const ENDPOINTS = {
     LIST: '/credit-approvals',
     APPROVE: '/credit-approvals/approve',
     REJECT: '/credit-approvals/reject',
-    POST_STAGE: (id: string) => `/credit-approvals/${id}/post-stage`,
   },
   STAFF: {
     LIST: (companyId: string) => `/companies/${companyId}/staff`,

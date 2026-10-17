@@ -18,6 +18,7 @@ import { getCreditApprovals, submitCreditDecision } from '../api';
 import { type CreditApprovalItem } from '../types';
 
 import { buildColumns } from './columns';
+import { PostStageFields } from './PostStageFields';
 
 interface CreditApprovalCardProps {
   /** خالی = همه شرکت‌ها */
@@ -132,6 +133,7 @@ export const CreditApprovalCard = ({ companyId, onCompanyChange }: CreditApprova
       <DecisionModal
         target={target}
         rejectReasons={rejectReasons ?? []}
+        approveFields={<PostStageFields />}
         onSubmit={decide}
         onClose={() => setTarget(null)}
       />
