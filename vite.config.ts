@@ -22,6 +22,8 @@ import { defineConfig } from 'vite';
  */
 
 export default defineConfig({
+  // برای GitHub Pages مسیر پایه (مثلاً /sana-panel-admin/) از متغیر BASE_PATH خوانده می‌شود
+  base: process.env.BASE_PATH ?? '/',
   plugins: [
     react(),
     tailwindcss(),
