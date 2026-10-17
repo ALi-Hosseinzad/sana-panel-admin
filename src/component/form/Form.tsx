@@ -16,3 +16,4 @@ export const Form = <T,>(props: FormProps<T>) =>
 Form.useForm = AntForm.useForm;
 Form.useWatch = AntForm.useWatch;
 Form.useFormInstance = AntForm.useFormInstance;
+Form.List = AntForm.List;

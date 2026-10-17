@@ -2,7 +2,8 @@ import { delay, http, HttpResponse } from 'msw';
 
 import { env } from '@/config/env';
 import { ENDPOINTS } from '@/constant/endpoints';
-import { MOCK_USERS } from '@/constant/mock';
+import { MOCK_BASE_INFO, MOCK_USERS } from '@/constant/mock';
+import { type BaseInfo } from '@/features/base-info/types';
 
 const api = (path: string) => `${env.apiBaseUrl}${path}`;
 
@@ -10,6 +11,9 @@ const findUserByToken = (authorization: string | null) => {
   const token = authorization?.replace('Bearer ', '');
   return MOCK_USERS.find((user) => user.token === token);
 };
+
+// نسخه قابل تغییر در حافظه (با رفرش صفحه به مقدار اولیه برمی‌گردد)
+let baseInfo: BaseInfo = structuredClone(MOCK_BASE_INFO);
 
 export const handlers = [
   http.post(api(ENDPOINTS.AUTH.LOGIN), async ({ request }) => {
@@ -29,5 +33,16 @@ export const handlers = [
     const user = findUserByToken(request.headers.get('Authorization'));
     if (!user) return HttpResponse.json({ message: 'unauthorized' }, { status: 401 });
     return HttpResponse.json(user.profile);
+  }),
+
+  http.get(api(ENDPOINTS.BASE_INFO), async () => {
+    await delay(300);
+    return HttpResponse.json(baseInfo);
+  }),
+
+  http.put(api(ENDPOINTS.BASE_INFO), async ({ request }) => {
+    await delay(300);
+    baseInfo = (await request.json()) as BaseInfo;
+    return HttpResponse.json(baseInfo);
   }),
 ];
