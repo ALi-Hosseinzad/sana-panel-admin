@@ -16,16 +16,24 @@ export interface GeneralSettings {
   staffDelayMonths: number;
 }
 
-/** لیست عددی (نرخ‌های مرابحه به درصد / مدت‌های بازپرداخت به ماه) */
-export interface NumberListValues {
-  items: number[];
+/** اطلاعات پایه یک طرح (بدنه ایجاد و ویرایش) */
+export interface SchemePayload extends GeneralSettings {
+  /** نام طرح */
+  name: string;
+  /** نرخ‌های مرابحه قابل انتخاب (درصد) */
+  murabahaRates: number[];
+  /** مدت‌های بازپرداخت قابل انتخاب (ماه) */
+  terms: number[];
+  /** درصد قابل استفاده از میانگین؛ هر ردیف یک مدت بازپرداخت، ستون اول قرض‌الحسنه و بقیه به ترتیب نرخ‌های مرابحه */
+  usable: number[][];
 }
 
-/** جدول درصد قابل استفاده از میانگین */
-export interface UsableMatrix {
-  qarzRate: number;
-  murabahaRates: number[];
-  terms: number[];
-  /** هر ردیف یک مدت بازپرداخت؛ ستون اول قرض‌الحسنه و بقیه به ترتیب نرخ‌های مرابحه */
-  values: number[][];
+export interface Scheme extends SchemePayload {
+  id: string;
 }
+
+/** ردیف جدول طرح‌ها */
+export type SchemeListItem = Pick<
+  Scheme,
+  'id' | 'name' | 'qarzRate' | 'murabahaRates' | 'terms' | 'contractYears' | 'maxPlans'
+>;

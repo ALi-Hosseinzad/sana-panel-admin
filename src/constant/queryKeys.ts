@@ -1,10 +1,8 @@
 export const QUERY_KEYS = {
   PROFILE: ['profile'],
   BASE_INFO: {
-    GENERAL: ['base-info', 'general'],
-    MURABAHA_RATES: ['base-info', 'murabaha-rates'],
-    TERMS: ['base-info', 'terms'],
-    USABLE_MATRIX: ['base-info', 'usable-matrix'],
+    SCHEMES: ['base-info', 'schemes'],
+    SCHEME: (id: string) => ['base-info', 'schemes', id],
   },
   LOOKUPS: {
     CANCEL_REASONS: ['lookups', 'cancel-reasons'],

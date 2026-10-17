@@ -1,25 +1,16 @@
 import { ENDPOINTS } from '@/constant/endpoints';
 import { http } from '@/services/http';
 
-import { type GeneralSettings, type UsableMatrix } from './types';
+import { type Scheme, type SchemeListItem, type SchemePayload } from './types';
 
-export const getGeneralSettings = () => http.get<GeneralSettings>(ENDPOINTS.BASE_INFO.GENERAL);
+export const getSchemes = () => http.get<SchemeListItem[]>(ENDPOINTS.BASE_INFO.SCHEMES);
 
-export const updateGeneralSettings = (body: GeneralSettings) =>
-  http.put<GeneralSettings, GeneralSettings>(ENDPOINTS.BASE_INFO.GENERAL, body);
+export const getScheme = (id: string) => http.get<Scheme>(ENDPOINTS.BASE_INFO.SCHEME(id));
 
-export const getMurabahaRates = () => http.get<number[]>(ENDPOINTS.BASE_INFO.MURABAHA_RATES);
+export const createScheme = (body: SchemePayload) =>
+  http.post<Scheme, SchemePayload>(ENDPOINTS.BASE_INFO.SCHEMES, body);
 
-export const updateMurabahaRates = (body: number[]) =>
-  http.put<number[], number[]>(ENDPOINTS.BASE_INFO.MURABAHA_RATES, body);
+export const updateScheme = (id: string, body: SchemePayload) =>
+  http.put<Scheme, SchemePayload>(ENDPOINTS.BASE_INFO.SCHEME(id), body);
 
-export const getTerms = () => http.get<number[]>(ENDPOINTS.BASE_INFO.TERMS);
-
-export const updateTerms = (body: number[]) =>
-  http.put<number[], number[]>(ENDPOINTS.BASE_INFO.TERMS, body);
-
-export const getUsableMatrix = () => http.get<UsableMatrix>(ENDPOINTS.BASE_INFO.USABLE_MATRIX);
-
-/** فقط مقادیر جدول ارسال می‌شود؛ ردیف/ستون‌ها از نرخ‌ها و مدت‌ها ساخته می‌شوند */
-export const updateUsableMatrix = (values: number[][]) =>
-  http.put<UsableMatrix, { values: number[][] }>(ENDPOINTS.BASE_INFO.USABLE_MATRIX, { values });
+export const deleteScheme = (id: string) => http.delete<void>(ENDPOINTS.BASE_INFO.SCHEME(id));

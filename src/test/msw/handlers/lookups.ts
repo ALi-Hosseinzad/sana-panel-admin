@@ -2,7 +2,7 @@ import { delay, http, HttpResponse } from 'msw';
 
 import { ENDPOINTS } from '@/constant/endpoints';
 
-import { buildPlanOptions, db, type LookupName, nextId } from '../db';
+import { buildPlanOptions, db, type LookupName, nextId, primaryScheme } from '../db';
 import { api } from '../utils';
 
 /** سرویس‌های CRUD یک لیست ساده */
@@ -43,7 +43,7 @@ export const lookupHandlers = [
 
   http.get(api(ENDPOINTS.LOOKUPS.PLANS), async () => {
     await delay(200);
-    return HttpResponse.json({ maxPlans: db.settings.maxPlans, items: buildPlanOptions() });
+    return HttpResponse.json({ maxPlans: primaryScheme().maxPlans, items: buildPlanOptions() });
   }),
 
   http.get(api(ENDPOINTS.LOOKUPS.COMPANIES), async ({ request }) => {

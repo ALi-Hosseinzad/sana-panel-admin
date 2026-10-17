@@ -1,4 +1,4 @@
-import { type GeneralSettings } from '@/features/base-info/types';
+import { type GeneralSettings, type Scheme } from '@/features/base-info/types';
 import { type LookupItem } from '@/types/common';
 
 export const MOCK_GENERAL_SETTINGS: GeneralSettings = {
@@ -22,6 +22,17 @@ export const MOCK_USABLE_VALUES = [
   [5, 6, 8, 10, 15, 20],
   [4, 4, 6, 8, 10, 15],
   [3, 3, 5, 6, 8, 10],
+];
+
+export const MOCK_SCHEMES: Scheme[] = [
+  {
+    id: 'scheme-1',
+    name: 'نگین میثاق',
+    ...MOCK_GENERAL_SETTINGS,
+    murabahaRates: MOCK_MURABAHA_RATES,
+    terms: MOCK_TERMS,
+    usable: MOCK_USABLE_VALUES,
+  },
 ];
 
 const toItems = (prefix: string, titles: string[]): LookupItem[] =>
