@@ -1,0 +1,57 @@
+import { useState } from 'react';
+
+import { PanelCard } from '@/component/card';
+import { useQueryParams } from '@/hooks/useQueryParams';
+import { CompanySelect } from '@/features/companies/components';
+
+import { StaffFormModal, StaffSearch, StaffTable, StaffToolbar } from '../components';
+import { type StaffFilters } from '../types';
+
+export const StaffPage = () => {
+  const { params, setParams } = useQueryParams();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const companyId = params.companyId;
+  const filters: StaffFilters = { q: params.q, hireFrom: params.hireFrom, hireTo: params.hireTo };
+
+  const openModal = (id: string | null) => {
+    setEditingId(id);
+    setModalOpen(true);
+  };
+
+  return (
+    <>
+      <PanelCard>
+        <CompanySelect value={companyId} onChange={(id) => setParams({ companyId: id })} />
+      </PanelCard>
+
+      {companyId && (
+        <PanelCard
+          title="پرسنل شرکت"
+          extra={<StaffToolbar companyId={companyId} onCreate={() => openModal(null)} />}
+        >
+          <p className="mt-0 mb-4 text-xs text-ink-soft">
+            جهت بارگذاری فایل گروهی، فایل نمونه را دانلود و پس از تکمیل آن را بارگذاری کنید. ستون‌ها
+            به ترتیب: نام و نام خانوادگی، کد ملی، موبایل، کد پرسنلی، تاریخ استخدام، اولویت تخصیص.
+            فهرست پرسنل و صفحه پرداخت وام بر اساس این اولویت مرتب می‌شوند.
+          </p>
+          <StaffSearch />
+          {/* با تغییر شرکت یا فیلترها جدول از صفحه اول شروع می‌شود */}
+          <StaffTable
+            key={`${companyId}-${JSON.stringify(filters)}`}
+            companyId={companyId}
+            filters={filters}
+            onEdit={openModal}
+          />
+          <StaffFormModal
+            open={modalOpen}
+            companyId={companyId}
+            staffId={editingId}
+            onClose={() => setModalOpen(false)}
+          />
+        </PanelCard>
+      )}
+    </>
+  );
+};

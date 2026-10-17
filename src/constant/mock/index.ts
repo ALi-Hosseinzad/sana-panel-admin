@@ -7,3 +7,4 @@ export {
   MOCK_USABLE_VALUES,
 } from './baseInfo';
 export { MOCK_COMPANIES, type MockCompany } from './companies';
+export { MOCK_STAFF, type MockStaff } from './staff';

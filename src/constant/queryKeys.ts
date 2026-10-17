@@ -21,4 +21,15 @@ export const QUERY_KEYS = {
     AVERAGES: (id: string) => ['companies', 'averages', id],
     AVERAGE_DOCS: (id: string) => ['companies', 'average-docs', id],
   },
+  STAFF: {
+    ALL: ['staff'],
+    LIST: (companyId: string, filters: object, page: number) => [
+      'staff',
+      'list',
+      companyId,
+      filters,
+      page,
+    ],
+    DETAIL: (companyId: string, id: string) => ['staff', 'detail', companyId, id],
+  },
 } as const;

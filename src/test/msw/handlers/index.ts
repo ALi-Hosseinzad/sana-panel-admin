@@ -3,6 +3,7 @@ import { baseInfoHandlers } from './baseInfo';
 import { companyHandlers } from './companies';
 import { fileHandlers } from './files';
 import { lookupHandlers } from './lookups';
+import { staffHandlers } from './staff';
 
 export const handlers = [
   ...authHandlers,
@@ -10,4 +11,5 @@ export const handlers = [
   ...lookupHandlers,
   ...fileHandlers,
   ...companyHandlers,
+  ...staffHandlers,
 ];

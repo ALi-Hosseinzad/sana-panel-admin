@@ -3,6 +3,7 @@ import {
   MOCK_GENERAL_SETTINGS,
   MOCK_LOOKUPS,
   MOCK_MURABAHA_RATES,
+  MOCK_STAFF,
   MOCK_TERMS,
   MOCK_USABLE_VALUES,
   MOCK_USERS,
@@ -20,6 +21,7 @@ export const db = {
   usable: structuredClone(MOCK_USABLE_VALUES),
   lookups: structuredClone(MOCK_LOOKUPS),
   companies: structuredClone(MOCK_COMPANIES),
+  staff: structuredClone(MOCK_STAFF),
   /** نام فایل‌های آپلودشده بر اساس شناسه */
   files: new Map<string, string>(),
   sequence: 100,

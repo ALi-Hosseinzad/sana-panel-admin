@@ -31,4 +31,12 @@ export const ENDPOINTS = {
     AVERAGES: (id: string) => `/companies/${id}/averages`,
     AVERAGE_DOCS: (id: string) => `/companies/${id}/average-docs`,
   },
+  STAFF: {
+    LIST: (companyId: string) => `/companies/${companyId}/staff`,
+    DETAIL: (companyId: string, id: string) => `/companies/${companyId}/staff/${id}`,
+    /** بارگذاری گروهی پرسنل از فایل اکسل */
+    IMPORT: (companyId: string) => `/companies/${companyId}/staff/import`,
+    /** فایل نمونه اکسل پرسنل */
+    SAMPLE_FILE: '/staff/sample-file',
+  },
 } as const;

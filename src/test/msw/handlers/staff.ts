@@ -1,0 +1,153 @@
+import ExcelJS from 'exceljs';
+import { delay, http, HttpResponse } from 'msw';
+
+import { ENDPOINTS } from '@/constant/endpoints';
+import { type MockStaff } from '@/constant/mock';
+import { type StaffPayload } from '@/features/staff/types';
+import { ISO_DATE_FORMAT, parseJalali, toEnglishDigits } from '@/utils/date';
+
+import { db, nextId } from '../db';
+import { api } from '../utils';
+
+const SAMPLE_HEADERS = [
+  'نام و نام خانوادگی',
+  'کد ملی',
+  'موبایل',
+  'کد پرسنلی',
+  'تاریخ استخدام',
+  'اولویت تخصیص',
+];
+const SAMPLE_ROW = ['علی محمدی', '0012345678', '09121234567', '101', '1403/02/15', 1];
+
+const notFound = () => HttpResponse.json({ message: 'پرسنل یافت نشد.' }, { status: 404 });
+
+const findStaff = (companyId: unknown, id: unknown) =>
+  db.staff.find((item) => item.companyId === companyId && item.id === id);
+
+const matchesSearch = (staff: MockStaff, query: string) => {
+  if (!query) return true;
+  const haystack = [staff.fullName, staff.nationalId, staff.mobile, staff.personnelCode].join(' ');
+  return haystack.includes(toEnglishDigits(query));
+};
+
+const inHireRange = (staff: MockStaff, from: string | null, to: string | null) =>
+  (!from || staff.hireDate >= from) && (!to || staff.hireDate <= to);
+
+const cellText = (value: ExcelJS.CellValue) =>
+  toEnglishDigits(String(value instanceof Date ? value.toISOString() : (value ?? ''))).trim();
+
+/** تبدیل یک ردیف اکسل (به ترتیب ستون‌های فایل نمونه) به پرسنل */
+const rowToStaff = (row: ExcelJS.Row, companyId: string): MockStaff | null => {
+  const [name, nationalId, mobile, code, hire, priority] = [1, 2, 3, 4, 5, 6].map((col) =>
+    cellText(row.getCell(col).value),
+  );
+  if (!name) return null;
+  return {
+    id: nextId('s'),
+    companyId,
+    fullName: name,
+    nationalId,
+    mobile,
+    personnelCode: code,
+    hireDate: parseJalali(hire)?.format(ISO_DATE_FORMAT) ?? hire.slice(0, 10),
+    priority: Number(priority) || 999,
+  };
+};
+
+export const staffHandlers = [
+  http.get(api(ENDPOINTS.STAFF.LIST(':companyId')), async ({ params, request }) => {
+    await delay(300);
+    const url = new URL(request.url);
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
+    const query = url.searchParams.get('q') ?? '';
+    const from = url.searchParams.get('hireFrom');
+    const to = url.searchParams.get('hireTo');
+
+    const list = db.staff
+      .filter((item) => item.companyId === params.companyId)
+      .filter((item) => matchesSearch(item, query) && inHireRange(item, from, to))
+      .sort((a, b) => a.priority - b.priority);
+    const start = (page - 1) * pageSize;
+    return HttpResponse.json({
+      items: list.slice(start, start + pageSize),
+      total: list.length,
+      page,
+      pageSize,
+    });
+  }),
+
+  http.post(api(ENDPOINTS.STAFF.LIST(':companyId')), async ({ params, request }) => {
+    await delay(300);
+    const body = (await request.json()) as StaffPayload;
+    const staff = { ...body, id: nextId('s'), companyId: String(params.companyId) };
+    db.staff.push(staff);
+    return HttpResponse.json(staff, { status: 201 });
+  }),
+
+  http.get(api(ENDPOINTS.STAFF.DETAIL(':companyId', ':id')), async ({ params }) => {
+    await delay(200);
+    const staff = findStaff(params.companyId, params.id);
+    return staff ? HttpResponse.json(staff) : notFound();
+  }),
+
+  http.put(api(ENDPOINTS.STAFF.DETAIL(':companyId', ':id')), async ({ params, request }) => {
+    await delay(300);
+    const staff = findStaff(params.companyId, params.id);
+    if (!staff) return notFound();
+    Object.assign(staff, (await request.json()) as StaffPayload);
+    return HttpResponse.json(staff);
+  }),
+
+  http.delete(api(ENDPOINTS.STAFF.DETAIL(':companyId', ':id')), async ({ params }) => {
+    await delay(250);
+    db.staff = db.staff.filter(
+      (item) => !(item.companyId === params.companyId && item.id === params.id),
+    );
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post(api(ENDPOINTS.STAFF.IMPORT(':companyId')), async ({ params, request }) => {
+    await delay(500);
+    const file = (await request.formData()).get('file');
+    if (!(file instanceof File)) {
+      return HttpResponse.json({ message: 'فایل ارسال نشده است.' }, { status: 400 });
+    }
+    const workbook = new ExcelJS.Workbook();
+    try {
+      await workbook.xlsx.load(await file.arrayBuffer());
+    } catch {
+      return HttpResponse.json(
+        { message: 'فایل قابل خواندن نیست؛ از فایل نمونه استفاده کنید.' },
+        { status: 422 },
+      );
+    }
+    let added = 0;
+    workbook.worksheets[0]?.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // ردیف اول عنوان ستون‌هاست
+      const staff = rowToStaff(row, String(params.companyId));
+      if (!staff) return;
+      db.staff.push(staff);
+      added += 1;
+    });
+    return HttpResponse.json({ added });
+  }),
+
+  http.get(api(ENDPOINTS.STAFF.SAMPLE_FILE), async () => {
+    await delay(200);
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('پرسنل', { views: [{ rightToLeft: true }] });
+    sheet.addRow(SAMPLE_HEADERS).font = { bold: true };
+    sheet.addRow(SAMPLE_ROW);
+    sheet.columns.forEach((column) => {
+      column.width = 22;
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    return new HttpResponse(buffer, {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent('نمونه-فایل-پرسنل.xlsx')}`,
+      },
+    });
+  }),
+];
