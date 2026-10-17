@@ -4,6 +4,7 @@ import { companyHandlers } from './companies';
 import { creditHandlers } from './credit';
 import { fileHandlers } from './files';
 import { lookupHandlers } from './lookups';
+import { managerApprovalHandlers } from './managerApprovals';
 import { staffHandlers } from './staff';
 
 export const handlers = [
@@ -14,4 +15,5 @@ export const handlers = [
   ...companyHandlers,
   ...staffHandlers,
   ...creditHandlers,
+  ...managerApprovalHandlers,
 ];

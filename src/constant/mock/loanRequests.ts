@@ -12,6 +12,8 @@ export interface MockLoanRequest {
   createdAt: string;
   decidedAt: string | null;
   status: LoanStatus;
+  note?: string;
+  file?: { id: string; name: string };
 }
 
 export const MOCK_LOAN_REQUESTS: MockLoanRequest[] = [
@@ -37,6 +39,19 @@ export const MOCK_LOAN_REQUESTS: MockLoanRequest[] = [
     planTitle: 'مرابحه - ۱۰٪ - ۲۴ ماه',
     amount: 80_000_000,
     paymentOrder: 2,
+    createdAt: '2025-08-03',
+    decidedAt: null,
+    status: 'pending_manager',
+  },
+  {
+    id: 'lr-3',
+    companyId: 'c-1',
+    staffId: 's-3',
+    staffName: 'محمد رضایی',
+    planId: 'qarz-0',
+    planTitle: 'قرض‌الحسنه - ۴٪ - ۱۲ ماه',
+    amount: 30_000_000,
+    paymentOrder: 3,
     createdAt: '2025-08-03',
     decidedAt: null,
     status: 'pending_manager',

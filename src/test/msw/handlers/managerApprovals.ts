@@ -1,0 +1,65 @@
+import { delay, http, HttpResponse } from 'msw';
+
+import { ENDPOINTS } from '@/constant/endpoints';
+import { type LoanStatus } from '@/constant/loanStatus';
+import { type DecisionPayload } from '@/features/manager-approval/types';
+
+import { db, fileOf, today } from '../db';
+import { api } from '../utils';
+
+const isPending = (companyId: unknown) => (item: (typeof db.loanRequests)[number]) =>
+  item.companyId === companyId && item.status === 'pending_manager';
+
+/** تأیید مدیر → به مرحله «تأیید اعتبارات» می‌رود؛ رد مدیر → پایان */
+const decide = (nextStatus: LoanStatus) =>
+  http.post(
+    api(
+      nextStatus === 'pending_credit'
+        ? ENDPOINTS.MANAGER_APPROVALS.APPROVE(':companyId')
+        : ENDPOINTS.MANAGER_APPROVALS.REJECT(':companyId'),
+    ),
+    async ({ params, request }) => {
+      await delay(350);
+      const body = (await request.json()) as DecisionPayload;
+      const targets = db.loanRequests
+        .filter(isPending(params.companyId))
+        .filter((item) => body.requestIds.includes(item.id));
+      if (!targets.length) {
+        return HttpResponse.json({ message: 'درخواستی برای این تصمیم یافت نشد.' }, { status: 404 });
+      }
+      targets.forEach((item) => {
+        item.status = nextStatus;
+        item.decidedAt = today();
+        item.note = body.note;
+        if (body.fileId) item.file = fileOf(body.fileId);
+      });
+      return HttpResponse.json({ updated: targets.length });
+    },
+  );
+
+export const managerApprovalHandlers = [
+  http.get(api(ENDPOINTS.MANAGER_APPROVALS.LIST(':companyId')), async ({ params, request }) => {
+    await delay(250);
+    const url = new URL(request.url);
+    const page = Number(url.searchParams.get('page') ?? 1);
+    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
+    const list = db.loanRequests.filter(isPending(params.companyId));
+    const start = (page - 1) * pageSize;
+    return HttpResponse.json({
+      items: list.slice(start, start + pageSize).map((item) => ({
+        id: item.id,
+        staffName: item.staffName,
+        planTitle: item.planTitle,
+        amount: item.amount,
+        createdAt: item.createdAt,
+        note: item.note,
+        status: item.status,
+      })),
+      total: list.length,
+      page,
+      pageSize,
+    });
+  }),
+  decide('pending_credit'),
+  decide('rejected_manager'),
+];

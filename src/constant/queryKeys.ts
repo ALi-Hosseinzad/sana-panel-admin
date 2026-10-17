@@ -32,6 +32,10 @@ export const QUERY_KEYS = {
       page,
     ],
   },
+  MANAGER_APPROVALS: {
+    ALL: ['manager-approvals'],
+    LIST: (companyId: string, page: number) => ['manager-approvals', companyId, page],
+  },
   STAFF: {
     ALL: ['staff'],
     LIST: (companyId: string, filters: object, page: number) => [

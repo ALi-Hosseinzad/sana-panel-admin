@@ -39,6 +39,12 @@ export const ENDPOINTS = {
     /** درخواست‌های وام شرکت (لیست / ثبت) */
     LOAN_REQUESTS: (companyId: string) => `/companies/${companyId}/loan-requests`,
   },
+  MANAGER_APPROVALS: {
+    /** درخواست‌های در انتظار تأیید مدیر شرکت */
+    LIST: (companyId: string) => `/companies/${companyId}/manager-approvals`,
+    APPROVE: (companyId: string) => `/companies/${companyId}/manager-approvals/approve`,
+    REJECT: (companyId: string) => `/companies/${companyId}/manager-approvals/reject`,
+  },
   STAFF: {
     LIST: (companyId: string) => `/companies/${companyId}/staff`,
     DETAIL: (companyId: string, id: string) => `/companies/${companyId}/staff/${id}`,
