@@ -72,6 +72,10 @@ export const ENDPOINTS = {
     AVERAGES: '/reports/averages',
     REMOVED_COMPANIES: '/reports/removed-companies',
   },
+  USERS: {
+    LIST: '/users',
+    DETAIL: (id: string) => `/users/${id}`,
+  },
   STAFF: {
     LIST: (companyId: string) => `/companies/${companyId}/staff`,
     DETAIL: (companyId: string, id: string) => `/companies/${companyId}/staff/${id}`,

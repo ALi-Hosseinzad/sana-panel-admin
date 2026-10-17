@@ -1,7 +1,10 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router';
 
 import logo from '@/assets/images/logo-omid.png';
 import { env } from '@/config/env';
+
+import { Spinner } from '../../loading';
 
 /** لی‌اوت فرعی (صفحات قبل از لاگین) */
 export const AuthLayout = () => (
@@ -10,7 +13,9 @@ export const AuthLayout = () => (
       <img src={logo} alt="امید بوم" className="mx-auto mb-3.5 h-24 w-auto" />
       <div className="mb-6 text-[13px] text-ink-soft">{env.appTitle}</div>
       <div className="text-right">
-        <Outlet />
+        <Suspense fallback={<Spinner className="block py-10 text-center" />}>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   </div>

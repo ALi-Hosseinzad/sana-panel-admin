@@ -47,6 +47,8 @@ export const FormModal = <T,>({
         form.resetFields();
         onCancel?.(undefined as never);
       }
+    } catch {
+      // خطا قبلاً توسط هندلر HTTP یا onError همان درخواست نمایش داده شده؛ مودال باز می‌ماند
     } finally {
       setSubmitting(false);
     }

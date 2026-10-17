@@ -1,0 +1,104 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { useMemo } from 'react';
+import { toast } from 'sonner';
+
+import { Form, FormItem } from '@/component/form';
+import { PasswordInput, TextInput } from '@/component/input';
+import { FormModal } from '@/component/modal';
+import { QUERY_KEYS } from '@/constant/queryKeys';
+import { type ApiErrorBody } from '@/types/common';
+
+import { createUser, getUser, updateUser } from '../api';
+import { type User, type UserPayload } from '../types';
+
+interface UserFormModalProps {
+  open: boolean;
+  /** شناسه کاربر برای ویرایش؛ خالی = افزودن */
+  userId?: string | null;
+  onClose: () => void;
+}
+
+const toFormValues = ({ id: _id, ...user }: User): UserPayload => user;
+
+/** ۴۰۹ (نام کاربری تکراری) به‌جای توست، کنار همان فیلد نمایش داده می‌شود */
+const DUPLICATE_HANDLED = { onError: { 409: () => undefined } };
+
+export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => {
+  const [form] = Form.useForm<UserPayload>();
+  const queryClient = useQueryClient();
+  const isEdit = Boolean(userId);
+
+  const { data: detail, isFetching } = useQuery({
+    queryKey: QUERY_KEYS.USERS.DETAIL(userId ?? ''),
+    queryFn: () => getUser(userId ?? ''),
+    enabled: open && isEdit,
+  });
+
+  const { mutateAsync } = useMutation({
+    mutationFn: (values: UserPayload) =>
+      userId
+        ? updateUser(userId, values, DUPLICATE_HANDLED)
+        : createUser(values, DUPLICATE_HANDLED),
+    onSuccess: (saved) => {
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS.ALL });
+      toast.success(
+        isEdit ? `کاربر «${saved.fullName}» ویرایش شد.` : `کاربر «${saved.fullName}» ثبت شد.`,
+      );
+    },
+    onError: (error) => {
+      if (isAxiosError<ApiErrorBody>(error) && error.response?.status === 409) {
+        form.setFields([
+          { name: 'username', errors: error.response.data.errors?.username ?? ['تکراری است.'] },
+        ]);
+      }
+    },
+  });
+
+  const initialValues = useMemo(
+    () => (isEdit && detail ? toFormValues(detail) : undefined),
+    [isEdit, detail],
+  );
+
+  return (
+    <FormModal<UserPayload>
+      form={form}
+      title={isEdit ? 'ویرایش کاربر' : 'افزودن کاربر'}
+      okText={isEdit ? 'ذخیره تغییرات' : 'ثبت کاربر'}
+      open={open}
+      width={760}
+      columns={2}
+      loading={isEdit && isFetching}
+      initialValues={initialValues}
+      onCancel={onClose}
+      onSubmit={mutateAsync}
+    >
+      <FormItem name="username" label="نام کاربری" required>
+        <TextInput autoComplete="off" dir="ltr" />
+      </FormItem>
+      <FormItem
+        name="password"
+        label="رمز عبور"
+        required={!isEdit}
+        extra={isEdit ? 'برای تغییر نکردن رمز، این فیلد را خالی بگذارید.' : undefined}
+      >
+        <PasswordInput
+          autoComplete="new-password"
+          placeholder={isEdit ? 'بدون تغییر' : 'رمز عبور'}
+        />
+      </FormItem>
+      <FormItem name="fullName" label="نام و نام خانوادگی کاربر" required>
+        <TextInput />
+      </FormItem>
+      <FormItem name="userCode" label="کد کاربر" required>
+        <TextInput inputMode="numeric" placeholder="مثلاً ۳۹۹" />
+      </FormItem>
+      <FormItem name="branchName" label="نام شعبه" required>
+        <TextInput placeholder="مثلاً شعبه بازار تهران" />
+      </FormItem>
+      <FormItem name="branchCode" label="کد شعبه" required>
+        <TextInput inputMode="numeric" placeholder="مثلاً ۱۵۰۰۰۲" />
+      </FormItem>
+    </FormModal>
+  );
+};

@@ -2,6 +2,7 @@ import {
   MOCK_COMPANIES,
   MOCK_LOAN_REQUESTS,
   MOCK_LOOKUPS,
+  MOCK_MANAGED_USERS,
   MOCK_POST_APPROVAL_STAGES,
   MOCK_SCHEMES,
   MOCK_STAFF,
@@ -20,6 +21,7 @@ export const db = {
   postApprovalStages: structuredClone(MOCK_POST_APPROVAL_STAGES),
   companies: structuredClone(MOCK_COMPANIES),
   staff: structuredClone(MOCK_STAFF),
+  users: structuredClone(MOCK_MANAGED_USERS),
   loanRequests: structuredClone(MOCK_LOAN_REQUESTS),
   /** نام فایل‌های آپلودشده بر اساس شناسه */
   files: new Map<string, string>(),

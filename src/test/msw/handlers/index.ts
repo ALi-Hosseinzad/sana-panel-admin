@@ -9,6 +9,7 @@ import { lookupHandlers } from './lookups';
 import { managerApprovalHandlers } from './managerApprovals';
 import { reportHandlers } from './reports';
 import { staffHandlers } from './staff';
+import { userHandlers } from './users';
 
 export const handlers = [
   ...authHandlers,
@@ -22,4 +23,5 @@ export const handlers = [
   ...creditApprovalHandlers,
   ...dashboardHandlers,
   ...reportHandlers,
+  ...userHandlers,
 ];
