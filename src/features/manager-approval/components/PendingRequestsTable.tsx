@@ -1,5 +1,5 @@
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -9,11 +9,12 @@ import { StatusChip } from '@/component/status-chip';
 import { Table } from '@/component/table';
 import { LOAN_STATUS } from '@/constant/loanStatus';
 import { QUERY_KEYS } from '@/constant/queryKeys';
-import { formatJalali } from '@/utils/date';
+import { resolveFile } from '@/services/file';
+import { formatJalali, toPersianDigits } from '@/utils/date';
 import { formatRial } from '@/utils/number';
 
-import { getPendingRequests } from '../api';
-import { type DecisionType, type PendingRequest } from '../types';
+import { getPendingRequests, submitDecision } from '../api';
+import { type DecisionFormValues, type DecisionType, type PendingRequest } from '../types';
 
 import { DecisionModal, type DecisionTarget } from './DecisionModal';
 
@@ -24,9 +25,31 @@ export const PendingRequestsTable = ({ companyId }: { companyId: string }) => {
   const [selected, setSelected] = useState<PendingRequest[]>([]);
   const [target, setTarget] = useState<DecisionTarget | null>(null);
 
+  const queryClient = useQueryClient();
+
   const { data, isFetching } = useQuery({
     queryKey: QUERY_KEYS.MANAGER_APPROVALS.LIST(companyId, page),
     queryFn: () => getPendingRequests(companyId, { page, pageSize: PAGE_SIZE }),
+  });
+
+  const { mutateAsync: decide } = useMutation({
+    mutationFn: async ({ file, note }: DecisionFormValues) => {
+      const uploaded = await resolveFile(file);
+      return submitDecision(target?.type ?? 'approve', companyId, {
+        requestIds: target?.requests.map((item) => item.id) ?? [],
+        note,
+        fileId: uploaded?.id ?? null,
+      });
+    },
+    onSuccess: ({ updated }) => {
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANAGER_APPROVALS.ALL });
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CREDIT.ALL });
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CREDIT_APPROVALS.ALL });
+      setSelected([]);
+      const result =
+        target?.type === 'reject' ? 'رد شد' : 'تأیید و به مرحله تأیید اعتبارات ارسال شد';
+      toast.success(`${toPersianDigits(updated)} درخواست ${result}.`);
+    },
   });
 
   const openBulk = (type: DecisionType) => {
@@ -110,12 +133,7 @@ export const PendingRequestsTable = ({ companyId }: { companyId: string }) => {
           رد گروهی
         </Button>
       </div>
-      <DecisionModal
-        companyId={companyId}
-        target={target}
-        onClose={() => setTarget(null)}
-        onDone={() => setSelected([])}
-      />
+      <DecisionModal target={target} onSubmit={decide} onClose={() => setTarget(null)} />
     </>
   );
 };

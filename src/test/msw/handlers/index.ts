@@ -2,6 +2,7 @@ import { authHandlers } from './auth';
 import { baseInfoHandlers } from './baseInfo';
 import { companyHandlers } from './companies';
 import { creditHandlers } from './credit';
+import { creditApprovalHandlers } from './creditApprovals';
 import { fileHandlers } from './files';
 import { lookupHandlers } from './lookups';
 import { managerApprovalHandlers } from './managerApprovals';
@@ -16,4 +17,5 @@ export const handlers = [
   ...staffHandlers,
   ...creditHandlers,
   ...managerApprovalHandlers,
+  ...creditApprovalHandlers,
 ];

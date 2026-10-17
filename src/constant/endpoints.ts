@@ -21,6 +21,8 @@ export const ENDPOINTS = {
     AVG_DOC_TYPES: '/lookups/avg-doc-types',
     PLANS: '/lookups/plans',
     COMPANIES: '/lookups/companies',
+    /** مراحل پس از تأیید اعتبارات */
+    POST_APPROVAL_STAGES: '/lookups/post-approval-stages',
     /** آدرس یک آیتم از لیست (برای ویرایش/حذف) */
     ITEM: (listPath: string, id: string) => `${listPath}/${id}`,
   },
@@ -44,6 +46,13 @@ export const ENDPOINTS = {
     LIST: (companyId: string) => `/companies/${companyId}/manager-approvals`,
     APPROVE: (companyId: string) => `/companies/${companyId}/manager-approvals/approve`,
     REJECT: (companyId: string) => `/companies/${companyId}/manager-approvals/reject`,
+  },
+  CREDIT_APPROVALS: {
+    /** درخواست‌های مرحله تأیید اعتبارات (همه شرکت‌ها یا یک شرکت) */
+    LIST: '/credit-approvals',
+    APPROVE: '/credit-approvals/approve',
+    REJECT: '/credit-approvals/reject',
+    POST_STAGE: (id: string) => `/credit-approvals/${id}/post-stage`,
   },
   STAFF: {
     LIST: (companyId: string) => `/companies/${companyId}/staff`,

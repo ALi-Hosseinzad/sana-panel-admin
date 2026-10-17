@@ -1,61 +1,37 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-
 import { FormItem } from '@/component/form';
-import { FileInput, TextAreaInput } from '@/component/input';
+import { FileInput, SelectInput, TextAreaInput } from '@/component/input';
 import { FormModal } from '@/component/modal';
-import { QUERY_KEYS } from '@/constant/queryKeys';
-import { resolveFile } from '@/services/file';
+import { type LookupItem } from '@/types/common';
 import { toPersianDigits } from '@/utils/date';
 import { formatRial } from '@/utils/number';
 import { rialToTomanWords } from '@/utils/numberToWords';
 
-import { submitDecision } from '../api';
-import { type DecisionFormValues, type DecisionType, type PendingRequest } from '../types';
+import { type DecisionFormValues, type DecisionRequestInfo, type DecisionType } from '../types';
 
 export interface DecisionTarget {
   type: DecisionType;
-  requests: PendingRequest[];
+  requests: DecisionRequestInfo[];
 }
 
 interface DecisionModalProps {
-  companyId: string;
   target: DecisionTarget | null;
+  /** اگر داده شود، در حالت رد انتخاب دلیل اجباری است */
+  rejectReasons?: LookupItem[];
+  onSubmit: (values: DecisionFormValues) => Promise<unknown>;
   onClose: () => void;
-  onDone: () => void;
 }
 
-const describe = (requests: PendingRequest[]) => {
+const describe = (requests: DecisionRequestInfo[]) => {
   const [first] = requests;
   if (requests.length > 1 || !first)
     return `${toPersianDigits(requests.length)} درخواست انتخاب‌شده`;
   return `${first.staffName} — ${first.planTitle} — ${formatRial(first.amount)} (${rialToTomanWords(first.amount)})`;
 };
 
-/** ثبت تصمیم مدیر شرکت (تأیید / رد) برای یک یا چند درخواست */
-export const DecisionModal = ({ companyId, target, onClose, onDone }: DecisionModalProps) => {
-  const queryClient = useQueryClient();
+/** مودال ثبت تصمیم (تأیید / رد) برای یک یا چند درخواست */
+export const DecisionModal = ({ target, rejectReasons, onSubmit, onClose }: DecisionModalProps) => {
   const isReject = target?.type === 'reject';
   const isGroup = (target?.requests.length ?? 0) > 1;
-
-  const { mutateAsync } = useMutation({
-    mutationFn: async ({ file, note }: DecisionFormValues) => {
-      const uploaded = await resolveFile(file);
-      return submitDecision(target?.type ?? 'approve', companyId, {
-        requestIds: target?.requests.map((item) => item.id) ?? [],
-        note,
-        fileId: uploaded?.id ?? null,
-      });
-    },
-    onSuccess: ({ updated }) => {
-      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANAGER_APPROVALS.ALL });
-      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CREDIT.ALL });
-      onDone();
-      toast.success(
-        `${toPersianDigits(updated)} درخواست ${isReject ? 'رد شد' : 'تأیید و به مرحله تأیید اعتبارات ارسال شد'}.`,
-      );
-    },
-  });
 
   return (
     <FormModal<DecisionFormValues>
@@ -64,11 +40,23 @@ export const DecisionModal = ({ companyId, target, onClose, onDone }: DecisionMo
       okButtonProps={{ danger: isReject }}
       open={Boolean(target)}
       onCancel={onClose}
-      onSubmit={mutateAsync}
+      onSubmit={onSubmit}
     >
       <p className="mt-0 mb-4 text-[12.5px] text-ink-soft">
         {target ? describe(target.requests) : ''}
       </p>
+      {isReject && rejectReasons && (
+        <FormItem
+          name="reasonId"
+          label="دلیل رد (اجباری)"
+          required
+          requiredMessage="انتخاب دلیل رد اجباری است."
+        >
+          <SelectInput
+            options={rejectReasons.map((reason) => ({ value: reason.id, label: reason.title }))}
+          />
+        </FormItem>
+      )}
       <FormItem name="note" label="توضیحات (اختیاری)">
         <TextAreaInput maxLength={500} />
       </FormItem>

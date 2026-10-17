@@ -1,2 +1,2 @@
 export * from './api';
-export type { PlanOption, PlanOptionsResponse, PlanType } from './types';
+export type { PlanOption, PlanOptionsResponse, PlanType, PostApprovalStage } from './types';

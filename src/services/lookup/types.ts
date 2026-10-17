@@ -18,3 +18,11 @@ export interface PlanOptionsResponse {
   maxPlans: number;
   items: PlanOption[];
 }
+
+/** مرحله پس از تأیید اعتبارات */
+export interface PostApprovalStage {
+  id: string;
+  title: string;
+  /** انتخاب این مرحله نیاز به علت (از دلایل عدم اعطای تسهیلات غیرحضوری) دارد */
+  requiresReason: boolean;
+}

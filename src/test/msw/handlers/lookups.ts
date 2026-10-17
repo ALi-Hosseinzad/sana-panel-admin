@@ -46,9 +46,17 @@ export const lookupHandlers = [
     return HttpResponse.json({ maxPlans: db.settings.maxPlans, items: buildPlanOptions() });
   }),
 
-  http.get(api(ENDPOINTS.LOOKUPS.COMPANIES), async () => {
+  http.get(api(ENDPOINTS.LOOKUPS.COMPANIES), async ({ request }) => {
     await delay(150);
-    const active = db.companies.filter((item) => !item.deleted && item.status === 'active');
-    return HttpResponse.json(active.map((item) => ({ id: item.id, title: item.name })));
+    const includeInactive = new URL(request.url).searchParams.get('includeInactive') === 'true';
+    const list = db.companies.filter(
+      (item) => !item.deleted && (includeInactive || item.status === 'active'),
+    );
+    return HttpResponse.json(list.map((item) => ({ id: item.id, title: item.name })));
+  }),
+
+  http.get(api(ENDPOINTS.LOOKUPS.POST_APPROVAL_STAGES), async () => {
+    await delay(150);
+    return HttpResponse.json(db.postApprovalStages);
   }),
 ];

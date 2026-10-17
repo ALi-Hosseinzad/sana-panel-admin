@@ -14,6 +14,9 @@ export interface MockLoanRequest {
   status: LoanStatus;
   note?: string;
   file?: { id: string; name: string };
+  rejectReason?: string;
+  /** مرحله پس از تأیید (فقط برای درخواست‌های تأییدشده) */
+  postStageId?: string;
 }
 
 export const MOCK_LOAN_REQUESTS: MockLoanRequest[] = [
@@ -55,5 +58,19 @@ export const MOCK_LOAN_REQUESTS: MockLoanRequest[] = [
     createdAt: '2025-08-03',
     decidedAt: null,
     status: 'pending_manager',
+  },
+  {
+    id: 'lr-4',
+    companyId: 'c-2',
+    staffId: 's-4',
+    staffName: 'مریم کریمی',
+    planId: 'qarz-1',
+    planTitle: 'قرض‌الحسنه - ۴٪ - ۲۴ ماه',
+    amount: 40_000_000,
+    paymentOrder: 1,
+    createdAt: '2025-08-21',
+    decidedAt: '2025-08-23',
+    status: 'pending_credit',
+    note: 'تأیید مدیر شرکت',
   },
 ];

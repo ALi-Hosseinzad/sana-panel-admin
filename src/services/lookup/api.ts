@@ -3,7 +3,7 @@ import { type LookupItem } from '@/types/common';
 
 import { http } from '../http';
 
-import { type PlanOptionsResponse } from './types';
+import { type PlanOptionsResponse, type PostApprovalStage } from './types';
 
 export interface LookupBody {
   title: string;
@@ -35,3 +35,10 @@ export const getPlanOptions = () => http.get<PlanOptionsResponse>(ENDPOINTS.LOOK
 
 /** شرکت‌های فعال (برای سلکت انتخاب شرکت) */
 export const getCompanyOptions = () => http.get<LookupItem[]>(ENDPOINTS.LOOKUPS.COMPANIES);
+
+/** همه شرکت‌ها، شامل قراردادهای لغوشده (برای فیلتر گزارش‌ها و تأیید اعتبارات) */
+export const getAllCompanyOptions = () =>
+  http.get<LookupItem[]>(ENDPOINTS.LOOKUPS.COMPANIES, { params: { includeInactive: true } });
+
+export const getPostApprovalStages = () =>
+  http.get<PostApprovalStage[]>(ENDPOINTS.LOOKUPS.POST_APPROVAL_STAGES);

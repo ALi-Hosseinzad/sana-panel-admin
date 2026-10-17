@@ -119,5 +119,8 @@ export const MENU: MenuGroup[] = [
   },
 ];
 
+/** آیتم منوی صفحه فعلی (دقیق یا زیرمسیر آن؛ /credit-approve با /credit اشتباه گرفته نمی‌شود) */
 export const findMenuItemByPath = (pathname: string) =>
-  MENU.flatMap((group) => group.items).find((item) => pathname.startsWith(item.path));
+  MENU.flatMap((group) => group.items).find(
+    (item) => pathname === item.path || pathname.startsWith(`${item.path}/`),
+  );

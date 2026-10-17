@@ -13,6 +13,8 @@ export const QUERY_KEYS = {
     AVG_DOC_TYPES: ['lookups', 'avg-doc-types'],
     PLANS: ['lookups', 'plans'],
     COMPANIES: ['lookups', 'companies'],
+    ALL_COMPANIES: ['lookups', 'companies', 'all'],
+    POST_APPROVAL_STAGES: ['lookups', 'post-approval-stages'],
   },
   COMPANIES: {
     ALL: ['companies'],
@@ -35,6 +37,14 @@ export const QUERY_KEYS = {
   MANAGER_APPROVALS: {
     ALL: ['manager-approvals'],
     LIST: (companyId: string, page: number) => ['manager-approvals', companyId, page],
+  },
+  CREDIT_APPROVALS: {
+    ALL: ['credit-approvals'],
+    LIST: (companyId: string | undefined, page: number) => [
+      'credit-approvals',
+      companyId ?? 'all',
+      page,
+    ],
   },
   STAFF: {
     ALL: ['staff'],
