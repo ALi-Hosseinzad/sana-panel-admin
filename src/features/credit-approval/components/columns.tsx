@@ -44,6 +44,11 @@ export const buildColumns = (
     ),
   },
   {
+    title: 'مرحله پس از تأیید',
+    dataIndex: 'postStageTitle',
+    render: (value?: string) => value ?? '—',
+  },
+  {
     title: 'عملیات',
     key: 'actions',
     render: (_value, row) =>

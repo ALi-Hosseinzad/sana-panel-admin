@@ -24,6 +24,7 @@ const toItem = (item: MockLoanRequest) => ({
   note: item.note,
   file: item.file,
   status: item.status,
+  postStageTitle: db.postApprovalStages.find((stage) => stage.id === item.postStageId)?.title,
 });
 
 /** اعتبارسنجی مرحله پس از تأیید؛ در صورت خطا متن خطا برمی‌گردد */

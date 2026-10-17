@@ -12,6 +12,8 @@ export interface CreditApprovalItem {
   note?: string;
   file?: { id: string; name: string };
   status: LoanStatus;
+  /** عنوان مرحله پس از تأیید (فقط برای درخواست‌های تأییدشده) */
+  postStageTitle?: string;
 }
 
 export interface CreditApprovalFilters {

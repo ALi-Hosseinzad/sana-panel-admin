@@ -32,6 +32,7 @@ export const MOCK_LOAN_REQUESTS: MockLoanRequest[] = [
     createdAt: '2025-08-03',
     decidedAt: '2025-08-10',
     status: 'approved',
+    postStageId: 'ps-1',
   },
   {
     id: 'lr-2',
