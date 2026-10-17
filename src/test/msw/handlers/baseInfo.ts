@@ -1,68 +1,63 @@
 import { delay, http, HttpResponse } from 'msw';
 
 import { ENDPOINTS } from '@/constant/endpoints';
-import { type Scheme, type SchemePayload } from '@/features/base-info/types';
+import { type GeneralSettings, type UsableMatrix } from '@/features/base-info/types';
 
-import { db, nextId, resizeUsable } from '../db';
+import { db, resizeUsable } from '../db';
 import { api } from '../utils';
 
-const toListItem = ({
-  id,
-  name,
-  qarzRate,
-  murabahaRates,
-  terms,
-  contractYears,
-  maxPlans,
-}: Scheme) => ({
-  id,
-  name,
-  qarzRate,
-  murabahaRates,
-  terms,
-  contractYears,
-  maxPlans,
+const usableMatrix = (): UsableMatrix => ({
+  qarzRate: db.settings.qarzRate,
+  murabahaRates: db.murabahaRates,
+  terms: db.terms,
+  values: db.usable,
 });
 
-const notFound = () => HttpResponse.json({ message: 'طرح یافت نشد.' }, { status: 404 });
-
 export const baseInfoHandlers = [
-  http.get(api(ENDPOINTS.BASE_INFO.SCHEMES), async () => {
+  http.get(api(ENDPOINTS.BASE_INFO.GENERAL), async () => {
     await delay(250);
-    return HttpResponse.json(db.schemes.map(toListItem));
+    return HttpResponse.json(db.settings);
   }),
 
-  http.get(api(ENDPOINTS.BASE_INFO.SCHEME(':id')), async ({ params }) => {
-    await delay(250);
-    const scheme = db.schemes.find((item) => item.id === params.id);
-    return scheme ? HttpResponse.json(scheme) : notFound();
-  }),
-
-  http.post(api(ENDPOINTS.BASE_INFO.SCHEMES), async ({ request }) => {
+  http.put(api(ENDPOINTS.BASE_INFO.GENERAL), async ({ request }) => {
     await delay(300);
-    const scheme = {
-      id: nextId('scheme'),
-      ...resizeUsable((await request.json()) as SchemePayload),
-    };
-    db.schemes.push(scheme);
-    return HttpResponse.json(scheme, { status: 201 });
+    db.settings = (await request.json()) as GeneralSettings;
+    return HttpResponse.json(db.settings);
   }),
 
-  http.put(api(ENDPOINTS.BASE_INFO.SCHEME(':id')), async ({ params, request }) => {
+  http.get(api(ENDPOINTS.BASE_INFO.MURABAHA_RATES), async () => {
+    await delay(200);
+    return HttpResponse.json(db.murabahaRates);
+  }),
+
+  http.put(api(ENDPOINTS.BASE_INFO.MURABAHA_RATES), async ({ request }) => {
     await delay(300);
-    const index = db.schemes.findIndex((item) => item.id === params.id);
-    if (index < 0) return notFound();
-    const scheme = {
-      id: params.id as string,
-      ...resizeUsable((await request.json()) as SchemePayload),
-    };
-    db.schemes[index] = scheme;
-    return HttpResponse.json(scheme);
+    db.murabahaRates = (await request.json()) as number[];
+    resizeUsable();
+    return HttpResponse.json(db.murabahaRates);
   }),
 
-  http.delete(api(ENDPOINTS.BASE_INFO.SCHEME(':id')), async ({ params }) => {
+  http.get(api(ENDPOINTS.BASE_INFO.TERMS), async () => {
+    await delay(200);
+    return HttpResponse.json(db.terms);
+  }),
+
+  http.put(api(ENDPOINTS.BASE_INFO.TERMS), async ({ request }) => {
+    await delay(300);
+    db.terms = (await request.json()) as number[];
+    resizeUsable();
+    return HttpResponse.json(db.terms);
+  }),
+
+  http.get(api(ENDPOINTS.BASE_INFO.USABLE_MATRIX), async () => {
     await delay(250);
-    db.schemes = db.schemes.filter((item) => item.id !== params.id);
-    return new HttpResponse(null, { status: 204 });
+    return HttpResponse.json(usableMatrix());
+  }),
+
+  http.put(api(ENDPOINTS.BASE_INFO.USABLE_MATRIX), async ({ request }) => {
+    await delay(300);
+    db.usable = ((await request.json()) as { values: number[][] }).values;
+    resizeUsable();
+    return HttpResponse.json(usableMatrix());
   }),
 ];

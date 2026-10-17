@@ -6,9 +6,10 @@ export const ENDPOINTS = {
     PROFILE: '/auth/profile',
   },
   BASE_INFO: {
-    /** طرح‌ها (لیست / ایجاد) */
-    SCHEMES: '/base-info/schemes',
-    SCHEME: (id: string) => `/base-info/schemes/${id}`,
+    GENERAL: '/base-info/general',
+    MURABAHA_RATES: '/base-info/murabaha-rates',
+    TERMS: '/base-info/terms',
+    USABLE_MATRIX: '/base-info/usable-matrix',
   },
   FILES: {
     UPLOAD: '/files',

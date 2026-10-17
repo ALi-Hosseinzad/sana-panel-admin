@@ -11,16 +11,7 @@ import {
   type SaveAveragesPayload,
 } from '@/features/companies/types';
 
-import {
-  buildPlanOptions,
-  db,
-  fileOf,
-  findUserByToken,
-  lookupTitle,
-  nextId,
-  primaryScheme,
-  today,
-} from '../db';
+import { buildPlanOptions, db, fileOf, findUserByToken, lookupTitle, nextId, today } from '../db';
 import { api } from '../utils';
 
 const notFound = () => HttpResponse.json({ message: 'شرکت یافت نشد.' }, { status: 404 });
@@ -60,7 +51,7 @@ const buildAverages = (company: MockCompany): MonthlyAverage[] => {
     ? plans.reduce((sum, plan) => sum + plan.usable, 0) / plans.length
     : 0;
   const multiplier =
-    primaryScheme().sepahEnabled && company.sepahSalary ? primaryScheme().sepahMultiplier : 1;
+    db.settings.sepahEnabled && company.sepahSalary ? db.settings.sepahMultiplier : 1;
 
   let cumulative = 0;
   return company.averages.map((average, index) => {

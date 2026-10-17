@@ -1,3 +1,4 @@
+export { GeneralSettingsCard } from './GeneralSettingsCard';
 export { LookupListCard } from './LookupListCard';
-export { SchemeForm } from './SchemeForm';
-export { SchemeTable } from './SchemeTable';
+export { NumberListCard } from './NumberListCard';
+export { UsableMatrixCard } from './UsableMatrixCard';

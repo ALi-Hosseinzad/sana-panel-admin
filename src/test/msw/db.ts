@@ -1,14 +1,16 @@
 import {
   MOCK_COMPANIES,
+  MOCK_GENERAL_SETTINGS,
   MOCK_LOAN_REQUESTS,
   MOCK_LOOKUPS,
   MOCK_MANAGED_USERS,
+  MOCK_MURABAHA_RATES,
   MOCK_POST_APPROVAL_STAGES,
-  MOCK_SCHEMES,
   MOCK_STAFF,
+  MOCK_TERMS,
+  MOCK_USABLE_VALUES,
   MOCK_USERS,
 } from '@/constant/mock';
-import type { Scheme, SchemePayload } from '@/features/base-info/types';
 import type { PlanOption } from '@/services/lookup/types';
 
 /**
@@ -16,7 +18,10 @@ import type { PlanOption } from '@/services/lookup/types';
  * با رفرش صفحه به مقادیر اولیه constant/mock برمی‌گردد.
  */
 export const db = {
-  schemes: structuredClone(MOCK_SCHEMES),
+  settings: structuredClone(MOCK_GENERAL_SETTINGS),
+  murabahaRates: [...MOCK_MURABAHA_RATES],
+  terms: [...MOCK_TERMS],
+  usable: structuredClone(MOCK_USABLE_VALUES),
   lookups: structuredClone(MOCK_LOOKUPS),
   postApprovalStages: structuredClone(MOCK_POST_APPROVAL_STAGES),
   companies: structuredClone(MOCK_COMPANIES),
@@ -47,44 +52,22 @@ export const findUserByToken = (authorization: string | null) => {
   return MOCK_USERS.find((user) => user.token === token);
 };
 
-/** طرح بدون اطلاعات (وقتی همه طرح‌ها حذف شده‌اند) */
-const EMPTY_SCHEME: Scheme = {
-  id: '',
-  name: '',
-  qarzRate: 0,
-  sepahEnabled: false,
-  sepahMultiplier: 1,
-  contractYears: 1,
-  graceMonths: 0,
-  maxPlans: 0,
-  staffDelayMonths: 0,
-  murabahaRates: [],
-  terms: [],
-  usable: [],
-};
-
-/** محاسبات شرکت‌ها و وام‌ها فعلاً از اولین طرح خوانده می‌شود */
-export const primaryScheme = () => db.schemes[0] ?? EMPTY_SCHEME;
-
 /** اندازه جدول درصد قابل استفاده را با تعداد مدت‌ها و نرخ‌ها هماهنگ می‌کند */
-export const resizeUsable = (scheme: SchemePayload): SchemePayload => ({
-  ...scheme,
-  usable: scheme.terms.map((_term, row) =>
-    Array.from(
-      { length: scheme.murabahaRates.length + 1 },
-      (_value, column) => scheme.usable[row]?.[column] ?? 0,
-    ),
-  ),
-});
+export const resizeUsable = () => {
+  const columns = db.murabahaRates.length + 1;
+  db.usable = db.terms.map((_term, row) =>
+    Array.from({ length: columns }, (_value, column) => db.usable[row]?.[column] ?? 0),
+  );
+};
 
 /** طرح‌های قابل انتخاب از روی اطلاعات پایه ساخته می‌شوند (همان کاری که بک‌اند انجام می‌دهد) */
 export const buildPlanOptions = (): PlanOption[] => {
-  const { terms, murabahaRates, usable, qarzRate } = primaryScheme();
+  const { terms, murabahaRates, usable } = db;
   const qarz = terms.map((term, termIndex) => ({
     id: `qarz-${termIndex}`,
     type: 'qarz' as const,
     typeTitle: 'قرض‌الحسنه',
-    rate: qarzRate,
+    rate: db.settings.qarzRate,
     term,
     usable: usable[termIndex]?.[0] ?? 0,
   }));
