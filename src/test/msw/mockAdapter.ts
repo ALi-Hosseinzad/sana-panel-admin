@@ -21,8 +21,11 @@ const realAdapter = axios.getAdapter(['xhr', 'fetch']);
 const toRequest = (config: InternalAxiosRequestConfig) => {
   const method = (config.method ?? 'get').toUpperCase();
   const headers = new Headers();
+  const isFormData = config.data instanceof FormData;
   const source = AxiosHeaders.from(config.headers).toJSON() as Record<string, unknown>;
   Object.entries(source).forEach(([key, value]) => {
+    // برای FormData خود Request هدر Content-Type (همراه boundary) را می‌سازد
+    if (isFormData && key.toLowerCase() === 'content-type') return;
     if (value === undefined || value === null) return;
     headers.set(key, String(value as string));
   });

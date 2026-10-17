@@ -43,7 +43,7 @@ export const Table = <T extends object>({
       key: '__row_number',
       width: 64,
       align: 'center',
-      fixed: 'right',
+      fixed: 'start',
       render: (_value, _record, index) => toPersianDigits(page.offset + index + 1),
     };
     return [rowNumberColumn, ...columns];

@@ -65,10 +65,15 @@ export const Typography = ({
     lineHeight: scale.lineHeight,
     color: COLOR_VAR[color],
     textAlign: align,
-    margin: 0,
     ...style,
   };
-  const shared = { className, style: mergedStyle, ellipsis, copyable };
+  // m-0 پیش‌فرض است و با کلاس‌های margin خود دولوپر (مثل mt-6) بازنویسی می‌شود
+  const shared = {
+    className: ['m-0', className].filter(Boolean).join(' '),
+    style: mergedStyle,
+    ellipsis,
+    copyable,
+  };
 
   if (as === 'title') {
     return (

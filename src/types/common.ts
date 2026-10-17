@@ -19,3 +19,20 @@ export interface UserProfile {
   branch?: string;
   roles: string[];
 }
+
+/** آیتم ساده برای لیست‌های کشویی */
+export interface LookupItem {
+  id: string;
+  title: string;
+}
+
+/** فایل آپلودشده در سرور */
+export interface UploadedFile {
+  id: string;
+  name: string;
+}
+
+export interface PageParams {
+  page: number;
+  pageSize: number;
+}

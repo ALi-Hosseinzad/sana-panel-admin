@@ -6,6 +6,7 @@ export {
   type DateInputProps,
   type DateInputValue,
 } from './DateInput';
+export { FileInput, type FileInputProps, type FileInputValue } from './FileInput';
 export { NumberInput, type NumberInputProps } from './NumberInput';
 export { PasswordInput, type PasswordInputProps } from './PasswordInput';
 export { SelectInput, type SelectInputProps } from './SelectInput';

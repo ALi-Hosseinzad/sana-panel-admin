@@ -84,6 +84,16 @@ http.get('/ping', { silent: true }); // بدون هیچ توست/ریدایرک�
 
 رفتارهای پیش‌فرض در `services/http/errorHandler.ts` هستند (مثلاً ۴۰۱ = خروج از حساب).
 
+### سرویس‌ها و ماک
+
+هر داده‌ای که در سلکت، جدول یا اکشن استفاده می‌شود یک سرویس و endpoint دارد؛ هیچ لیستی داخل کامپوننت تعریف نمی‌شود.
+
+- آدرس‌ها: `src/constant/endpoints.ts` · کلیدهای کش: `src/constant/queryKeys.ts`
+- سرویس‌های هر بخش: `src/features/<feature>/api.ts`
+- سرویس‌های مشترک: `src/services/lookup` (لیست‌های کشویی) و `src/services/file` (آپلود فایل)
+- دیتای اولیه ماک: `src/constant/mock` · پاسخ‌دهنده‌های ماک (شبیه بک‌اند): `src/test/msw/handlers`
+- فایل `docs/design/panel-negin-misagh.html` راهنمای صفحات و سرویس‌های مورد نیاز است.
+
 ### احراز هویت
 
 فقط `useAuthStore` با کوکی کار می‌کند: موقع لاگین `login(token)` و موقع خروج `logout()`.
