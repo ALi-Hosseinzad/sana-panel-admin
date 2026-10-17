@@ -2,6 +2,8 @@ export const ROUTES = {
   LOGIN: '/login',
   HOME: '/',
   BASE_INFO: '/base-info',
+  BASE_INFO_NEW: '/base-info/new',
+  BASE_INFO_EDIT: '/base-info/:id/edit',
   COMPANIES: '/companies',
   STAFF: '/staff',
   CREDIT: '/credit',

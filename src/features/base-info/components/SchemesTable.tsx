@@ -3,18 +3,18 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { App } from 'antd';
 import { type ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
+import { generatePath, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { Button } from '@/component/button';
 import { PanelCard } from '@/component/card';
 import { Table } from '@/component/table';
 import { QUERY_KEYS } from '@/constant/queryKeys';
+import { ROUTES } from '@/constant/routes';
 import { toPersianDigits } from '@/utils/date';
 
 import { deleteScheme, getSchemes } from '../api';
 import { type SchemeListItem } from '../types';
-
-import { SchemeFormModal } from './SchemeFormModal';
 
 const PAGE_SIZE = 10;
 
@@ -23,8 +23,7 @@ const joinNumbers = (list: number[], suffix = '') =>
 
 export const SchemesTable = () => {
   const [page, setPage] = useState(1);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { modal } = App.useApp();
 
@@ -41,11 +40,6 @@ export const SchemesTable = () => {
       toast.success('طرح حذف شد.');
     },
   });
-
-  const openModal = (id: string | null) => {
-    setEditingId(id);
-    setModalOpen(true);
-  };
 
   const confirmDelete = (scheme: SchemeListItem) =>
     modal.confirm({
@@ -89,7 +83,7 @@ export const SchemesTable = () => {
             variant="outline"
             size="small"
             icon={<EditOutlined />}
-            onClick={() => openModal(row.id)}
+            onClick={() => navigate(generatePath(ROUTES.BASE_INFO_EDIT, { id: row.id }))}
           >
             ویرایش
           </Button>
@@ -109,13 +103,13 @@ export const SchemesTable = () => {
   return (
     <PanelCard
       title="طرح‌ها"
-      subtitle="اطلاعات پایه هر طرح (نرخ‌ها، مدت‌ها، درصد قابل استفاده، دلایل و انواع مستند) در فرم افزودن و ویرایش طرح تعریف می‌شود."
+      subtitle="اطلاعات پایه هر طرح (نرخ‌ها، مدت‌ها، درصد قابل استفاده، دلایل و انواع مستند) در صفحه افزودن و ویرایش طرح تعریف می‌شود."
       extra={
         <Button
           variant="outline"
           size="small"
           icon={<PlusOutlined />}
-          onClick={() => openModal(null)}
+          onClick={() => navigate(ROUTES.BASE_INFO_NEW)}
         >
           افزودن طرح
         </Button>
@@ -134,7 +128,6 @@ export const SchemesTable = () => {
           onChange: setPage,
         }}
       />
-      <SchemeFormModal open={modalOpen} schemeId={editingId} onClose={() => setModalOpen(false)} />
     </PanelCard>
   );
 };

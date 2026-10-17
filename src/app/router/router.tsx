@@ -14,6 +14,10 @@ const BaseInfoPage = lazyPage(
   () => import('@/features/base-info/pages/BaseInfoPage'),
   'BaseInfoPage',
 );
+const SchemeFormPage = lazyPage(
+  () => import('@/features/base-info/pages/SchemeFormPage'),
+  'SchemeFormPage',
+);
 const CompaniesPage = lazyPage(
   () => import('@/features/companies/pages/CompaniesPage'),
   'CompaniesPage',
@@ -56,6 +60,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: ROUTES.BASE_INFO, element: <BaseInfoPage /> },
+      { path: ROUTES.BASE_INFO_NEW, element: <SchemeFormPage /> },
+      { path: ROUTES.BASE_INFO_EDIT, element: <SchemeFormPage /> },
       { path: ROUTES.COMPANIES, element: <CompaniesPage /> },
       { path: ROUTES.STAFF, element: <StaffPage /> },
       { path: ROUTES.CREDIT, element: <CreditPage /> },
