@@ -14,12 +14,9 @@ applyPaletteToDocument(useThemeStore.getState().mode);
 
 const enableMocking = async () => {
   if (!env.enableMock) return;
-  try {
-    const { worker } = await import('./test/msw/browser');
-    await worker.start({ onUnhandledFrame: 'bypass' });
-  } catch (error) {
-    console.error('[MSW] راه‌اندازی ماک انجام نشد؛ درخواست‌ها به سرور واقعی ارسال می‌شوند.', error);
-  }
+  // ماک مستقیماً روی axios وصل می‌شود (بدون Service Worker) تا روی هر سروری بعد از دیپلوی هم کار کند
+  const { enableMockAdapter } = await import('./test/msw/mockAdapter');
+  enableMockAdapter();
 };
 
 void enableMocking().then(() => {

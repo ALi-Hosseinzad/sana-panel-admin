@@ -2,6 +2,5 @@ dist
 coverage
 node_modules
 package-lock.json
-public/mockServiceWorker.js
 playwright-report
 test-results

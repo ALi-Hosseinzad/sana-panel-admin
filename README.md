@@ -16,7 +16,7 @@ npm run build:stage  # بیلد staging
 > تنظیمات https و گواهی در `vite.config.ts`، `playwright.config.ts` و `src/config/env.ts` کامنت شده‌اند
 > و هنگام دیپلوی واقعی دوباره بررسی و فعال می‌شوند.
 
-در محیط development دیتای ماک (MSW) فعال است. کاربر نمونه: `admin / admin` یا `branch / branch`.
+فعلاً در **همه محیط‌ها** (development، staging و production) دیتا از ماک خوانده می‌شود (`VITE_ENABLE_MOCK=true`). ماک مستقیماً روی axios وصل است و به Service Worker یا https نیاز ندارد، پس بعد از دیپلوی هم کار می‌کند. هنگام اتصال به API واقعی کافی است این متغیر در `.env.staging` و `.env.production` برابر `false` شود. کاربر نمونه: `admin / admin` یا `branch / branch`.
 
 | فرمان                       | کار                                                    |
 | --------------------------- | ------------------------------------------------------ |

@@ -19,7 +19,9 @@ export const useAuthStore = create<AuthState>()((set) => ({
   token: Cookies.get(TOKEN_COOKIE) ?? null,
   login: (token, options) => {
     Cookies.set(TOKEN_COOKIE, token, {
-      secure: true,
+      // HTTPS فعلاً غیرفعال است؛ هنگام دیپلوی واقعی روی https دوباره `secure: true` شود
+      // secure: true,
+      secure: window.location.protocol === 'https:',
       sameSite: 'strict',
       expires: options?.expiresInDays,
     });
