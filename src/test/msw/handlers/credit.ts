@@ -23,12 +23,12 @@ const notFound = () => HttpResponse.json({ message: 'شرکت یافت نشد.' 
 
 const findCompany = (id: unknown) => db.companies.find((item) => item.id === id && !item.deleted);
 
-const monthKey = (date: string) => {
+export const monthKey = (date: string) => {
   const { year, month } = dayjs(date).jalali();
   return `${year}/${month}`;
 };
 
-const activeRequests = (companyId: string) =>
+export const activeRequests = (companyId: string) =>
   db.loanRequests.filter(
     (item) =>
       item.companyId === companyId &&
@@ -82,7 +82,7 @@ const buildEligibility = (company: MockCompany, date: string): CreditEligibility
   return { canAllocate: eligible && transferDay, messages };
 };
 
-const buildPlanCredits = (company: MockCompany, date: string): PlanCredit[] => {
+export const buildPlanCredits = (company: MockCompany, date: string): PlanCredit[] => {
   const plans = companyPlans(company);
   const sharePercent = plans.length ? 100 / plans.length : 0;
   const multiplier =

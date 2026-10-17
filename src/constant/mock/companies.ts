@@ -8,6 +8,7 @@ export interface MockCompany extends CompanyDetail {
   registeredBy: string;
   status: ContractStatus;
   deleted: boolean;
+  deletedAt?: string;
   cancelDate?: string;
   cancelReason?: string;
   /** میانگین ۱۲ ماه سال جاری قرارداد (ریال) */

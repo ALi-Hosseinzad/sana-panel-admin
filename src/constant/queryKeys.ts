@@ -46,6 +46,23 @@ export const QUERY_KEYS = {
       page,
     ],
   },
+  DASHBOARD: {
+    ALL: ['dashboard'],
+    SUMMARY: ['dashboard', 'summary'],
+    REQUEST_STATUS: ['dashboard', 'request-status'],
+    PLAN_SHARE: ['dashboard', 'plan-share'],
+    COMPANY_CREDIT: ['dashboard', 'company-credit'],
+    MONTHS: ['dashboard', 'months'],
+    RANKING: (month: string | undefined, sortBy: string) => [
+      'dashboard',
+      'ranking',
+      month ?? 'all',
+      sortBy,
+    ],
+    CONTRACTS_BY_MONTH: ['dashboard', 'contracts-by-month'],
+    MONTHLY_PERFORMANCE: ['dashboard', 'monthly-performance'],
+    REMOVED_COMPANIES: ['dashboard', 'removed-companies'],
+  },
   STAFF: {
     ALL: ['staff'],
     LIST: (companyId: string, filters: object, page: number) => [

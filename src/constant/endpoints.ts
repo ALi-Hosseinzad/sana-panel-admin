@@ -53,6 +53,26 @@ export const ENDPOINTS = {
     APPROVE: '/credit-approvals/approve',
     REJECT: '/credit-approvals/reject',
   },
+  DASHBOARD: {
+    SUMMARY: '/dashboard/summary',
+    REQUEST_STATUS: '/dashboard/request-status',
+    PLAN_SHARE: '/dashboard/plan-share',
+    COMPANY_CREDIT: '/dashboard/company-credit',
+    /** ماه‌هایی که درخواست ثبت شده (برای فیلتر رتبه‌بندی) */
+    MONTHS: '/dashboard/months',
+    RANKING: '/dashboard/ranking',
+    CONTRACTS_BY_MONTH: '/dashboard/contracts-by-month',
+    MONTHLY_PERFORMANCE: '/dashboard/monthly-performance',
+    REMOVED_COMPANIES: '/dashboard/removed-companies',
+  },
+  /** خروجی‌های اکسل (فایل از سرور دریافت می‌شود) */
+  REPORTS: {
+    COMPANIES: '/reports/companies',
+    STAFF: '/reports/staff',
+    LOAN_REQUESTS: '/reports/loan-requests',
+    AVERAGES: '/reports/averages',
+    REMOVED_COMPANIES: '/reports/removed-companies',
+  },
   STAFF: {
     LIST: (companyId: string) => `/companies/${companyId}/staff`,
     DETAIL: (companyId: string, id: string) => `/companies/${companyId}/staff/${id}`,

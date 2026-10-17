@@ -125,6 +125,7 @@ export const companyHandlers = [
     const company = findCompany(params.id);
     if (!company) return notFound();
     company.deleted = true;
+    company.deletedAt = today();
     return new HttpResponse(null, { status: 204 });
   }),
 
