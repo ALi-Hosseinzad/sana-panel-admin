@@ -1,10 +1,12 @@
-/** تنظیمات عمومی طرح */
-export interface GeneralSettings {
-  /** نرخ تسهیلات قرض‌الحسنه (درصد) */
+/** اطلاعات پایه یک طرح (همه بخش‌های فرم افزودن/ویرایش) */
+export interface SchemePayload {
+  /** نام طرح (مثل نگین میثاق) */
+  name: string;
+  /** نرخ تسهیلات قرض‌الحسنه (درصد - ثابت) */
   qarzRate: number;
   /** حقوق‌بگیر بانک سپه */
   sepahEnabled: boolean;
-  /** ضریب تأثیر حقوق‌بگیر بودن بانک سپه */
+  /** نرخ تأثیر حقوق‌بگیر بودن بانک سپه (ضریب) */
   sepahMultiplier: number;
   /** مدت قرارداد (سال) */
   contractYears: number;
@@ -14,18 +16,20 @@ export interface GeneralSettings {
   maxPlans: number;
   /** مهلت مجاز شدن معرفی پرسنل پس از انعقاد قرارداد (ماه) */
   staffDelayMonths: number;
-}
-
-/** اطلاعات پایه یک طرح (بدنه ایجاد و ویرایش) */
-export interface SchemePayload extends GeneralSettings {
-  /** نام طرح */
-  name: string;
   /** نرخ‌های مرابحه قابل انتخاب (درصد) */
   murabahaRates: number[];
   /** مدت‌های بازپرداخت قابل انتخاب (ماه) */
   terms: number[];
-  /** درصد قابل استفاده از میانگین؛ هر ردیف یک مدت بازپرداخت، ستون اول قرض‌الحسنه و بقیه به ترتیب نرخ‌های مرابحه */
+  /** درصد قابل استفاده از میانگین؛ ردیف = مدت، ستون اول قرض‌الحسنه و بقیه نرخ‌های مرابحه */
   usable: number[][];
+  /** دلایل لغو قرارداد */
+  cancelReasons: string[];
+  /** دلایل رد درخواست وام */
+  rejectReasons: string[];
+  /** دلایل عدم اعطای تسهیلات غیرحضوری */
+  noGrantReasons: string[];
+  /** انواع مستند میانگین موجودی */
+  avgDocTypes: string[];
 }
 
 export interface Scheme extends SchemePayload {
@@ -37,3 +41,6 @@ export type SchemeListItem = Pick<
   Scheme,
   'id' | 'name' | 'qarzRate' | 'murabahaRates' | 'terms' | 'contractYears' | 'maxPlans'
 >;
+
+/** نام لیست‌های متنی هر طرح */
+export type SchemeTextList = 'cancelReasons' | 'rejectReasons' | 'noGrantReasons' | 'avgDocTypes';

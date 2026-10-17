@@ -1,8 +1,9 @@
 export const QUERY_KEYS = {
   PROFILE: ['profile'],
   BASE_INFO: {
-    SCHEMES: ['base-info', 'schemes'],
-    SCHEME: (id: string) => ['base-info', 'schemes', id],
+    ALL: ['base-info'],
+    LIST: (page: number) => ['base-info', 'list', page],
+    DETAIL: (id: string) => ['base-info', 'detail', id],
   },
   LOOKUPS: {
     CANCEL_REASONS: ['lookups', 'cancel-reasons'],

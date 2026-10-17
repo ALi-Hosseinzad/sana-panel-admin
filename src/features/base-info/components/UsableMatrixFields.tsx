@@ -1,61 +1,68 @@
-import { type ColumnsType } from 'antd/es/table';
+/* eslint-disable react/no-array-index-key -- خانه‌های جدول با جایگاه ردیف و ستون شناخته می‌شوند */
+import { Form } from 'antd';
 
-import { PanelCard } from '@/component/card';
-import { Form, FormItem } from '@/component/form';
+import { FormItem } from '@/component/form';
 import { NumberInput } from '@/component/input';
-import { Table } from '@/component/table';
 import { toPersianDigits } from '@/utils/date';
 
-interface MatrixRow {
-  id: number;
-  term?: number;
-}
+import { SectionTitle } from './SectionTitle';
 
-const UsableCell = ({ row, column }: { row: number; column: number }) => (
-  <FormItem name={['usable', row, column]} noStyle>
-    <NumberInput min={0} max={100} style={{ width: 90 }} placeholder="۰" />
-  </FormItem>
-);
+const label = (value: number | null | undefined, suffix: string) =>
+  value === null || value === undefined ? '—' : toPersianDigits(value) + suffix;
 
-/** عدد وارد نشده با خط تیره نمایش داده می‌شود */
-const display = (value?: number) => (typeof value === 'number' ? toPersianDigits(value) : '—');
-
-const buildColumns = (qarzRate?: number, murabahaRates: number[] = []): ColumnsType<MatrixRow> => [
-  {
-    title: 'مدت \\ نرخ',
-    key: 'term',
-    render: (_value, row) => `${display(row.term)} ماهه`,
-  },
-  {
-    title: `قرض‌الحسنه (${display(qarzRate)}٪)`,
-    key: 'qarz',
-    align: 'center',
-    render: (_value, row) => <UsableCell row={row.id} column={0} />,
-  },
-  ...murabahaRates.map((rate, index) => ({
-    title: `مرابحه ${display(rate)}٪`,
-    key: `rate-${index}`,
-    align: 'center' as const,
-    render: (_value: unknown, row: MatrixRow) => <UsableCell row={row.id} column={index + 1} />,
-  })),
-];
-
-/** جدول درصد قابل استفاده از میانگین (ردیف: مدت بازپرداخت · ستون: نرخ تسهیلات) */
+/** جدول درصد قابل استفاده: ردیف = مدت بازپرداخت، ستون = نرخ تسهیلات */
 export const UsableMatrixFields = () => {
+  const terms = Form.useWatch<(number | null)[] | undefined>('terms') ?? [];
+  const rates = Form.useWatch<(number | null)[] | undefined>('murabahaRates') ?? [];
   const qarzRate = Form.useWatch<number | undefined>('qarzRate');
-  const murabahaRates = Form.useWatch<number[] | undefined>('murabahaRates');
-  const terms = Form.useWatch<number[] | undefined>('terms');
+  const headers = [
+    'قرض‌الحسنه (' + label(qarzRate, '٪') + ')',
+    ...rates.map((rate) => 'مرابحه ' + label(rate, '٪')),
+  ];
 
   return (
-    <PanelCard
-      title="جدول درصد قابل استفاده از میانگین"
-      subtitle="هر ردیف یک مدت بازپرداخت و هر ستون یک نرخ تسهیلات است؛ عدد داخل جدول، درصد قابل استفاده از مجموع میانگین حساب برای آن ترکیب است. خانه‌های خالی صفر ذخیره می‌شوند."
-    >
-      <Table<MatrixRow>
-        columns={buildColumns(qarzRate, murabahaRates)}
-        dataSource={terms?.map((term, index) => ({ id: index, term }))}
-        locale={{ emptyText: 'برای ساخت جدول ابتدا مدت‌های بازپرداخت را اضافه کنید.' }}
+    <>
+      <SectionTitle
+        title="درصد قابل استفاده از میانگین"
+        subtitle="هر ردیف یک مدت بازپرداخت و هر ستون یک نرخ تسهیلات است؛ عدد داخل جدول، درصد قابل استفاده از مجموع میانگین حساب برای آن ترکیب است."
       />
-    </PanelCard>
+      <div className="overflow-x-auto rounded-lg border border-line">
+        <table className="w-full min-w-[640px] text-[12.5px]">
+          <thead className="bg-bg">
+            <tr>
+              <th className="p-2 text-start font-bold whitespace-nowrap">مدت \ نرخ</th>
+              {headers.map((header, column) => (
+                <th key={column} className="p-2 text-start font-bold">
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {terms.map((term, row) => (
+              <tr key={row} className="border-t border-line">
+                <td className="p-2 font-medium whitespace-nowrap">{label(term, ' ماه')}</td>
+                {headers.map((header, column) => (
+                  <td key={column} className="p-1.5">
+                    <FormItem
+                      name={['usable', row, column]}
+                      required
+                      requiredMessage="الزامی"
+                      className="mb-0"
+                    >
+                      <NumberInput
+                        min={0}
+                        max={100}
+                        aria-label={`${label(term, ' ماه')} - ${header}`}
+                      />
+                    </FormItem>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };

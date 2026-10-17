@@ -2,14 +2,13 @@ import {
   MOCK_AUDIT_LOGS,
   MOCK_COMPANIES,
   MOCK_LOAN_REQUESTS,
-  MOCK_LOOKUPS,
   MOCK_MANAGED_USERS,
   MOCK_POST_APPROVAL_STAGES,
   MOCK_SCHEMES,
   MOCK_STAFF,
   MOCK_USERS,
 } from '@/constant/mock';
-import type { Scheme, SchemePayload } from '@/features/base-info/types';
+import type { Scheme, SchemePayload, SchemeTextList } from '@/features/base-info/types';
 import type { PlanOption } from '@/services/lookup/types';
 
 /**
@@ -18,7 +17,6 @@ import type { PlanOption } from '@/services/lookup/types';
  */
 export const db = {
   schemes: structuredClone(MOCK_SCHEMES),
-  lookups: structuredClone(MOCK_LOOKUPS),
   postApprovalStages: structuredClone(MOCK_POST_APPROVAL_STAGES),
   companies: structuredClone(MOCK_COMPANIES),
   staff: structuredClone(MOCK_STAFF),
@@ -30,17 +28,12 @@ export const db = {
   sequence: 100,
 };
 
-export type LookupName = keyof typeof db.lookups;
-
 export const nextId = (prefix: string) => {
   db.sequence += 1;
   return `${prefix}-${db.sequence}`;
 };
 
 export const fileOf = (id: string) => ({ id, name: db.files.get(id) ?? id });
-
-export const lookupTitle = (name: LookupName, id: string) =>
-  db.lookups[name].find((item) => item.id === id)?.title;
 
 export const today = () => new Date().toISOString().slice(0, 10);
 
@@ -63,10 +56,21 @@ const EMPTY_SCHEME: Scheme = {
   murabahaRates: [],
   terms: [],
   usable: [],
+  cancelReasons: [],
+  rejectReasons: [],
+  noGrantReasons: [],
+  avgDocTypes: [],
 };
 
 /** محاسبات شرکت‌ها و وام‌ها فعلاً از اولین طرح خوانده می‌شود */
 export const primaryScheme = () => db.schemes[0] ?? EMPTY_SCHEME;
+
+/** لیست‌های کشویی (دلایل و انواع مستند) از اطلاعات پایه طرح خوانده می‌شوند */
+export const lookupItems = (name: SchemeTextList) =>
+  primaryScheme()[name].map((title, index) => ({ id: String(index), title }));
+
+export const lookupTitle = (name: SchemeTextList, id: string) =>
+  lookupItems(name).find((item) => item.id === id)?.title;
 
 /** اندازه جدول درصد قابل استفاده را با تعداد مدت‌ها و نرخ‌ها هماهنگ می‌کند */
 export const resizeUsable = (scheme: SchemePayload): SchemePayload => ({

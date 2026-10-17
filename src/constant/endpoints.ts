@@ -25,7 +25,6 @@ export const ENDPOINTS = {
     /** انواع عملیات گزارش تغییرات */
     AUDIT_LOG_TYPES: '/lookups/audit-log-types',
     /** آدرس یک آیتم از لیست (برای ویرایش/حذف) */
-    ITEM: (listPath: string, id: string) => `${listPath}/${id}`,
   },
   COMPANIES: {
     LIST: '/companies',
