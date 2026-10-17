@@ -1,0 +1,188 @@
+/*
+ * ترتیب لایه‌ها: ریست Tailwind (base) قبل از antd قرار می‌گیرد تا استایل antd را بازنویسی نکند
+ * و utilityها بعد از antd می‌آیند تا در صورت نیاز روی آن اعمال شوند.
+ */
+@layer theme, base, antd, components, utilities;
+
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: 'Vazirmatn Variable', 'Vazirmatn', 'IRANSansX', Tahoma, sans-serif;
+
+  --color-primary: var(--sana-primary);
+  --color-primary-hover: var(--sana-primary-hover);
+  --color-accent: var(--sana-accent);
+  --color-accent-light: var(--sana-accent-light);
+  --color-amber: var(--sana-amber);
+  --color-gold-soft: var(--sana-gold-soft);
+  --color-gold-soft-border: var(--sana-gold-soft-border);
+  --color-gold-soft-text: var(--sana-gold-soft-text);
+  --color-bg: var(--sana-bg);
+  --color-panel: var(--sana-panel);
+  --color-line: var(--sana-line);
+  --color-line-2: var(--sana-line2);
+  --color-ink: var(--sana-ink);
+  --color-ink-soft: var(--sana-ink-soft);
+  --color-heading: var(--sana-heading);
+  --color-heading-sub: var(--sana-heading-sub);
+  --color-label: var(--sana-label);
+  --color-success: var(--sana-success);
+  --color-success-bg: var(--sana-success-bg);
+  --color-success-border: var(--sana-success-border);
+  --color-success-text: var(--sana-success-text);
+  --color-warning: var(--sana-warning);
+  --color-warning-bg: var(--sana-warning-bg);
+  --color-warning-text: var(--sana-warning-text);
+  --color-danger: var(--sana-danger);
+  --color-danger-bg: var(--sana-danger-bg);
+  --color-danger-border: var(--sana-danger-border);
+  --color-danger-text: var(--sana-danger-text);
+  --color-sidebar-text: var(--sana-sidebar-text);
+  --color-sidebar-muted: var(--sana-sidebar-muted);
+  --color-sidebar-group: var(--sana-sidebar-group);
+
+  --radius-panel: 14px;
+  --shadow-panel: 0 1px 3px rgba(16, 24, 40, 0.06), 0 6px 16px rgba(16, 24, 40, 0.05);
+  --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--sana-bg);
+    color: var(--sana-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--sana-scrollbar);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* ---------- Date picker (react-multi-date-picker) هماهنگ با ورودی‌های antd ---------- */
+  .sana-date-input {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 12px;
+    border: 1px solid var(--sana-input-border);
+    border-radius: 10px;
+    background: var(--sana-input-bg);
+    color: var(--sana-ink);
+    font-family: inherit;
+    font-size: 14px;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  .sana-date-input::placeholder {
+    color: var(--sana-disabled-text);
+  }
+  .sana-date-input:hover {
+    border-color: var(--sana-input-border-hover);
+  }
+  .sana-date-input:focus {
+    outline: none;
+    border-color: var(--sana-accent);
+    box-shadow: 0 0 0 4px rgba(201, 154, 46, 0.18);
+  }
+  .sana-date-input:disabled {
+    background: var(--sana-disabled-bg);
+    color: var(--sana-disabled-text);
+    cursor: not-allowed;
+  }
+  .sana-date-input.sana-date-input--error {
+    border-color: var(--sana-danger);
+  }
+  /* ---------- Table ---------- */
+  .sana-table .ant-table-container {
+    border: 1px solid var(--sana-line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sana-table .ant-table-thead > tr > th {
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--sana-line);
+  }
+  .sana-table .ant-table-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sana-sidebar-item-active::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -16px;
+    top: 9px;
+    bottom: 9px;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+    background: var(--sana-accent);
+  }
+}
+
+/*
+ * استایل تقویم react-multi-date-picker خارج از لایه‌ها نوشته می‌شود،
+ * چون CSS خود کتابخانه بدون لایه است و استایل لایه‌دار روی آن اعمال نمی‌شود.
+ */
+.sana-date-calendar {
+  font-family: var(--font-sans) !important;
+}
+.sana-date-calendar .rmdp-day.rmdp-selected span:not(.highlight) {
+  box-shadow: none;
+  background-color: var(--sana-primary);
+}
+.sana-date-calendar .rmdp-day:not(.rmdp-disabled, .rmdp-day-hidden) span:hover {
+  background-color: var(--sana-accent);
+}
+.sana-date-calendar .rmdp-today span {
+  background-color: var(--sana-gold-soft);
+  color: var(--sana-ink);
+}
+.sana-date-calendar .rmdp-range {
+  background-color: var(--sana-primary-hover);
+}
+.sana-date-calendar .rmdp-week-day {
+  color: var(--sana-accent);
+}
+.sana-date-calendar .rmdp-arrow {
+  border-color: var(--sana-primary);
+}
+.sana-date-calendar .rmdp-arrow-container:hover {
+  background-color: var(--sana-primary);
+}
+.dark .sana-date-calendar .rmdp-arrow {
+  border-color: var(--sana-ink);
+}
+
+@media print {
+  .sana-no-print {
+    display: none !important;
+  }
+}
+
+.sana-date-calendar .rmdp-week-day,
+.sana-date-calendar .rmdp-header-values {
+  font-weight: 700;
+}

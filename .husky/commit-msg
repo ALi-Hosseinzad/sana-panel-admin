@@ -1,0 +1,7 @@
+# حداقل طول پیام کامیت
+msg_file="$1"
+first_line=$(head -n1 "$msg_file")
+if [ ${#first_line} -lt 8 ]; then
+  echo "✖ پیام کامیت خیلی کوتاه است (حداقل ۸ کاراکتر)."
+  exit 1
+fi

@@ -1,0 +1,20 @@
+node_modules
+dist
+dist-ssr
+coverage
+*.local
+.env.*.local
+
+# playwright
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.log
+.cert
