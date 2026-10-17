@@ -1,4 +1,3 @@
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { createElement } from 'react';
 import { NavLink } from 'react-router';
 
@@ -6,19 +5,15 @@ import logo from '@/assets/images/logo-sana.png';
 import { MENU } from '@/constant/menu';
 import { useProfileStore } from '@/store/useProfileStore';
 
-import { Button } from '../../button';
-
 export interface SidebarProps {
   title: string;
   subtitle?: string;
-  onLogout: () => void;
 }
 
 const ITEM_BASE =
   'relative flex w-full items-center gap-[11px] rounded-[11px] px-3.5 py-[11px] text-[13.5px] transition-colors max-[960px]:w-auto max-[960px]:px-3 max-[960px]:py-[9px] max-[960px]:text-[12.5px]';
 
-export const Sidebar = ({ title, subtitle, onLogout }: SidebarProps) => {
-  const profile = useProfileStore((state) => state.profile);
+export const Sidebar = ({ title, subtitle }: SidebarProps) => {
   const hasRole = useProfileStore((state) => state.hasRole);
 
   const groups = MENU.map((group) => ({
@@ -41,13 +36,17 @@ export const Sidebar = ({ title, subtitle, onLogout }: SidebarProps) => {
       <nav className="flex flex-1 flex-col gap-[3px] max-[960px]:flex-row max-[960px]:flex-wrap">
         {groups.map((group) => (
           <div key={group.key} className="contents">
-            <div className="mx-2.5 mt-4 mb-1.5 text-[10.5px] font-bold text-sidebar-group max-[960px]:hidden">
-              {group.title}
-            </div>
+            {group.title && (
+              <div className="mx-2.5 mt-4 mb-1.5 text-[10.5px] font-bold text-sidebar-group max-[960px]:hidden">
+                {group.title}
+              </div>
+            )}
             {group.items.map((item) => (
               <NavLink
                 key={item.key}
                 to={item.path}
+                // «خانه» (/) فقط روی همان مسیر فعال شود، نه روی همه صفحات
+                end={item.path === '/'}
                 className={({ isActive }) =>
                   isActive
                     ? `${ITEM_BASE} sana-sidebar-item-active bg-accent/16 font-bold text-white max-[960px]:before:hidden [&_.anticon]:text-accent-light`
@@ -61,26 +60,6 @@ export const Sidebar = ({ title, subtitle, onLogout }: SidebarProps) => {
           </div>
         ))}
       </nav>
-
-      <div className="mt-3.5 flex flex-col gap-2.5 rounded-panel border border-white/8 bg-white/7 p-3.5">
-        <div className="flex items-center gap-2 text-xs leading-[1.7] text-[#E6EDF6]">
-          <UserOutlined />
-          <span>
-            {profile?.fullName ?? '—'}
-            {profile?.branch && <span className="text-sidebar-muted"> · {profile.branch}</span>}
-          </span>
-        </div>
-        <Button
-          variant="secondary"
-          size="small"
-          block
-          icon={<LogoutOutlined />}
-          onClick={onLogout}
-          className="!border-white/18 !bg-white/10 !text-white hover:!bg-white/18"
-        >
-          خروج از حساب
-        </Button>
-      </div>
     </aside>
   );
 };

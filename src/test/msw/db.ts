@@ -1,4 +1,5 @@
 import {
+  MOCK_AUDIT_LOGS,
   MOCK_COMPANIES,
   MOCK_LOAN_REQUESTS,
   MOCK_LOOKUPS,
@@ -23,6 +24,7 @@ export const db = {
   staff: structuredClone(MOCK_STAFF),
   users: structuredClone(MOCK_MANAGED_USERS),
   loanRequests: structuredClone(MOCK_LOAN_REQUESTS),
+  auditLogs: structuredClone(MOCK_AUDIT_LOGS),
   /** نام فایل‌های آپلودشده بر اساس شناسه */
   files: new Map<string, string>(),
   sequence: 100,

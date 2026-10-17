@@ -8,6 +8,7 @@ import { ISO_DATE_FORMAT, parseJalali, toEnglishDigits } from '@/utils/date';
 
 import { db, nextId } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
 
 const SAMPLE_HEADERS = [
   'نام و نام خانوادگی',
@@ -18,6 +19,8 @@ const SAMPLE_HEADERS = [
   'اولویت تخصیص',
 ];
 const SAMPLE_ROW = ['علی محمدی', '0012345678', '09121234567', '101', '1403/02/15', 1];
+
+const companyName = (id: string) => db.companies.find((item) => item.id === id)?.name ?? '—';
 
 const notFound = () => HttpResponse.json({ message: 'پرسنل یافت نشد.' }, { status: 404 });
 
@@ -82,6 +85,11 @@ export const staffHandlers = [
     const body = (await request.json()) as StaffPayload;
     const staff = { ...body, id: nextId('s'), companyId: String(params.companyId) };
     db.staff.push(staff);
+    logAction(
+      request,
+      'staff',
+      `ثبت پرسنل جدید: ${staff.fullName} (${companyName(staff.companyId)})`,
+    );
     return HttpResponse.json(staff, { status: 201 });
   }),
 
@@ -95,15 +103,34 @@ export const staffHandlers = [
     await delay(300);
     const staff = findStaff(params.companyId, params.id);
     if (!staff) return notFound();
+    const before = structuredClone(staff);
     Object.assign(staff, (await request.json()) as StaffPayload);
+    logAction(
+      request,
+      'staff',
+      `ویرایش پرسنل: ${staff.fullName} (${companyName(staff.companyId)})`,
+      {
+        entity: 'staff',
+        id: staff.id,
+        before,
+      },
+    );
     return HttpResponse.json(staff);
   }),
 
-  http.delete(api(ENDPOINTS.STAFF.DETAIL(':companyId', ':id')), async ({ params }) => {
+  http.delete(api(ENDPOINTS.STAFF.DETAIL(':companyId', ':id')), async ({ params, request }) => {
     await delay(250);
+    const removed = findStaff(params.companyId, params.id);
     db.staff = db.staff.filter(
       (item) => !(item.companyId === params.companyId && item.id === params.id),
     );
+    if (removed) {
+      logAction(
+        request,
+        'staff',
+        `حذف پرسنل: ${removed.fullName} (${companyName(removed.companyId)})`,
+      );
+    }
     return new HttpResponse(null, { status: 204 });
   }),
 
@@ -130,6 +157,11 @@ export const staffHandlers = [
       db.staff.push(staff);
       added += 1;
     });
+    logAction(
+      request,
+      'staff',
+      `بارگذاری گروهی ${added} پرسنل از فایل اکسل (${companyName(String(params.companyId))})`,
+    );
     return HttpResponse.json({ added });
   }),
 

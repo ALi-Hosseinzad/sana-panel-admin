@@ -13,7 +13,7 @@ import { Footer } from './Footer';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 
-const DEFAULT_TITLE = 'داشبورد';
+const DEFAULT_TITLE = 'خانه';
 
 /** لی‌اوت اصلی (صفحات بعد از لاگین): سایدبار + هدر + محتوا + فوتر */
 export const MainLayout = () => {
@@ -32,9 +32,9 @@ export const MainLayout = () => {
 
   return (
     <div className="grid min-h-screen grid-cols-[276px_minmax(0,1fr)] max-[960px]:grid-cols-1">
-      <Sidebar title={env.appTitle} subtitle="طرح نگین میثاق" onLogout={handleLogout} />
+      <Sidebar title={env.appTitle} />
       <div className="flex min-h-screen min-w-0 flex-col">
-        <Header title={pageTitle} />
+        <Header title={pageTitle} onLogout={handleLogout} />
         <main className="flex-1 px-7 pt-6 pb-2 max-[960px]:p-4">
           {/* اسکلتون تا زمان دانلود کد صفحه (lazy) */}
           <Suspense fallback={<Skeleton variant="panel" count={2} rows={4} />}>

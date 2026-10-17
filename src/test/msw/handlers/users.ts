@@ -7,6 +7,7 @@ import { toEnglishDigits } from '@/utils/date';
 
 import { db, nextId } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
 
 const withoutPassword = ({ password: _password, ...user }: MockManagedUser) => user;
 
@@ -62,6 +63,7 @@ export const userHandlers = [
     if (isTaken(body.username)) return duplicate();
     const user = { ...body, id: nextId('u'), password: body.password };
     db.users.push(user);
+    logAction(request, 'user', `ثبت کاربر جدید: ${user.fullName} (${user.username})`);
     return HttpResponse.json(withoutPassword(user), { status: 201 });
   }),
 
@@ -71,11 +73,17 @@ export const userHandlers = [
     if (!user) return notFound();
     const { password, ...body } = normalize((await request.json()) as UserPayload);
     if (isTaken(body.username, user.id)) return duplicate();
+    const before = structuredClone(user);
     Object.assign(user, body, password ? { password } : {});
+    logAction(request, 'user', `ویرایش کاربر: ${user.fullName} (${user.username})`, {
+      entity: 'user',
+      id: user.id,
+      before,
+    });
     return HttpResponse.json(withoutPassword(user));
   }),
 
-  http.delete(api(ENDPOINTS.USERS.DETAIL(':id')), async ({ params }) => {
+  http.delete(api(ENDPOINTS.USERS.DETAIL(':id')), async ({ params, request }) => {
     await delay(250);
     if (db.users.length <= 1) {
       return HttpResponse.json(
@@ -83,7 +91,9 @@ export const userHandlers = [
         { status: 422 },
       );
     }
+    const removed = db.users.find((item) => item.id === params.id);
     db.users = db.users.filter((item) => item.id !== params.id);
+    if (removed) logAction(request, 'user', `حذف کاربر: ${removed.username}`);
     return new HttpResponse(null, { status: 204 });
   }),
 ];

@@ -1,14 +1,21 @@
-import { Result } from 'antd';
+import heroImage from '@/assets/images/home-hero.svg';
+import { env } from '@/config/env';
 
-import { PanelCard } from '@/component/card';
-
-/** صفحه موقت — صفحات واقعی هر بخش بعداً در features ساخته می‌شوند */
+/** صفحه خانه — تصویر معرفی خدمات تسهیلاتی */
 export const HomePage = () => (
-  <PanelCard>
-    <Result
-      status="info"
-      title="به پنل سانا خوش آمدید"
-      subTitle="محتوای این بخش هنوز ساخته نشده است."
+  <section className="overflow-hidden rounded-[28px] border border-line shadow-panel">
+    <img
+      src={heroImage}
+      alt="خدمات تسهیلاتی سانا: بانک، سکه‌ها، قرارداد تأییدشده، کارت اعتباری و نمودار رشد اعتبار"
+      className="block h-auto w-full"
     />
-  </PanelCard>
+    <div className="bg-panel px-8 py-5 max-sm:px-4">
+      <h2 className="m-0 text-[20px] font-extrabold text-heading max-sm:text-base">
+        {env.appTitle}
+      </h2>
+      <p className="m-0 mt-1 text-[13.5px] text-ink-soft max-sm:text-xs">
+        تخصیص تسهیلات قرض‌الحسنه و مرابحه به پرسنل شرکت‌ها بر اساس میانگین موجودی حساب
+      </p>
+    </div>
+  </section>
 );

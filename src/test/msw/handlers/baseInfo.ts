@@ -5,6 +5,7 @@ import { type Scheme, type SchemePayload } from '@/features/base-info/types';
 
 import { db, nextId, resizeUsable } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
 
 const toListItem = ({
   id,
@@ -45,6 +46,7 @@ export const baseInfoHandlers = [
       ...resizeUsable((await request.json()) as SchemePayload),
     };
     db.schemes.push(scheme);
+    logAction(request, 'base', `ثبت طرح جدید: ${scheme.name}`);
     return HttpResponse.json(scheme, { status: 201 });
   }),
 
@@ -56,12 +58,19 @@ export const baseInfoHandlers = [
       id: params.id as string,
       ...resizeUsable((await request.json()) as SchemePayload),
     };
+    logAction(request, 'base', `ویرایش طرح: ${scheme.name}`, {
+      entity: 'scheme',
+      id: scheme.id,
+      before: db.schemes[index] ?? {},
+    });
     db.schemes[index] = scheme;
     return HttpResponse.json(scheme);
   }),
 
-  http.delete(api(ENDPOINTS.BASE_INFO.SCHEME(':id')), async ({ params }) => {
+  http.delete(api(ENDPOINTS.BASE_INFO.SCHEME(':id')), async ({ params, request }) => {
     await delay(250);
+    const removed = db.schemes.find((item) => item.id === params.id);
+    if (removed) logAction(request, 'base', `حذف طرح: ${removed.name}`);
     db.schemes = db.schemes.filter((item) => item.id !== params.id);
     return new HttpResponse(null, { status: 204 });
   }),

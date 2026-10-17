@@ -13,6 +13,7 @@ import { formatAmount } from '@/utils/number';
 
 import { buildPlanOptions, db, nextId, primaryScheme, today } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
 
 /*
  * این فایل نقش بک‌اند را بازی می‌کند: همه قوانین تخصیص وام (مجاز بودن شرکت، روز انتقال،
@@ -221,6 +222,11 @@ export const creditHandlers = [
         status: 'pending_manager',
       });
     });
+    logAction(
+      request,
+      'loan',
+      `ثبت درخواست وام جمعاً ${rial(total)} برای ${toPersianDigits(body.items.length)} نفر — شرکت: ${company.name}`,
+    );
     return HttpResponse.json({ created: body.items.length }, { status: 201 });
   }),
 ];

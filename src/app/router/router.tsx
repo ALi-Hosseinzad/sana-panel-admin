@@ -33,6 +33,10 @@ const DashboardPage = lazyPage(
   'DashboardPage',
 );
 const UsersPage = lazyPage(() => import('@/features/users/pages/UsersPage'), 'UsersPage');
+const ChangeLogPage = lazyPage(
+  () => import('@/features/change-log/pages/ChangeLogPage'),
+  'ChangeLogPage',
+);
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +63,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.CREDIT_APPROVE, element: <CreditApprovalPage /> },
       { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
       { path: ROUTES.USERS, element: <UsersPage /> },
+      { path: ROUTES.CHANGE_LOG, element: <ChangeLogPage /> },
       // صفحات هر بخش بعداً در features ساخته و اینجا اضافه می‌شوند
       { path: '*', element: <HomePage /> },
     ],

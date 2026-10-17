@@ -4,9 +4,11 @@ import { ENDPOINTS } from '@/constant/endpoints';
 import { type LoanStatus } from '@/constant/loanStatus';
 import { type MockLoanRequest } from '@/constant/mock';
 import { type DecisionPayload } from '@/features/manager-approval/types';
+import { formatRial } from '@/utils/number';
 
 import { db, fileOf, lookupTitle, today } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
 
 /** درخواست‌هایی که هنوز در مرحله مدیر شرکت هستند یا توسط او رد شده‌اند اینجا نمایش داده نمی‌شوند */
 const HIDDEN: LoanStatus[] = ['pending_manager', 'rejected_manager'];
@@ -64,6 +66,12 @@ const decide = (path: string, nextStatus: LoanStatus) =>
         const noGrant = body.noGrantReasonId && lookupTitle('noGrantReasons', body.noGrantReasonId);
         if (noGrant) item.note = body.note ? `${noGrant} — ${body.note}` : noGrant;
       }
+      const reason = item.rejectReason ? ` — دلیل: ${item.rejectReason}` : '';
+      logAction(
+        request,
+        'loan',
+        `${nextStatus === 'approved' ? 'تأیید' : 'رد'} درخواست وام ${item.staffName} — ${formatRial(item.amount)} — شرکت: ${companyName(item.companyId)}${reason}`,
+      );
     });
     return HttpResponse.json({ updated: targets.length });
   });

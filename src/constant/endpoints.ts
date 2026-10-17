@@ -22,6 +22,8 @@ export const ENDPOINTS = {
     COMPANIES: '/lookups/companies',
     /** مراحل پس از تأیید اعتبارات */
     POST_APPROVAL_STAGES: '/lookups/post-approval-stages',
+    /** انواع عملیات گزارش تغییرات */
+    AUDIT_LOG_TYPES: '/lookups/audit-log-types',
     /** آدرس یک آیتم از لیست (برای ویرایش/حذف) */
     ITEM: (listPath: string, id: string) => `${listPath}/${id}`,
   },
@@ -71,6 +73,12 @@ export const ENDPOINTS = {
     LOAN_REQUESTS: '/reports/loan-requests',
     AVERAGES: '/reports/averages',
     REMOVED_COMPANIES: '/reports/removed-companies',
+    AUDIT_LOGS: '/reports/audit-logs',
+  },
+  AUDIT_LOGS: {
+    LIST: '/audit-logs',
+    /** بازگردانی یک ویرایش به حالت قبل */
+    ROLLBACK: (id: string) => `/audit-logs/${id}/rollback`,
   },
   USERS: {
     LIST: '/users',

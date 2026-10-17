@@ -3,9 +3,13 @@ import { delay, http, HttpResponse } from 'msw';
 import { ENDPOINTS } from '@/constant/endpoints';
 import { type LoanStatus } from '@/constant/loanStatus';
 import { type DecisionPayload } from '@/features/manager-approval/types';
+import { formatRial } from '@/utils/number';
 
 import { db, fileOf, today } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
+
+const companyName = (id: string) => db.companies.find((item) => item.id === id)?.name ?? '—';
 
 const isPending = (companyId: unknown) => (item: (typeof db.loanRequests)[number]) =>
   item.companyId === companyId && item.status === 'pending_manager';
@@ -32,6 +36,12 @@ const decide = (nextStatus: LoanStatus) =>
         item.decidedAt = today();
         item.note = body.note;
         if (body.fileId) item.file = fileOf(body.fileId);
+        const action = nextStatus === 'pending_credit' ? 'تأیید' : 'رد';
+        logAction(
+          request,
+          'loan',
+          `${action} توسط مدیر شرکت درخواست وام ${item.staffName} — ${formatRial(item.amount)} — شرکت: ${companyName(item.companyId)}${body.note ? ' — توضیحات: ' + body.note : ''}`,
+        );
       });
       return HttpResponse.json({ updated: targets.length });
     },

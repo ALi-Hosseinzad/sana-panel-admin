@@ -1,3 +1,4 @@
+import { auditLogHandlers } from './auditLogs';
 import { authHandlers } from './auth';
 import { baseInfoHandlers } from './baseInfo';
 import { companyHandlers } from './companies';
@@ -24,4 +25,5 @@ export const handlers = [
   ...dashboardHandlers,
   ...reportHandlers,
   ...userHandlers,
+  ...auditLogHandlers,
 ];

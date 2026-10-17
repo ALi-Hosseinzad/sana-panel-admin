@@ -62,6 +62,9 @@ export const FormModal = <T,>({
       onCancel={onCancel}
       confirmLoading={confirmLoading ?? submitting}
       afterClose={() => form.resetFields()}
+      // فرم همیشه ساخته می‌ماند تا مقداردهی (مثلاً در حالت ویرایش) قبل از باز شدن مودال هم اعمال شود
+      forceRender
+      destroyOnHidden={false}
       {...rest}
     >
       <Form<T>

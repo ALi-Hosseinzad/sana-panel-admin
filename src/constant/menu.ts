@@ -5,6 +5,7 @@ import {
   ControlOutlined,
   CreditCardOutlined,
   HistoryOutlined,
+  HomeOutlined,
   SafetyOutlined,
   ShopOutlined,
   TeamOutlined,
@@ -30,6 +31,11 @@ export interface MenuGroup {
 }
 
 export const MENU: MenuGroup[] = [
+  {
+    key: 'home',
+    title: '',
+    items: [{ key: 'home', label: 'خانه', path: ROUTES.HOME, icon: HomeOutlined }],
+  },
   {
     key: 'settings',
     title: 'تنظیمات',

@@ -7,6 +7,11 @@ describe('findMenuItemByPath', () => {
     expect(findMenuItemByPath(ROUTES.CREDIT_APPROVE)?.label).toBe('تأیید اعتبارات');
   });
 
+  it('matches home only on the root path', () => {
+    expect(findMenuItemByPath(ROUTES.HOME)?.label).toBe('خانه');
+    expect(findMenuItemByPath(ROUTES.USERS)?.label).toBe('مدیریت کاربران');
+  });
+
   it('matches nested paths and ignores unknown ones', () => {
     expect(findMenuItemByPath(`${ROUTES.COMPANIES}/c-1`)?.label).toBe('مدیریت شرکت‌ها');
     expect(findMenuItemByPath('/unknown')).toBeUndefined();

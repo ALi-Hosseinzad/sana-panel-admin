@@ -22,6 +22,10 @@ import {
   today,
 } from '../db';
 import { api } from '../utils';
+import { logAction } from '../audit';
+
+/** پسوند توضیحات برای متن لاگ */
+const noteSuffix = (note?: string) => (note ? ' — توضیحات: ' + note : '');
 
 const notFound = () => HttpResponse.json({ message: 'شرکت یافت نشد.' }, { status: 404 });
 
@@ -108,6 +112,7 @@ export const companyHandlers = [
       averageDocs: [],
     };
     db.companies.unshift(company);
+    logAction(request, 'company', `ثبت شرکت جدید: ${company.name}`);
     return HttpResponse.json(toDetail(company), { status: 201 });
   }),
 
@@ -122,19 +127,26 @@ export const companyHandlers = [
     const company = findCompany(params.id);
     if (!company) return notFound();
     const { agreementFileId, ...body } = (await request.json()) as CompanyPayload;
+    const before = structuredClone(company);
     Object.assign(company, body);
     if (agreementFileId && agreementFileId !== company.agreementFile?.id) {
       company.agreementFile = fileOf(agreementFileId);
     }
+    logAction(request, 'company', `ویرایش اطلاعات شرکت: ${company.name}`, {
+      entity: 'company',
+      id: company.id,
+      before,
+    });
     return HttpResponse.json(toDetail(company));
   }),
 
-  http.delete(api(ENDPOINTS.COMPANIES.DETAIL(':id')), async ({ params }) => {
+  http.delete(api(ENDPOINTS.COMPANIES.DETAIL(':id')), async ({ params, request }) => {
     await delay(300);
     const company = findCompany(params.id);
     if (!company) return notFound();
     company.deleted = true;
     company.deletedAt = today();
+    logAction(request, 'company', `حذف شرکت: ${company.name}`);
     return new HttpResponse(null, { status: 204 });
   }),
 
@@ -146,6 +158,11 @@ export const companyHandlers = [
     company.status = 'cancelled';
     company.cancelDate = body.cancelDate;
     company.cancelReason = lookupTitle('cancelReasons', body.reasonId);
+    logAction(
+      request,
+      'company',
+      `لغو قرارداد شرکت: ${company.name} — دلیل: ${company.cancelReason ?? '—'}${noteSuffix(body.note)}`,
+    );
     return new HttpResponse(null, { status: 204 });
   }),
 
@@ -172,6 +189,11 @@ export const companyHandlers = [
       note: body.note,
       createdBy: userName(request),
     });
+    logAction(
+      request,
+      'company',
+      `ثبت/ویرایش میانگین موجودی (ماه‌های ${body.items.map((item) => item.month).join('، ')}): ${company.name}`,
+    );
     return HttpResponse.json(buildAverages(company));
   }),
 

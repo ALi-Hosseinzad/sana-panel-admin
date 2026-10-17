@@ -13,6 +13,7 @@ export const QUERY_KEYS = {
     COMPANIES: ['lookups', 'companies'],
     ALL_COMPANIES: ['lookups', 'companies', 'all'],
     POST_APPROVAL_STAGES: ['lookups', 'post-approval-stages'],
+    AUDIT_LOG_TYPES: ['lookups', 'audit-log-types'],
   },
   COMPANIES: {
     ALL: ['companies'],
@@ -60,6 +61,10 @@ export const QUERY_KEYS = {
     CONTRACTS_BY_MONTH: ['dashboard', 'contracts-by-month'],
     MONTHLY_PERFORMANCE: ['dashboard', 'monthly-performance'],
     REMOVED_COMPANIES: ['dashboard', 'removed-companies'],
+  },
+  AUDIT_LOGS: {
+    ALL: ['audit-logs'],
+    LIST: (type: string | undefined, page: number) => ['audit-logs', type ?? 'all', page],
   },
   USERS: {
     ALL: ['users'],
