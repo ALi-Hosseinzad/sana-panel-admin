@@ -55,10 +55,13 @@ const TEXT_LISTS: SchemeTextList[] = [
   'avgDocTypes',
 ];
 
-/** مقادیر خالی فرستاده نمی‌شوند؛ ردیف‌های خالی لیست‌های متنی حذف می‌شوند (لیست خالی = []) */
-const toPayload = (values: SchemePayload) =>
+/**
+ * مقادیر خالی فرستاده نمی‌شوند؛ ردیف‌های خالی لیست‌های متنی حذف می‌شوند (لیست خالی = []).
+ * ضریب سپه فقط وقتی «حقوق‌بگیر بانک سپه» روشن است فرستاده می‌شود.
+ */
+const toPayload = ({ sepahMultiplier, ...values }: SchemePayload) =>
   ({
-    ...removeEmpty(values),
+    ...removeEmpty(values.sepahEnabled ? { ...values, sepahMultiplier } : values),
     ...Object.fromEntries(
       TEXT_LISTS.map((key) => [
         key,
