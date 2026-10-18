@@ -6,15 +6,16 @@
 
 ```bash
 npm install
-npm run dev          # محیط development  (http://localhost:5173)
+npm run dev          # محیط development  (http://localhost:3005)
 npm run dev:stage    # محیط staging
 npm run build        # بیلد production
 npm run build:stage  # بیلد staging
 ```
 
-> **HTTPS فعلاً غیرفعال است** و پروژه روی `http://localhost:5173` اجرا می‌شود.
-> تنظیمات https و گواهی در `vite.config.ts`، `playwright.config.ts` و `src/config/env.ts` کامنت شده‌اند
-> و هنگام دیپلوی واقعی دوباره بررسی و فعال می‌شوند.
+> **HTTPS فعلاً غیرفعال است** و پروژه روی `http://localhost:3005` اجرا می‌شود.
+> برای اجرای محلی با https کافی است `HTTPS=true` در فایل env باشد (گواهی self-signed با plugin-basic-ssl).
+> پورت با متغیر `PORT` قابل تغییر است (پیش‌فرض ۳۰۰۵).
+> بیلد production با terser فشرده می‌شود و `console` و `debugger` حذف می‌شوند؛ بقیه محیط‌ها sourcemap دارند.
 
 فعلاً در **همه محیط‌ها** (development، staging و production) دیتا از ماک خوانده می‌شود (`VITE_ENABLE_MOCK=true`). ماک مستقیماً روی axios وصل است و به Service Worker یا https نیاز ندارد، پس بعد از دیپلوی هم کار می‌کند. هنگام اتصال به API واقعی کافی است این متغیر در `.env.staging` و `.env.production` برابر `false` شود. کاربر نمونه: `admin / admin` یا `branch / branch`.
 

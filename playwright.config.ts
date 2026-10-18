@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// HTTPS فعلاً غیرفعال است؛ هنگام فعال‌سازی، آدرس‌ها به https://localhost:5173 برگردند.
-const BASE_URL = 'http://localhost:5173';
+// HTTPS فعلاً غیرفعال است؛ هنگام فعال‌سازی، آدرس‌ها به https://localhost:3005 برگردند.
+const BASE_URL = 'http://localhost:3005';
 
 export default defineConfig({
   testDir: './e2e',

@@ -2,9 +2,9 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 
 import viteConfig from './vite.config';
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
+// vite.config تابعی از mode است؛ اول با همان env اجرا و بعد با تنظیمات تست ادغام می‌شود
+export default defineConfig((configEnv) =>
+  mergeConfig(viteConfig(configEnv), {
     test: {
       globals: true,
       environment: 'jsdom',
