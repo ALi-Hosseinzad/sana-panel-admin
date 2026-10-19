@@ -13,7 +13,10 @@ export const env = {
   appTitle: readEnv('VITE_APP_TITLE', 'سامانه سانا'),
   apiBaseUrl: readEnv('VITE_API_BASE_URL'), // ensureHttps(readEnv('VITE_API_BASE_URL'))
   /** آدرس Facility API از Gateway (مدیریت شرکت‌ها و ...) */
-  facilityApiBaseUrl: readEnv('VITE_FACILITY_API_BASE_URL', '/gateway/facility-mangment'),
+  facilityApiBaseUrl: readEnv(
+    'VITE_FACILITY_API_BASE_URL',
+    'https://api-admin-stg.abromid.ir/gateway/facility-management',
+  ),
   apiTimeout: Number(readEnv('VITE_API_TIMEOUT', '30000')),
   enableMock: readEnv('VITE_ENABLE_MOCK') === 'true',
   isDev: import.meta.env.DEV,
