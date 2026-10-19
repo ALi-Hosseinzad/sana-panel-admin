@@ -23,14 +23,17 @@ interface CompanyTableProps {
 
 const PAGE_SIZE = 10;
 
+/**
+ * فرض موقت: وضعیت ۱ یعنی فعال. بکند هنوز معنای `CompanyStatus` (۱ تا ۴) را مشخص نکرده
+ * و فهرست، تاریخ و دلیل لغو را هم برنمی‌گرداند.
+ */
+const ACTIVE_STATUS = 1;
+
 const renderStatus = (company: CompanyListItem) =>
-  company.status === 'active' ? (
+  company.status === ACTIVE_STATUS ? (
     <StatusChip tone="success">فعال (تمدید خودکار فعال)</StatusChip>
   ) : (
-    <StatusChip tone="error">
-      لغوشده در {formatJalali(company.cancelDate, undefined, { persianDigits: true })} (
-      {company.cancelReason ?? '—'})
-    </StatusChip>
+    <StatusChip tone="error">وضعیت {toPersianDigits(company.status)}</StatusChip>
   );
 
 export const CompanyTable = ({ onCreate, onEdit, onCancelContract }: CompanyTableProps) => {
@@ -93,7 +96,7 @@ export const CompanyTable = ({ onCreate, onEdit, onCancelContract }: CompanyTabl
           >
             ویرایش
           </Button>
-          {row.status === 'active' && (
+          {row.status === ACTIVE_STATUS && (
             <Button
               variant="secondary"
               size="small"

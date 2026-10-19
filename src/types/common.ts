@@ -7,6 +7,14 @@ export interface PaginatedResponse<T> {
   pageSize: number;
 }
 
+/** پوشش پاسخ‌های Facility API (`FacilityBaseMessageResponseOf...`) */
+export interface FacilityResponse<T> {
+  statusCode: number;
+  message: string | null;
+  data: T;
+  isSuccess: boolean;
+}
+
 export interface ApiErrorBody {
   message?: string;
   errors?: Record<string, string[]>;

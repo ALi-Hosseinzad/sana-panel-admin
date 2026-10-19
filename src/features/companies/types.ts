@@ -1,6 +1,52 @@
-import { type UploadedFile } from '@/types/common';
+import { type PaginatedResponse, type UploadedFile } from '@/types/common';
 
 export type ContractStatus = 'active' | 'cancelled';
+
+/** وضعیت شرکت در API (`CompanyStatus`)؛ بکند هنوز معنای ۱ تا ۴ را مشخص نکرده */
+export type CompanyStatus = 1 | 2 | 3 | 4;
+
+/** ثبت‌کننده (`Common.RegistrarDto`) */
+export interface CompanyRegistrar {
+  panelUserId: number;
+  userName: string;
+  userCode: string | null;
+  branchName: string | null;
+  branchCode: string | null;
+}
+
+/** ردیف فهرست شرکت‌ها در API (`ReadModels.CompanyListItemDto`) */
+export interface CompanyListItemDto {
+  id: number;
+  name: string;
+  nationalId: string;
+  agreementNumber: string;
+  contractDate: string;
+  planCount: number;
+  registrar: CompanyRegistrar | null;
+  status: CompanyStatus;
+  branchCode: string;
+}
+
+/** خروجی `GET /Companies` (`ReadModels.CompanySearchResultDto`) */
+export interface CompanySearchResultDto {
+  page: {
+    items: CompanyListItemDto[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+  };
+  activeCount: number;
+  registeredCount: number;
+}
+
+/** پارامترهای جستجوی `GET /Companies` */
+export interface CompanySearchParams {
+  page: number;
+  pageSize: number;
+  status?: CompanyStatus;
+  branchCode?: string;
+  term?: string;
+}
 
 /** ردیف جدول فهرست شرکت‌ها */
 export interface CompanyListItem {
@@ -11,9 +57,14 @@ export interface CompanyListItem {
   contractDate: string;
   planCount: number;
   registeredBy: string;
-  status: ContractStatus;
-  cancelDate?: string;
-  cancelReason?: string;
+  status: CompanyStatus;
+  branchCode: string;
+}
+
+/** خروجی فهرست شرکت‌ها برای جدول */
+export interface CompanyListResult extends PaginatedResponse<CompanyListItem> {
+  activeCount: number;
+  registeredCount: number;
 }
 
 /** اطلاعات کامل شرکت (برای ویرایش) */

@@ -26,6 +26,10 @@ export const ENDPOINTS = {
     AUDIT_LOG_TYPES: '/lookups/audit-log-types',
     /** آدرس یک آیتم از لیست (برای ویرایش/حذف) */
   },
+  /** Facility API (نسبت به `VITE_FACILITY_API_BASE_URL`) — آدرس‌ها مطابق Swagger */
+  FACILITY: {
+    COMPANIES: '/Companies',
+  },
   COMPANIES: {
     LIST: '/companies',
     DETAIL: (id: string) => `/companies/${id}`,

@@ -1,19 +1,67 @@
+import { env } from '@/config/env';
 import { ENDPOINTS } from '@/constant/endpoints';
 import { http } from '@/services/http';
-import { type PageParams, type PaginatedResponse } from '@/types/common';
+import { type FacilityResponse } from '@/types/common';
 
 import {
   type AverageDoc,
   type CancelContractPayload,
   type CompanyDetail,
   type CompanyListItem,
+  type CompanyListItemDto,
+  type CompanyListResult,
   type CompanyPayload,
+  type CompanySearchParams,
+  type CompanySearchResultDto,
   type MonthlyAverage,
   type SaveAveragesPayload,
 } from './types';
 
-export const getCompanies = (params: PageParams) =>
-  http.get<PaginatedResponse<CompanyListItem>>(ENDPOINTS.COMPANIES.LIST, { params });
+/** درخواست‌های Facility API: آدرس Gateway و احراز هویت با کوکی ورود (`token`) */
+const facilityConfig = { baseURL: env.facilityApiBaseUrl, withCredentials: true };
+
+const toListItem = (dto: CompanyListItemDto): CompanyListItem => ({
+  id: String(dto.id),
+  name: dto.name,
+  nationalId: dto.nationalId,
+  agreementNo: dto.agreementNumber,
+  contractDate: dto.contractDate,
+  planCount: dto.planCount,
+  registeredBy: dto.registrar?.userName ?? '—',
+  status: dto.status,
+  branchCode: dto.branchCode,
+});
+
+/** فهرست شرکت‌ها (`Companies_Search`) */
+export const getCompanies = async ({
+  page,
+  pageSize,
+  status,
+  branchCode,
+  term,
+}: CompanySearchParams): Promise<CompanyListResult> => {
+  const { data } = await http.get<FacilityResponse<CompanySearchResultDto>>(
+    ENDPOINTS.FACILITY.COMPANIES,
+    {
+      ...facilityConfig,
+      params: {
+        Page: page,
+        PageSize: pageSize,
+        Status: status,
+        BranchCode: branchCode,
+        Term: term,
+      },
+    },
+  );
+  return {
+    items: data.page.items.map(toListItem),
+    total: data.page.totalCount,
+    page: data.page.page,
+    pageSize: data.page.pageSize,
+    activeCount: data.activeCount,
+    registeredCount: data.registeredCount,
+  };
+};
 
 export const getCompany = (id: string) => http.get<CompanyDetail>(ENDPOINTS.COMPANIES.DETAIL(id));
 

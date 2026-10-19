@@ -5,7 +5,6 @@ import { type MockCompany } from '@/constant/mock';
 import {
   type CancelContractPayload,
   type CompanyDetail,
-  type CompanyListItem,
   type CompanyPayload,
   type MonthlyAverage,
   type SaveAveragesPayload,
@@ -30,19 +29,6 @@ const noteSuffix = (note?: string) => (note ? ' — توضیحات: ' + note : '
 const notFound = () => HttpResponse.json({ message: 'شرکت یافت نشد.' }, { status: 404 });
 
 const findCompany = (id: unknown) => db.companies.find((item) => item.id === id && !item.deleted);
-
-const toListItem = (company: MockCompany): CompanyListItem => ({
-  id: company.id,
-  name: company.name,
-  nationalId: company.nationalId,
-  agreementNo: company.agreementNo,
-  contractDate: company.contractDate,
-  planCount: company.planIds.length,
-  registeredBy: company.registeredBy,
-  status: company.status,
-  cancelDate: company.cancelDate,
-  cancelReason: company.cancelReason,
-});
 
 const toDetail = (company: MockCompany): CompanyDetail => ({
   id: company.id,
@@ -82,21 +68,6 @@ const userName = (request: Request) =>
   findUserByToken(request.headers.get('Authorization'))?.profile.fullName ?? '—';
 
 export const companyHandlers = [
-  http.get(api(ENDPOINTS.COMPANIES.LIST), async ({ request }) => {
-    await delay(300);
-    const url = new URL(request.url);
-    const page = Number(url.searchParams.get('page') ?? 1);
-    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
-    const list = db.companies.filter((item) => !item.deleted);
-    const start = (page - 1) * pageSize;
-    return HttpResponse.json({
-      items: list.slice(start, start + pageSize).map(toListItem),
-      total: list.length,
-      page,
-      pageSize,
-    });
-  }),
-
   http.post(api(ENDPOINTS.COMPANIES.LIST), async ({ request }) => {
     await delay(400);
     const body = (await request.json()) as CompanyPayload;
