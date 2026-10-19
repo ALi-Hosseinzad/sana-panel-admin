@@ -13,7 +13,7 @@ import { QUERY_KEYS } from '@/constant/queryKeys';
 import { formatJalali, toPersianDigits } from '@/utils/date';
 
 import { deleteCompany, getCompanies } from '../api';
-import { type CompanyListItem } from '../types';
+import { COMPANY_STATUS, type CompanyListItem, type CompanyStatus } from '../types';
 
 interface CompanyTableProps {
   onCreate: () => void;
@@ -23,18 +23,18 @@ interface CompanyTableProps {
 
 const PAGE_SIZE = 10;
 
-/**
- * فرض موقت: وضعیت ۱ یعنی فعال. بکند هنوز معنای `CompanyStatus` (۱ تا ۴) را مشخص نکرده
- * و فهرست، تاریخ و دلیل لغو را هم برنمی‌گرداند.
- */
-const ACTIVE_STATUS = 1;
+const STATUS_LABELS: Record<CompanyStatus, string> = {
+  [COMPANY_STATUS.ACTIVE]: 'فعال (تمدید خودکار فعال)',
+  [COMPANY_STATUS.CANCELLED]: 'لغوشده',
+  [COMPANY_STATUS.EXPIRED]: 'منقضی‌شده',
+  [COMPANY_STATUS.DELETED]: 'حذف‌شده',
+};
 
-const renderStatus = (company: CompanyListItem) =>
-  company.status === ACTIVE_STATUS ? (
-    <StatusChip tone="success">فعال (تمدید خودکار فعال)</StatusChip>
-  ) : (
-    <StatusChip tone="error">وضعیت {toPersianDigits(company.status)}</StatusChip>
-  );
+const renderStatus = (company: CompanyListItem) => (
+  <StatusChip tone={company.status === COMPANY_STATUS.ACTIVE ? 'success' : 'error'}>
+    {STATUS_LABELS[company.status]}
+  </StatusChip>
+);
 
 export const CompanyTable = ({ onCreate, onEdit, onCancelContract }: CompanyTableProps) => {
   const [page, setPage] = useState(1);
@@ -96,7 +96,7 @@ export const CompanyTable = ({ onCreate, onEdit, onCancelContract }: CompanyTabl
           >
             ویرایش
           </Button>
-          {row.status === ACTIVE_STATUS && (
+          {row.status === COMPANY_STATUS.ACTIVE && (
             <Button
               variant="secondary"
               size="small"

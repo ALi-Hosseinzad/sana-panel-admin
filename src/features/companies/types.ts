@@ -2,8 +2,15 @@ import { type PaginatedResponse, type UploadedFile } from '@/types/common';
 
 export type ContractStatus = 'active' | 'cancelled';
 
-/** وضعیت شرکت در API (`CompanyStatus`)؛ بکند هنوز معنای ۱ تا ۴ را مشخص نکرده */
-export type CompanyStatus = 1 | 2 | 3 | 4;
+/** وضعیت شرکت در API (`CompanyStatus` در FacilityEnums بکند) */
+export const COMPANY_STATUS = {
+  ACTIVE: 1,
+  CANCELLED: 2,
+  EXPIRED: 3,
+  DELETED: 4,
+} as const;
+
+export type CompanyStatus = (typeof COMPANY_STATUS)[keyof typeof COMPANY_STATUS];
 
 /** ثبت‌کننده (`Common.RegistrarDto`) */
 export interface CompanyRegistrar {
