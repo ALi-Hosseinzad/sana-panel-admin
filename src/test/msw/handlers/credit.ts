@@ -11,7 +11,7 @@ import {
 import { dayjs, formatJalali, toPersianDigits } from '@/utils/date';
 import { formatAmount } from '@/utils/number';
 
-import { buildPlanOptions, db, nextId, schemeOf, today } from '../db';
+import { buildPlanOptions, db, nextId, schemeOf, sepahMultiplier, today } from '../db';
 import { api, json } from '../utils';
 import { logAction } from '../audit';
 
@@ -51,7 +51,8 @@ const usedPreviousMonth = (company: MockCompany, date: string) => {
 const buildEligibility = (company: MockCompany, date: string): CreditEligibility => {
   const base = dayjs(date);
   const monthsSinceContract = base.diff(dayjs(company.contractDate), 'month');
-  const eligible = monthsSinceContract >= schemeOf(company.schemeId).staffDelayMonths;
+  const staffDelayMonths = schemeOf(company.schemeId).settings.personnelIntroductionDelayMonths;
+  const eligible = monthsSinceContract >= staffDelayMonths;
   const transferDayNumber = dayjs(company.accountOpenDate).jalali().day;
   const transferDay = base.jalali().day === transferDayNumber;
   const messages: EligibilityMessage[] = [];
@@ -60,7 +61,7 @@ const buildEligibility = (company: MockCompany, date: string): CreditEligibility
     messages.push({
       type: 'error',
       text: toPersianDigits(
-        `این شرکت هنوز مجاز به معرفی پرسنل برای دریافت وام نیست — مجاز شدن از ${schemeOf(company.schemeId).staffDelayMonths} ماه پس از تاریخ انعقاد قرارداد (${formatJalali(company.contractDate)}) خواهد بود.`,
+        `این شرکت هنوز مجاز به معرفی پرسنل برای دریافت وام نیست — مجاز شدن از ${staffDelayMonths} ماه پس از تاریخ انعقاد قرارداد (${formatJalali(company.contractDate)}) خواهد بود.`,
       ),
     });
   } else if (!transferDay) {
@@ -87,7 +88,7 @@ export const buildPlanCredits = (company: MockCompany, date: string): PlanCredit
   const plans = companyPlans(company);
   const sharePercent = plans.length ? 100 / plans.length : 0;
   const scheme = schemeOf(company.schemeId);
-  const multiplier = scheme.sepahEnabled && company.sepahSalary ? scheme.sepahMultiplier : 1;
+  const multiplier = sepahMultiplier(scheme, company.sepahSalary);
   const filled = company.averages.filter((value): value is number => value !== null);
   const totalAverage = filled.reduce((sum, value) => sum + value, 0);
   const lastAverage = filled.at(-1) ?? 0;

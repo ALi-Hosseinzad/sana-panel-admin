@@ -33,7 +33,7 @@ const toItem = (item: MockLoanRequest) => ({
 const validateStage = (body: DecisionPayload) => {
   const stage = db.postApprovalStages.find((entry) => entry.id === body.stageId);
   if (!stage) return 'انتخاب مرحله پس از تأیید اجباری است.';
-  if (stage.requiresReason && !lookupTitle('noGrantReasons', body.noGrantReasonId ?? '')) {
+  if (stage.requiresReason && !lookupTitle('remoteGrantDenied', body.noGrantReasonId ?? '')) {
     return 'علت عدم اعطای تسهیلات غیرحضوری را انتخاب کنید.';
   }
   return null;
@@ -63,11 +63,12 @@ const decide = (path: string, nextStatus: LoanStatus) =>
       item.decidedAt = today();
       item.note = body.note;
       if (body.fileId) item.file = fileOf(body.fileId);
-      if (body.reasonId) item.rejectReason = lookupTitle('rejectReasons', body.reasonId);
+      if (body.reasonId) item.rejectReason = lookupTitle('loanReject', body.reasonId);
       if (nextStatus === 'approved') {
         item.postStageId = body.stageId;
         // مثل فایل طراحی: علت عدم اعطا در توضیحات ثبت می‌شود
-        const noGrant = body.noGrantReasonId && lookupTitle('noGrantReasons', body.noGrantReasonId);
+        const noGrant =
+          body.noGrantReasonId && lookupTitle('remoteGrantDenied', body.noGrantReasonId);
         if (noGrant) item.note = body.note ? `${noGrant} — ${body.note}` : noGrant;
       }
       const reason = item.rejectReason ? ` — دلیل: ${item.rejectReason}` : '';

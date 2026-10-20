@@ -1,17 +1,17 @@
 import { delay, http } from 'msw';
 
 import { ENDPOINTS, FACILITY } from '@/constant/endpoints';
+import { type MockReasonKind } from '@/constant/mock';
 import { MOCK_ENUMS } from '@/constant/mock/enums';
-import { type SchemeTextList } from '@/features/base-info/types';
 
 import { buildPlanOptions, db, lookupItems, schemeOf } from '../db';
 import { api, json } from '../utils';
 
 /** لیست ساده‌ای که از اطلاعات پایه طرح خوانده می‌شود */
-const lookupList = (path: string, name: SchemeTextList) =>
+const lookupList = (path: string, kind: MockReasonKind) =>
   http.get(api(path), async () => {
     await delay(150);
-    return json(lookupItems(name));
+    return json(lookupItems(kind));
   });
 
 export const lookupHandlers = [
@@ -21,22 +21,29 @@ export const lookupHandlers = [
     return json(MOCK_ENUMS);
   }),
 
-  lookupList(ENDPOINTS.LOOKUPS.CANCEL_REASONS, 'cancelReasons'),
-  lookupList(ENDPOINTS.LOOKUPS.REJECT_REASONS, 'rejectReasons'),
-  lookupList(ENDPOINTS.LOOKUPS.NO_GRANT_REASONS, 'noGrantReasons'),
-  lookupList(ENDPOINTS.LOOKUPS.AVG_DOC_TYPES, 'avgDocTypes'),
+  lookupList(ENDPOINTS.LOOKUPS.CANCEL_REASONS, 'contractCancel'),
+  lookupList(ENDPOINTS.LOOKUPS.REJECT_REASONS, 'loanReject'),
+  lookupList(ENDPOINTS.LOOKUPS.NO_GRANT_REASONS, 'remoteGrantDenied'),
+  lookupList(ENDPOINTS.LOOKUPS.AVG_DOC_TYPES, 'documentType'),
 
   /** طرح‌های قابل انتخاب یک طرح کلان + سقف تعداد طرح هر شرکت */
   http.get(api(ENDPOINTS.LOOKUPS.PLANS), async ({ request }) => {
     await delay(200);
     const scheme = schemeOf(new URL(request.url).searchParams.get('schemeId') ?? undefined);
-    return json({ maxPlans: scheme.maxPlans, items: buildPlanOptions(scheme) });
+    return json({
+      maxPlans: scheme.settings.maxPlansPerCompany,
+      items: buildPlanOptions(scheme),
+    });
   }),
 
   /** کشویی طرح‌های کلان برای فرم شرکت */
   http.get(api(ENDPOINTS.LOOKUPS.SCHEMES), async () => {
     await delay(150);
-    return json(db.schemes.map((scheme) => ({ id: scheme.id, title: scheme.name })));
+    return json(
+      db.schemes
+        .filter((scheme) => scheme.isActive)
+        .map((scheme) => ({ id: String(scheme.id), title: scheme.title })),
+    );
   }),
 
   http.get(api(ENDPOINTS.LOOKUPS.COMPANIES), async ({ request }) => {

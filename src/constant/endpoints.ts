@@ -13,11 +13,6 @@ export const ENDPOINTS = {
     /** بکند ندارد — سرویس پروفایل در نسخه بعدی سوئگر منتشر می‌شود */
     PROFILE: '/auth/profile',
   },
-  BASE_INFO: {
-    /** طرح‌ها (لیست / ایجاد) */
-    SCHEMES: '/base-info/schemes',
-    SCHEME: (id: string) => `/base-info/schemes/${id}`,
-  },
   FILES: {
     UPLOAD: '/files',
   },

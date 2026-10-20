@@ -1,5 +1,12 @@
 export { MOCK_USERS, type MockUser } from './auth';
-export { MOCK_POST_APPROVAL_STAGES, MOCK_SCHEMES } from './baseInfo';
+export {
+  MOCK_POST_APPROVAL_STAGES,
+  MOCK_SCHEMES,
+  REASON_TYPES,
+  toReasons,
+  type MockReasonKind,
+  type MockScheme,
+} from './baseInfo';
 export { MOCK_COMPANIES, type MockCompany } from './companies';
 export { MOCK_STAFF, type MockStaff } from './staff';
 export { MOCK_LOAN_REQUESTS, type MockLoanRequest } from './loanRequests';
