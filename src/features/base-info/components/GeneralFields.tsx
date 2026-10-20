@@ -9,7 +9,8 @@ import { type SchemeFormValues } from '../types';
 import { SectionTitle } from './SectionTitle';
 
 /** نام طرح و تنظیمات عمومی */
-export const GeneralFields = () => {
+/** isEdit: کد طرح بعد از ثبت قابل تغییر نیست */
+export const GeneralFields = ({ isEdit }: { isEdit: boolean }) => {
   const isActive = Form.useWatch<boolean | undefined>('isActive');
   const digitalApproval = Form.useWatch<boolean | undefined>('digitalApprovalEnabled');
 
@@ -28,9 +29,11 @@ export const GeneralFields = () => {
         <FormItem<SchemeFormValues>
           name="code"
           label="کد طرح"
+          required
           rules={[{ min: 2, max: 30, message: 'کد طرح باید بین ۲ تا ۳۰ حرف باشد.' }]}
+          extra={isEdit ? 'کد طرح بعد از ثبت قابل تغییر نیست.' : undefined}
         >
-          <TextInput placeholder="مثلاً NM-01" />
+          <TextInput placeholder="مثلاً NM-01" disabled={isEdit} />
         </FormItem>
         <FormItem<SchemeFormValues> name="isActive" label="وضعیت طرح">
           <Switch label={isActive ? 'فعال' : 'غیرفعال'} />

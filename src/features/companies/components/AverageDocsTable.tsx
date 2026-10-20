@@ -13,7 +13,9 @@ import { Button } from '@/component/button';
 import { Table } from '@/component/table';
 import { Typography } from '@/component/typography';
 import { FACILITY } from '@/constant/endpoints';
+import { ROLES } from '@/constant/roles';
 import { http } from '@/services/http';
+import { useProfileStore } from '@/store/useProfileStore';
 import { toPersianDigits } from '@/utils/date';
 
 import { type BalanceDocument } from '../types';
@@ -21,6 +23,8 @@ import { type BalanceDocument } from '../types';
 export const AverageDocsTable = ({ companyId }: { companyId: number }) => {
   const queryClient = useQueryClient();
   const { modal } = App.useApp();
+  // حذف مستند فقط برای ادمین
+  const isAdmin = useProfileStore((state) => state.hasRole(ROLES.ADMIN));
   const { data, isFetching } = useCompaniesBalanceDocuments(companyId);
 
   const { mutateAsync: remove } = useCompaniesBalanceDocumentDelete({
@@ -77,14 +81,16 @@ export const AverageDocsTable = ({ companyId }: { companyId: number }) => {
           >
             دانلود
           </Button>
-          <Button
-            variant="secondary"
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => confirmDelete(row)}
-          >
-            حذف
-          </Button>
+          {isAdmin && (
+            <Button
+              variant="secondary"
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => confirmDelete(row)}
+            >
+              حذف
+            </Button>
+          )}
         </div>
       ),
     },

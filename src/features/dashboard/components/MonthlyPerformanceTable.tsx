@@ -1,6 +1,6 @@
 import { type ColumnsType } from 'antd/es/table';
 
-import { useDashboardGet } from '@/api/generated/facility';
+import { useDashboardGet, useDashboardMonths } from '@/api/generated/facility';
 import { PanelCard } from '@/component/card';
 import { Table } from '@/component/table';
 import { toPersianDigits } from '@/utils/date';
@@ -23,10 +23,10 @@ const buildColumns = (months: string[]): ColumnsType<MonthlyAllocation> => [
 
 export const MonthlyPerformanceTable = () => {
   const { data, isFetching } = useDashboardGet();
+  // ترتیب ستون‌ها از سرویس ماه‌ها (تازه‌ترین اول)
+  const { data: monthOptions } = useDashboardMonths();
   const rows = data?.monthlyAllocation ?? [];
-  const months = [...new Set(rows.flatMap((row) => Object.keys(row.amountByMonth ?? {})))].sort(
-    (a, b) => a.localeCompare(b),
-  );
+  const months = (monthOptions ?? []).map((item) => item.key ?? '');
 
   return (
     <PanelCard

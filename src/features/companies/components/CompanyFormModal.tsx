@@ -18,6 +18,7 @@ import { Switch } from '@/component/switch';
 
 import { type CompanyDetail, type CompanyFormValues } from '../types';
 
+import { AgreementDownload } from './AgreementDownload';
 import { PlanSelect } from './PlanSelect';
 
 interface CompanyFormModalProps {
@@ -163,7 +164,11 @@ export const CompanyFormModal = ({ open, companyId, onClose }: CompanyFormModalP
       <FormItem name="salaryFromSepah" label="دریافت حقوق پرسنل از بانک سپه">
         <Switch checkedChildren="بله" unCheckedChildren="خیر" />
       </FormItem>
-      <FormItem name="agreementFile" label="فایل تفاهم‌نامه">
+      <FormItem
+        name="agreementFile"
+        label="فایل تفاهم‌نامه"
+        extra={detail?.agreementFile && <AgreementDownload companyId={companyId ?? 0} />}
+      >
         <FileInput />
       </FormItem>
       <div className="md:col-span-2">

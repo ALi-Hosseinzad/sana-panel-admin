@@ -16,7 +16,7 @@ import { LOAN_REQUEST_STATUS, PERSONNEL_STATUS, type MockStaff } from '@/constan
 import { ISO_DATE_FORMAT, parseJalali, toEnglishDigits } from '@/utils/date';
 
 import { logAction } from '../audit';
-import { db, nextId, reasonTitle, registrarOf } from '../db';
+import { activeLoans, db, nextId, reasonTitle, registrarOf } from '../db';
 import { api, formText, json } from '../utils';
 
 const SAMPLE_HEADERS = [
@@ -39,11 +39,27 @@ const notFound = () => json({ message: 'پرسنل یافت نشد.' }, { status
 const findStaff = (id: unknown) =>
   db.staff.find((item) => String(item.id) === id && item.status !== PERSONNEL_STATUS.DELETED);
 
-const toListItem = ({
-  companyId: _companyId,
-  rowVersion: _rowVersion,
-  ...staff
-}: MockStaff): ReadModelsPersonnelListItemDto => staff;
+/** فردی که در وام استفاده شده قفل است (ویرایش و حذف نمی‌شود) */
+const isLocked = (staff: MockStaff) =>
+  db.loanRequests.some(
+    (item) => item.personnelId === staff.id && activeLoans(staff.companyId).includes(item),
+  );
+
+const toListItem = (staff: MockStaff): ReadModelsPersonnelListItemDto => ({
+  id: staff.id,
+  priority: staff.priority,
+  fullName: staff.fullName,
+  nationalCode: staff.nationalCode,
+  mobile: staff.mobile,
+  personnelCode: staff.personnelCode,
+  hireDate: staff.hireDate,
+  status: staff.status,
+  rejectReason: staff.rejectReason,
+  createdAt: staff.createdAt,
+  decidedAt: staff.decidedAt,
+  registrar: staff.registrar,
+  isLocked: isLocked(staff),
+});
 
 const toDetail = (staff: MockStaff): ReadModelsPersonnelDetailsDto => ({
   id: staff.id,
@@ -55,7 +71,7 @@ const toDetail = (staff: MockStaff): ReadModelsPersonnelDetailsDto => ({
   personnelCode: staff.personnelCode,
   hireDate: staff.hireDate,
   status: staff.status,
-  isLocked: staff.isLocked,
+  isLocked: isLocked(staff),
   history: [],
   rowVersion: staff.rowVersion,
 });
@@ -133,12 +149,12 @@ const newStaff = (
   hireDate: body.hireDate,
   // اولویت اختیاری است؛ خالی = آخرین اولویت شرکت
   priority: body.priority ?? lastPriority(companyId) + 1,
-  status: PERSONNEL_STATUS.APPROVED,
+  // پرسنل جدید با وضعیت «در انتظار تأیید مدیر شرکت» ثبت می‌شود
+  status: PERSONNEL_STATUS.PENDING,
   rejectReason: null,
   createdAt: new Date().toISOString(),
   decidedAt: null,
   registrar: registrarOf(request),
-  isLocked: false,
   rowVersion: crypto.randomUUID(),
 });
 
@@ -249,9 +265,17 @@ export const staffHandlers = [
         { status: 409 },
       );
     }
+    if (isLocked(staff)) {
+      return json({ message: 'این پرسنل در وام استفاده شده و قابل ویرایش نیست.' }, { status: 400 });
+    }
     const error = invalidStaff(body, staff.companyId, staff.id);
     if (error) return json({ message: error }, { status: 400 });
     const before = structuredClone(staff);
+    // اصلاح فرد ردشده = ارسال دوباره برای تأیید مدیر
+    if (staff.status === PERSONNEL_STATUS.REJECTED) {
+      staff.status = PERSONNEL_STATUS.PENDING;
+      staff.rejectReason = null;
+    }
     Object.assign(staff, {
       fullName: body.fullName.trim(),
       nationalCode: body.nationalCode,
@@ -282,8 +306,8 @@ export const staffHandlers = [
         { status: 400 },
       );
     }
-    if (hasOpenLoan(staff)) {
-      return json({ message: 'این پرسنل درخواست وام در جریان دارد.' }, { status: 422 });
+    if (isLocked(staff)) {
+      return json({ message: 'این پرسنل در وام استفاده شده و قابل حذف نیست.' }, { status: 400 });
     }
     staff.status = PERSONNEL_STATUS.DELETED;
     logAction(

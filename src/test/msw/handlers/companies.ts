@@ -175,7 +175,7 @@ export const companyHandlers = [
         (!activeOnly || item.status === COMPANY_STATUS.ACTIVE) &&
         (!term || item.name.includes(term)),
     );
-    return json(list.map((item) => ({ id: String(item.id), title: item.name })));
+    return json(list.map((item) => ({ id: item.id, title: item.name })));
   }),
 
   http.post(api(COMPANIES), async ({ request }) => {

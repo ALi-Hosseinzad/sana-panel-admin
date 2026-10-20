@@ -198,6 +198,12 @@ export const baseInfoHandlers = [
     const body = (await request.json()) as SaveSchemeCommand;
     const error = invalid(body);
     if (error) return json({ message: error }, { status: 400 });
+    // کد الزامی و یکتاست
+    const code = body.code?.trim() ?? '';
+    if (code.length < 2) return json({ message: 'کد طرح الزامی است.' }, { status: 400 });
+    if (db.schemes.some((item) => item.code === code)) {
+      return json({ message: 'طرحی با این کد قبلاً ثبت شده است.' }, { status: 400 });
+    }
     const id = Math.max(0, ...db.schemes.map((item) => item.id)) + 1;
     const scheme = toScheme(id, body);
     db.schemes.push(scheme);
@@ -219,7 +225,8 @@ export const baseInfoHandlers = [
         { status: 409 },
       );
     }
-    const scheme = toScheme(previous.id, body, previous);
+    // کد طرح در ویرایش نادیده گرفته می‌شود
+    const scheme = toScheme(previous.id, { ...body, code: previous.code }, previous);
     logAction(request, 'base', `ویرایش طرح: ${scheme.title}`, {
       entity: 'scheme',
       id: String(scheme.id),
@@ -234,10 +241,10 @@ export const baseInfoHandlers = [
     const removed = findScheme(params.schemeId);
     if (!removed) return notFound();
     if (removed.isActive && db.schemes.filter((item) => item.isActive).length === 1) {
-      return json({ message: 'حداقل یک طرح فعال باید در سامانه باقی بماند.' }, { status: 422 });
+      return json({ message: 'حداقل یک طرح فعال باید در سامانه باقی بماند.' }, { status: 400 });
     }
     if (companyCount(removed)) {
-      return json({ message: 'این طرح به شرکت‌هایی اختصاص داده شده است.' }, { status: 422 });
+      return json({ message: 'این طرح شرکت فعال دارد.' }, { status: 400 });
     }
     logAction(request, 'base', `حذف طرح: ${removed.title}`);
     db.schemes = db.schemes.filter((item) => item.id !== removed.id);

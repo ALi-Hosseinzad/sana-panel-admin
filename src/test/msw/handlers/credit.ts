@@ -104,7 +104,7 @@ const filledBalances = (company: MockCompany) =>
 export const buildPlanCredits = (company: MockCompany, date: string): ReadModelsPlanCreditDto[] => {
   const scheme = schemeOf(company.schemeId);
   const plans = schemePlans(scheme).filter((plan) => company.planIds.includes(plan.id ?? 0));
-  const shareOfAverage = plans.length ? 100 / plans.length : 0;
+  const sharePercent = plans.length ? 100 / plans.length : 0;
   const multiplier = sepahMultiplier(scheme, company.salaryFromSepah);
   const filled = filledBalances(company);
   const totalAverage = filled.reduce((sum, value) => sum + value, 0);
@@ -112,7 +112,7 @@ export const buildPlanCredits = (company: MockCompany, date: string): ReadModels
   const onlyThisMonth = usedPreviousMonth(company, date);
 
   return plans.map((plan) => {
-    const factor = ((plan.usablePercent ?? 0) / 100) * multiplier * (shareOfAverage / 100);
+    const factor = ((plan.usablePercent ?? 0) / 100) * multiplier * (sharePercent / 100);
     const createdCredit = Math.round(factor * totalAverage);
     const allocated = activeLoans(company.id)
       .filter((item) => item.planId === plan.id)
@@ -123,7 +123,8 @@ export const buildPlanCredits = (company: MockCompany, date: string): ReadModels
       contractType: plan.contractType === 1 ? 'قرض‌الحسنه' : 'مرابحه',
       rate: plan.rate,
       termMonths: plan.termMonths,
-      shareOfAverage,
+      // مبلغ سهم این طرح از مجموع میانگین
+      shareOfAverage: Math.round((totalAverage * sharePercent) / 100),
       usablePercent: plan.usablePercent,
       createdCredit,
       allocated,

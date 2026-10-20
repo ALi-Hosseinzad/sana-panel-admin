@@ -21,7 +21,6 @@ export interface MockStaff {
   createdAt: string;
   decidedAt: string | null;
   registrar: CommonRegistrarDto;
-  isLocked: boolean;
   rowVersion: string;
 }
 
@@ -47,7 +46,6 @@ const staff = (seed: StaffSeed): MockStaff => ({
   createdAt: '2025-06-01T10:00:00',
   decidedAt: '2025-06-01T12:00:00',
   registrar: ADMIN_REGISTRAR,
-  isLocked: false,
   rowVersion: `s${seed.id}-v1`,
 });
 
@@ -91,5 +89,15 @@ export const MOCK_STAFF: MockStaff[] = [
     mobile: '09124567890',
     personnelCode: '201',
     hireDate: '2022-11-01',
+  }),
+  staff({
+    id: 5,
+    companyId: 1,
+    priority: 4,
+    fullName: 'سارا نوری',
+    nationalCode: '0056789012',
+    mobile: '09125678901',
+    personnelCode: '104',
+    hireDate: '2024-09-10',
   }),
 ];

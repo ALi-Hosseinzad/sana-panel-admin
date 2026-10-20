@@ -95,8 +95,8 @@ export const managerApprovalHandlers = [
     const body = (await request.json()) as DecideLoanRequestsCommand;
     const approve = body.decision === APPROVE;
     const description = body.description?.trim() ?? '';
-    if (!approve && description.length < 5) {
-      return json({ message: 'توضیحات رد (حداقل ۵ نویسه) الزامی است.' }, { status: 400 });
+    if (!approve && (!reasonTitle('loanReject', body.reasonId) || description.length < 5)) {
+      return json({ message: 'دلیل رد و توضیحات (حداقل ۵ نویسه) الزامی است.' }, { status: 400 });
     }
     return json(
       decide(request, {
@@ -106,6 +106,9 @@ export const managerApprovalHandlers = [
         to: approve ? LOAN_REQUEST_STATUS.PENDING_CREDIT : LOAN_REQUEST_STATUS.REJECTED_MANAGER,
         description,
         stage: 'مدیر شرکت',
+        apply: (item) => {
+          if (!approve) item.rejectReason = reasonTitle('loanReject', body.reasonId);
+        },
       }),
     );
   }),

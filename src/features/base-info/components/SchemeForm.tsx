@@ -96,7 +96,7 @@ export const SchemeForm = ({ schemeId, onBack }: SchemeFormProps) => {
           initialValues={initialValues}
           onFinish={submit}
         >
-          <GeneralFields />
+          <GeneralFields isEdit={isEdit} />
           <NumberListFields
             name="murabahaRates"
             title="نرخ‌های مرابحه قابل انتخاب (درصد)"
