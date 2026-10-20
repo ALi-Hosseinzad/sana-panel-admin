@@ -16,7 +16,6 @@ export const QUERY_KEYS = {
     COMPANIES: ['lookups', 'companies'],
     ALL_COMPANIES: ['lookups', 'companies', 'all'],
     POST_APPROVAL_STAGES: ['lookups', 'post-approval-stages'],
-    AUDIT_LOG_TYPES: ['lookups', 'audit-log-types'],
   },
   COMPANIES: {
     ALL: ['companies'],

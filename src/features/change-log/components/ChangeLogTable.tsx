@@ -3,7 +3,8 @@ import { useMutation } from '@tanstack/react-query';
 import { type ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
 
-import { useChangeLogsSearch } from '@/api/generated/facility';
+import { useChangeLogsSearch, useChangeLogsUsers } from '@/api/generated/facility';
+import { type CommonRegistrarDto } from '@/api/generated/facility/facilityPanelAPI.schemas';
 import { Button } from '@/component/button';
 import { PanelCard } from '@/component/card';
 import { SelectInput } from '@/component/input';
@@ -25,18 +26,23 @@ const ALL = 0;
 const toJalaliDateTime = (iso?: string) =>
   iso ? toPersianDigits(dayjs(iso).formatJalali('YYYY/MM/DD HH:mm')) : '—';
 
-const userLabel = ({ user }: ChangeLogItem) =>
+const userLabel = (user?: CommonRegistrarDto | null) =>
   [user?.userName, user?.branchName].filter(Boolean).join(' — ') || '—';
 
 export const ChangeLogTable = () => {
   const [category, setCategory] = useState<number>(ALL);
+  const [panelUserId, setPanelUserId] = useState<number>(ALL);
   const [page, setPage] = useState(1);
   const [restoring, setRestoring] = useState<ChangeLogItem | null>(null);
   const isAdmin = useProfileStore((state) => state.hasRole(ROLES.ADMIN));
 
   const enums = useEnums();
+  const { data: users } = useChangeLogsUsers();
 
-  const filters = { Category: category === ALL ? undefined : (category as ChangeLogCategory) };
+  const filters = {
+    Category: category === ALL ? undefined : (category as ChangeLogCategory),
+    PanelUserId: panelUserId === ALL ? undefined : panelUserId,
+  };
   const { data, isFetching } = useChangeLogsSearch({ ...filters, Page: page, PageSize: PAGE_SIZE });
 
   const { mutate: download, isPending: isExporting } = useMutation({
@@ -62,7 +68,7 @@ export const ChangeLogTable = () => {
 
   const columns: ColumnsType<ChangeLogItem> = [
     { title: 'تاریخ و ساعت', dataIndex: 'at', render: toJalaliDateTime, width: 150 },
-    { title: 'کاربر', key: 'user', render: (_value, row) => userLabel(row), width: 190 },
+    { title: 'کاربر', key: 'user', render: (_value, row) => userLabel(row.user), width: 190 },
     {
       title: 'نوع عملیات',
       dataIndex: 'category',
@@ -75,6 +81,11 @@ export const ChangeLogTable = () => {
 
   const changeCategory = (value: number) => {
     setCategory(value);
+    setPage(1);
+  };
+
+  const changeUser = (value: number) => {
+    setPanelUserId(value);
     setPage(1);
   };
 
@@ -94,6 +105,21 @@ export const ChangeLogTable = () => {
             options={[
               { value: ALL, label: 'همه انواع عملیات' },
               ...enums.options('changeLogCategory'),
+            ]}
+          />
+          <SelectInput<number>
+            size="small"
+            allowClear={false}
+            style={{ minWidth: 200 }}
+            aria-label="کاربر"
+            value={panelUserId}
+            onChange={changeUser}
+            options={[
+              { value: ALL, label: 'همه کاربران' },
+              ...(users ?? []).map((user) => ({
+                value: user.panelUserId ?? 0,
+                label: userLabel(user),
+              })),
             ]}
           />
           <Button
