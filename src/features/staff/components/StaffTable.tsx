@@ -11,7 +11,9 @@ import {
 } from '@/api/generated/facility';
 import { Button } from '@/component/button';
 import { DeleteReasonModal, type DeleteReasonValues } from '@/component/delete-modal';
+import { StatusChip, type StatusTone } from '@/component/status-chip';
 import { Table } from '@/component/table';
+import { useEnums } from '@/services/enums';
 import { formatJalali, toPersianDigits } from '@/utils/date';
 
 import { type Staff, type StaffFilters, toSearchParams } from '../types';
@@ -24,10 +26,16 @@ interface StaffTableProps {
 
 const PAGE_SIZE = 10;
 
+/** رنگ وضعیت پرسنل (۱ در انتظار تأیید مدیر، ۲ تأییدشده، ۳ ردشده) */
+const STATUS_TONE: Record<number, StatusTone> = { 1: 'warning', 2: 'success', 3: 'error' };
+
+const LOCKED_TITLE = 'این پرسنل در وام استفاده شده و قابل ویرایش یا حذف نیست.';
+
 export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<Staff | null>(null);
   const queryClient = useQueryClient();
+  const enums = useEnums();
 
   const { data, isFetching } = usePersonnelSearch(companyId, {
     ...toSearchParams(filters),
@@ -68,6 +76,16 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
       render: (value: string) => formatJalali(value, undefined, { persianDigits: true }),
     },
     {
+      title: 'وضعیت',
+      key: 'status',
+      render: (_value, row) => (
+        <StatusChip tone={STATUS_TONE[row.status ?? 0] ?? 'default'}>
+          {enums.title('personnelStatus', row.status)}
+          {row.rejectReason ? ` (${row.rejectReason})` : ''}
+        </StatusChip>
+      ),
+    },
+    {
       title: 'عملیات',
       key: 'actions',
       render: (_value, row) => (
@@ -76,6 +94,8 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
             variant="outline"
             size="small"
             icon={<EditOutlined />}
+            disabled={row.isLocked}
+            title={row.isLocked ? LOCKED_TITLE : undefined}
             onClick={() => onEdit(row.id ?? 0)}
           >
             ویرایش
@@ -84,6 +104,8 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
             variant="secondary"
             size="small"
             icon={<DeleteOutlined />}
+            disabled={row.isLocked}
+            title={row.isLocked ? LOCKED_TITLE : undefined}
             onClick={() => setDeleting(row)}
           >
             حذف

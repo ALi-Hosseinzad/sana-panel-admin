@@ -39,11 +39,15 @@ test('main pages work on the backend models (mock) without errors', async ({ pag
   // staff
   await go(page, '/staff');
   await expect(page.getByRole('cell', { name: 'علی محمدی' })).toBeVisible();
+  // فردی که در وام استفاده شده قفل است
+  await expect(
+    page.getByRole('row', { name: /علی محمدی/ }).getByRole('button', { name: /ویرایش/ }),
+  ).toBeDisabled();
   await page
-    .getByRole('row', { name: /علی محمدی/ })
+    .getByRole('row', { name: /سارا نوری/ })
     .getByRole('button', { name: /ویرایش/ })
     .click();
-  await expect(page.getByRole('dialog').getByLabel('کد ملی')).toHaveValue('0012345678');
+  await expect(page.getByRole('dialog').getByLabel('کد ملی')).toHaveValue('0056789012');
   await page.getByRole('button', { name: 'ذخیره تغییرات' }).click();
   await expect(page.getByText(/ویرایش شد/)).toBeVisible();
 

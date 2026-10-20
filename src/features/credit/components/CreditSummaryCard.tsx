@@ -18,7 +18,8 @@ const columns: ColumnsType<PlanCredit> = [
     dataIndex: 'termMonths',
     render: (value?: number) => toPersianDigits(`${value ?? 0} ماه`),
   },
-  { title: 'سهم از میانگین', dataIndex: 'shareOfAverage', render: percent },
+  // مبلغ سهم این طرح از مجموع میانگین (ریال)
+  { title: 'سهم از میانگین', dataIndex: 'shareOfAverage', render: formatRial },
   { title: 'درصد قابل‌استفاده', dataIndex: 'usablePercent', render: percent },
   { title: 'اعتبار ایجادشده (تجمعی)', dataIndex: 'createdCredit', render: formatRial },
   { title: 'تخصیص‌یافته', dataIndex: 'allocated', render: formatRial },

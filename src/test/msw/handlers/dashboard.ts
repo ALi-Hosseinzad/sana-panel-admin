@@ -59,9 +59,10 @@ const approvalRate = (companyId: number) => {
   return loans.length ? Math.round((approved / loans.length) * 100) : null;
 };
 
+/** ماه‌های دارای داده؛ تازه‌ترین اول */
 const loanMonths = () =>
   [...new Set(db.loanRequests.map((item) => monthKey(item.baseDate)))].sort((a, b) =>
-    a.localeCompare(b),
+    b.localeCompare(a),
   );
 
 const buildDashboard = (): ReadModelsDashboardDto => {

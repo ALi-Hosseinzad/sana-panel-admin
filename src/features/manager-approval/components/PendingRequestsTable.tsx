@@ -17,6 +17,7 @@ import { Button } from '@/component/button';
 import { DecisionModal, showDecisionResult, type DecisionTarget } from '@/component/decision-modal';
 import { LoanStatusChip } from '@/component/loan-status';
 import { Table } from '@/component/table';
+import { REASON_TYPE, useReasonOptions } from '@/services/reasons';
 import { formatJalali } from '@/utils/date';
 import { formatRial } from '@/utils/number';
 
@@ -58,9 +59,13 @@ export const PendingRequestsTable = ({ companyId }: { companyId: number }) => {
     },
   });
 
-  const decide = ({ description }: DecisionFormValues) =>
+  // رد: دلیل (از «دلایل رد درخواست وام»، همان فهرست اعتبارات) و توضیح الزامی
+  const rejectReasons = useReasonOptions(REASON_TYPE.LOAN_REJECT);
+
+  const decide = ({ description, reasonId }: DecisionFormValues) =>
     mutateAsync({
       data: {
+        reasonId: target?.type === 'reject' ? reasonId : null,
         requestIds: target?.requests.map((item) => item.id ?? 0) ?? [],
         decision: DECISION[target?.type ?? 'approve'],
         description: description?.trim() ? description.trim() : null,
@@ -154,6 +159,7 @@ export const PendingRequestsTable = ({ companyId }: { companyId: number }) => {
       <DecisionModal
         target={target}
         allowFile={false}
+        rejectReasons={rejectReasons.options}
         requireRejectNote
         onSubmit={decide}
         onClose={() => setTarget(null)}

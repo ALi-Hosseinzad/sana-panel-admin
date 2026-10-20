@@ -116,7 +116,7 @@ export const CreditApprovalCard = ({ companyId, onCompanyChange }: CreditApprova
             onChange={changeCompany}
             options={[
               { value: ALL, label: 'همه شرکت‌ها' },
-              ...(companies ?? []).map((item) => ({ value: item.id, label: item.title })),
+              ...(companies ?? []).map((item) => ({ value: String(item.id), label: item.title })),
             ]}
           />
           <Button size="small" icon={<CheckOutlined />} onClick={() => openBulk('approve')}>
