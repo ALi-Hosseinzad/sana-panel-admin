@@ -6,11 +6,9 @@
     "version": "v2"
   },
   "paths": {
-    "/ManagerApprovals": {
+    "/gateway/facility-management/ManagerApprovals": {
       "get": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "صف تأیید مدیر شرکت",
         "description": "فقط درخواست‌هایی که اینجا تأیید شوند به «تأیید اعتبارات» می‌روند.",
         "operationId": "Approvals_ManagerQueue",
@@ -94,13 +92,11 @@
         }
       }
     },
-    "/ManagerApprovals/Decisions": {
+    "/gateway/facility-management/ManagerApprovals/Decisions": {
       "post": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "تأیید/رد گروهی یا تکی مدیر شرکت",
-        "description": "تأیید به manager-approval.approve و رد به manager-approval.reject نیاز دارد. رد: دلیل و توضیح الزامی.",
+        "description": "تأیید به manager-approval.approve و رد به manager-approval.reject نیاز دارد. رد: دلیل و توضیح الزامی (از «دلایل رد درخواست وام»، همان فهرست اعتبارات). اجرای ناقص مجاز است: ردیف‌های انجام‌نشده در skipped با دلیل برمی‌گردند.",
         "operationId": "Approvals_ManagerDecide",
         "requestBody": {
           "content": {
@@ -155,11 +151,9 @@
         }
       }
     },
-    "/CreditApprovals": {
+    "/gateway/facility-management/CreditApprovals": {
       "get": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "صف تأیید اعتبارات (US-B7)",
         "description": "کاربر شعبه فقط شرکت‌های شعبهٔ خود؛ فیلتر شرکت.",
         "operationId": "Approvals_CreditQueue",
@@ -243,22 +237,17 @@
         }
       }
     },
-    "/CreditApprovals/Decisions": {
+    "/gateway/facility-management/CreditApprovals/Decisions": {
       "post": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "تأیید/رد اعتبارات، تکی یا گروهی (US-B8)",
-        "description": "همه در یک تراکنش. رد: دلیل از فهرست و توضیح الزامی و برای همه یکسان. پیوست مصوبه اختیاری.",
+        "description": "یک تراکنش، ولی اجرای ناقص مجاز است: ردیف‌هایی که در این مرحله نیستند یا خارج از دامنهٔ شمایند در skipped با دلیل برمی‌گردند و processed تعداد انجام‌شده است. رد: دلیل از فهرست و توضیح الزامی و برای همه یکسان. پیوست مصوبه اختیاری. postStage را در همین تصمیم بفرستید تا مرحلهٔ پس از تأیید گروهی ثبت شود (کلید facility.credit-approval.stage لازم است؛ برای عدم اعطای غیرحضوری postStageReasonId الزامی).",
         "operationId": "Approvals_CreditDecide",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "Decision",
-                  "RequestIds"
-                ],
+                "required": ["Decision", "RequestIds"],
                 "type": "object",
                 "properties": {
                   "RequestIds": {
@@ -282,6 +271,13 @@
                     "minLength": 0,
                     "type": "string"
                   },
+                  "PostStage": {
+                    "$ref": "#/components/schemas/PostApprovalStage"
+                  },
+                  "PostStageReasonId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
                   "attachment": {
                     "type": "string",
                     "format": "binary"
@@ -299,6 +295,12 @@
                   "style": "form"
                 },
                 "Description": {
+                  "style": "form"
+                },
+                "PostStage": {
+                  "style": "form"
+                },
+                "PostStageReasonId": {
                   "style": "form"
                 },
                 "attachment": {
@@ -342,13 +344,11 @@
         }
       }
     },
-    "/CreditApprovals/{requestId}/PostApprovalStage": {
+    "/gateway/facility-management/CreditApprovals/{requestId}/PostApprovalStage": {
       "put": {
-        "tags": [
-          "Approvals"
-        ],
-        "summary": "تغییر مرحلهٔ پس از تأیید",
-        "description": "تشکیل پرونده در شعبه / دریافت تسهیلات از امید بانک / دریافت در شعبه / عدم اعطای غیرحضوری (دلیل الزامی).",
+        "tags": ["Approvals"],
+        "summary": "تغییر مرحلهٔ پس از تأیید (برای درخواست تأییدشده)",
+        "description": "تشکیل پرونده در شعبه / دریافت تسهیلات از امید بانک / دریافت در شعبه / عدم اعطای غیرحضوری (دلیل الزامی). برای ثبت مرحله هم‌زمان با تأیید، postStage را به سرویس تصمیم بدهید؛ این سرویس برای تغییر بعدی است.",
         "operationId": "Approvals_PostStage",
         "parameters": [
           {
@@ -414,11 +414,9 @@
         }
       }
     },
-    "/DigitalApprovals": {
+    "/gateway/facility-management/DigitalApprovals": {
       "get": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "صف تأیید شعبهٔ دیجیتال",
         "operationId": "Approvals_DigitalQueue",
         "parameters": [
@@ -501,21 +499,16 @@
         }
       }
     },
-    "/DigitalApprovals/Decisions": {
+    "/gateway/facility-management/DigitalApprovals/Decisions": {
       "post": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "تأیید/رد شعبهٔ دیجیتال",
         "operationId": "Approvals_DigitalDecide",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "Decision",
-                  "RequestIds"
-                ],
+                "required": ["Decision", "RequestIds"],
                 "type": "object",
                 "properties": {
                   "RequestIds": {
@@ -539,6 +532,13 @@
                     "minLength": 0,
                     "type": "string"
                   },
+                  "PostStage": {
+                    "$ref": "#/components/schemas/PostApprovalStage"
+                  },
+                  "PostStageReasonId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
                   "attachment": {
                     "type": "string",
                     "format": "binary"
@@ -556,6 +556,12 @@
                   "style": "form"
                 },
                 "Description": {
+                  "style": "form"
+                },
+                "PostStage": {
+                  "style": "form"
+                },
+                "PostStageReasonId": {
                   "style": "form"
                 },
                 "attachment": {
@@ -599,11 +605,9 @@
         }
       }
     },
-    "/Approvals/PendingCounts": {
+    "/gateway/facility-management/Approvals/PendingCounts": {
       "get": {
-        "tags": [
-          "Approvals"
-        ],
+        "tags": ["Approvals"],
         "summary": "تعداد در انتظار روی تب‌ها",
         "description": "برای مراحلی که کاربر مجوز دیدنشان را ندارد null برمی‌گردد.",
         "operationId": "Approvals_PendingCounts",
@@ -641,12 +645,11 @@
         }
       }
     },
-    "/BasicInfo/Schemes": {
+    "/gateway/facility-management/BasicInfo/Schemes": {
       "get": {
-        "tags": [
-          "BasicInfo"
-        ],
-        "summary": "طرح‌های کلان (نگین میثاق، شجره طیبه، ...)",
+        "tags": ["BasicInfo"],
+        "summary": "کشویی طرح‌های کلان (نگین میثاق، شجره طیبه، ...)",
+        "description": "فقط شناسه و عنوان، برای کشویی فرم شرکت. برای جدول «اطلاعات پایه طرح» از Schemes/Search استفاده کنید.",
         "operationId": "BasicInfo_Schemes",
         "responses": {
           "401": {
@@ -680,14 +683,346 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": ["BasicInfo"],
+        "summary": "ایجاد طرح — همهٔ موارد فرم در یک درخواست",
+        "description": "code الزامی است و بعداً عوض نمی‌شود. فهرست‌های دلایل به‌صورت آرایهٔ عنوان فرستاده می‌شوند و به همین طرح تعلق می‌گیرند.",
+        "operationId": "BasicInfo_SchemeCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSchemeCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSchemeCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSchemeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfSchemeFormDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "کد تکراری، کد خالی، یا نقض یکی از بازه‌های فرم (نرخ، مدت، ضریب، درصد قابل استفاده).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/BasicInfo/{schemeId}": {
+    "/gateway/facility-management/BasicInfo/Schemes/Search": {
       "get": {
-        "tags": [
-          "BasicInfo"
+        "tags": ["BasicInfo"],
+        "summary": "جدول طرح‌ها (صفحه‌بندی‌شده)",
+        "description": "همان ستون‌هایی که در جدول دیده می‌شود: نام، نرخ قرض‌الحسنه، نرخ‌های مرابحه، مدت‌های بازپرداخت، مدت قرارداد، حداکثر طرح، وضعیت و تعداد شرکت. includeInactive فقط برای کسی که اطلاعات پایه را ویرایش می‌کند کار می‌کند.",
+        "operationId": "BasicInfo_SchemeSearch",
+        "parameters": [
+          {
+            "name": "IncludeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Term",
+            "in": "query",
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
-        "summary": "تنظیمات یک طرح (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده)",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfFacilityPagedResponseOfSchemeListItemDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/BasicInfo/Schemes/{schemeId}": {
+      "get": {
+        "tags": ["BasicInfo"],
+        "summary": "جزئیات طرح — همهٔ ۱۴ مورد فرم",
+        "description": "هویت طرح، تنظیمات (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده) و فهرست‌های دلایل همین طرح، در یک پاسخ.",
+        "operationId": "BasicInfo_SchemeGet",
+        "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfSchemeFormDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["BasicInfo"],
+        "summary": "ویرایش طرح — همهٔ موارد فرم در یک درخواست",
+        "description": "rowVersion الزامی است (قفل خوش‌بینانه). code نادیده گرفته می‌شود. فهرستی که null بیاید تغییر نمی‌کند؛ فهرستی که بیاید جایگزین می‌شود و موارد برداشته‌شده غیرفعال (نه پاک) می‌شوند.",
+        "operationId": "BasicInfo_SchemeUpdate",
+        "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSchemeCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSchemeCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSchemeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfSchemeFormDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "طرح در این فاصله عوض شده؛ دوباره بخوانید.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["BasicInfo"],
+        "summary": "حذف طرح (نرم)",
+        "description": "آخرین طرح فعال و طرحی که شرکت فعال دارد حذف نمی‌شوند.",
+        "operationId": "BasicInfo_SchemeDelete",
+        "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfBoolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "آخرین طرح فعال است، یا شرکت فعال دارد.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/BasicInfo/{schemeId}": {
+      "get": {
+        "tags": ["BasicInfo"],
+        "summary": "فقط تنظیمات یک طرح (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده)",
+        "description": "برای فرم طرح از Schemes/{schemeId} استفاده کنید؛ آن یکی هویت طرح و فهرست‌های دلایلش را هم می‌دهد.",
         "operationId": "BasicInfo_Get",
         "parameters": [
           {
@@ -734,11 +1069,9 @@
         }
       },
       "put": {
-        "tags": [
-          "BasicInfo"
-        ],
-        "summary": "ذخیرهٔ تنظیمات پایه",
-        "description": "فقط ادمین (پیش‌فرض). همهٔ محاسبات اعتبار از همین‌جا خوانده می‌شود.",
+        "tags": ["BasicInfo"],
+        "summary": "ذخیرهٔ فقط تنظیمات پایه",
+        "description": "فقط ادمین (پیش‌فرض). همهٔ محاسبات اعتبار از همین‌جا خوانده می‌شود. برای ذخیرهٔ کل فرم طرح (با نام و فهرست‌های دلایل) از PUT Schemes/{schemeId} استفاده کنید.",
         "operationId": "BasicInfo_Update",
         "parameters": [
           {
@@ -804,13 +1137,11 @@
         }
       }
     },
-    "/BasicInfo/{schemeId}/Plans": {
+    "/gateway/facility-management/BasicInfo/{schemeId}/Plans": {
       "get": {
-        "tags": [
-          "BasicInfo"
-        ],
-        "summary": "طرح‌های قابل انتخاب (عقد × نرخ × مدت)",
-        "description": "برای فرم ثبت شرکت و انتخاب طرح در تخصیص وام.",
+        "tags": ["BasicInfo"],
+        "summary": "طرح‌های قابل انتخاب (عقد × نرخ × مدت) + سقف تعداد طرح هر شرکت",
+        "description": "برای فرم ثبت شرکت و انتخاب طرح در تخصیص وام. maxPlansPerCompany همان سقفی است که فرانت برای محدود کردن انتخاب لازم دارد.",
         "operationId": "BasicInfo_Plans",
         "parameters": [
           {
@@ -849,7 +1180,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfIReadOnlyListOfPlanDto"
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfPlanListDto"
                 }
               }
             }
@@ -857,15 +1188,22 @@
         }
       }
     },
-    "/BasicInfo/Reasons": {
+    "/gateway/facility-management/BasicInfo/Schemes/{schemeId}/Reasons": {
       "get": {
-        "tags": [
-          "BasicInfo"
-        ],
-        "summary": "فهرست‌های داینامیک",
-        "description": "دلایل لغو قرارداد، رد وام، عدم اعطای غیرحضوری، لغو درخواست، رد پرسنل، نوع مستند. برای Dropdown مدال‌ها.",
-        "operationId": "BasicInfo_Reasons",
+        "tags": ["BasicInfo"],
+        "summary": "یک فهرست داینامیک از یک طرح",
+        "description": "دلایل لغو قرارداد، رد وام، عدم اعطای غیرحضوری، لغو درخواست، رد پرسنل، نوع مستند. برای Dropdown مدال‌ها — طرح را از شرکت بگیرید.",
+        "operationId": "BasicInfo_SchemeReasons",
         "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
           {
             "name": "type",
             "in": "query",
@@ -915,11 +1253,20 @@
         }
       },
       "post": {
-        "tags": [
-          "BasicInfo"
-        ],
-        "summary": "افزودن دلیل جدید",
+        "tags": ["BasicInfo"],
+        "summary": "افزودن یک مورد به فهرست طرح",
         "operationId": "BasicInfo_ReasonCreate",
+        "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -973,14 +1320,87 @@
         }
       }
     },
-    "/BasicInfo/Reasons/{id}": {
-      "put": {
-        "tags": [
-          "BasicInfo"
+    "/gateway/facility-management/BasicInfo/Reasons": {
+      "get": {
+        "tags": ["BasicInfo"],
+        "summary": "فهرست داینامیک طرح پیش‌فرض (برای سازگاری)",
+        "description": "⚠ فهرست‌ها دیگر سراسری نیستند. این مسیر تا وقتی فقط یک طرح فعال باشد کار می‌کند و با طرح دوم خطای روشن می‌دهد. مسیر درست: Schemes/{schemeId}/Reasons.",
+        "operationId": "BasicInfo_Reasons",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ReasonType"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
         ],
-        "summary": "ویرایش/غیرفعال کردن دلیل",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfIReadOnlyListOfReasonDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "بیش از یک طرح فعال وجود دارد؛ طرح را مشخص کنید.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/BasicInfo/Schemes/{schemeId}/Reasons/{id}": {
+      "put": {
+        "tags": ["BasicInfo"],
+        "summary": "ویرایش/غیرفعال کردن یک مورد",
         "operationId": "BasicInfo_ReasonUpdate",
         "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
           {
             "name": "id",
             "in": "path",
@@ -1044,12 +1464,19 @@
         }
       },
       "delete": {
-        "tags": [
-          "BasicInfo"
-        ],
-        "summary": "حذف دلیل (نرم)",
+        "tags": ["BasicInfo"],
+        "summary": "حذف یک مورد (نرم)",
         "operationId": "BasicInfo_ReasonDelete",
         "parameters": [
+          {
+            "name": "schemeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
           {
             "name": "id",
             "in": "path",
@@ -1094,11 +1521,9 @@
         }
       }
     },
-    "/ChangeLogs": {
+    "/gateway/facility-management/ChangeLogs": {
       "get": {
-        "tags": [
-          "ChangeLogs"
-        ],
+        "tags": ["ChangeLogs"],
         "summary": "لاگ عملیات",
         "description": "فیلتر نوع (شرکت/پرسنل/وام)، شرکت، کاربر، تاریخ؛ در دامنهٔ کاربر.",
         "operationId": "ChangeLogs_Search",
@@ -1206,12 +1631,51 @@
         }
       }
     },
-    "/ChangeLogs/Export": {
+    "/gateway/facility-management/ChangeLogs/Users": {
       "get": {
-        "tags": [
-          "ChangeLogs"
-        ],
-        "summary": "خروجی اکسل گزارش",
+        "tags": ["ChangeLogs"],
+        "summary": "کاربران دارای ردیف در گزارش (برای سلکت فیلتر)",
+        "description": "فقط کاربرانی که ردیف‌هایشان در دامنهٔ کاربر جاری دیده می‌شود؛ panelUserId همان چیزی است که به فیلتر داده می‌شود.",
+        "operationId": "ChangeLogs_Users",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfIReadOnlyListOfRegistrarDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/ChangeLogs/Export": {
+      "get": {
+        "tags": ["ChangeLogs"],
+        "summary": "خروجی گزارش (CSV با UTF-8 BOM، قابل باز شدن در Excel)",
+        "description": "فیلترها دقیقاً همان فیلترهای لیست‌اند (شامل جستجوی متنی و فیلتر کاربر). ⚠ اگر xlsx لازم است باید تصمیم گرفته شود.",
         "operationId": "ChangeLogs_Export",
         "parameters": [
           {
@@ -1230,6 +1694,14 @@
             }
           },
           {
+            "name": "PanelUserId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
             "name": "From",
             "in": "query",
             "schema": {
@@ -1243,6 +1715,13 @@
             "schema": {
               "type": "string",
               "format": "date-time"
+            }
+          },
+          {
+            "name": "Term",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1266,15 +1745,16 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "فایل CSV"
           }
         }
       }
     },
-    "/ChangeLogs/{id}/Restore": {
+    "/gateway/facility-management/ChangeLogs/{id}/Restore": {
       "post": {
-        "tags": [
-          "ChangeLogs"
-        ],
+        "tags": ["ChangeLogs"],
         "summary": "بازگردانی عملیات (US-A4)",
         "description": "فقط ادمین. ⚠ Q16: عملیات قابل بازگردانی تعیین شود.",
         "operationId": "ChangeLogs_Restore",
@@ -1342,11 +1822,9 @@
         }
       }
     },
-    "/Companies": {
+    "/gateway/facility-management/Companies": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "فهرست شرکت‌ها",
         "description": "فقط شرکت‌های دامنهٔ کاربر (شعبهٔ خود/همه). جستجو در نام، شناسهٔ ملی، شمارهٔ تفاهم‌نامه.",
         "operationId": "Companies_Search",
@@ -1431,9 +1909,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "ثبت شرکت جدید (US-B2)",
         "description": "فرم + فایل تفاهم‌نامه. شعبهٔ شرکت = شعبهٔ کاربر ثبت‌کننده.",
         "operationId": "Companies_Create",
@@ -1581,11 +2057,9 @@
         }
       }
     },
-    "/Companies/Lookup": {
+    "/gateway/facility-management/Companies/Lookup": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "Dropdown «انتخاب شرکت»",
         "description": "برای نقش شرکت فقط شرکت خودش (قفل).",
         "operationId": "Companies_Lookup",
@@ -1640,11 +2114,9 @@
         }
       }
     },
-    "/Companies/{id}": {
+    "/gateway/facility-management/Companies/{id}": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "جزئیات شرکت و ثبت‌کننده (US-B6)",
         "operationId": "Companies_Get",
         "parameters": [
@@ -1692,9 +2164,7 @@
         }
       },
       "put": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "ویرایش شرکت",
         "operationId": "Companies_Update",
         "parameters": [
@@ -1833,9 +2303,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "حذف شرکت (نرم)",
         "description": "در داشبورد «شرکت‌های حذف‌شده» می‌ماند.",
         "operationId": "Companies_Delete",
@@ -1903,11 +2371,9 @@
         }
       }
     },
-    "/Companies/{id}/Cancel": {
+    "/gateway/facility-management/Companies/{id}/Cancel": {
       "post": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "لغو قرارداد (مدال تصمیم)",
         "description": "تاریخ، دلیل از فهرست، توضیح و فایل نامه الزامی.",
         "operationId": "Companies_CancelContract",
@@ -1926,11 +2392,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "CancelDate",
-                  "Description",
-                  "ReasonId"
-                ],
+                "required": ["CancelDate", "Description", "ReasonId"],
                 "type": "object",
                 "properties": {
                   "CancelDate": {
@@ -2005,11 +2467,9 @@
         }
       }
     },
-    "/Companies/{id}/AgreementFile": {
+    "/gateway/facility-management/Companies/{id}/AgreementFile": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "دانلود فایل تفاهم‌نامه",
         "operationId": "Companies_AgreementFile",
         "parameters": [
@@ -2047,11 +2507,9 @@
         }
       }
     },
-    "/Companies/{id}/Balances": {
+    "/gateway/facility-management/Companies/{id}/Balances": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "میانگین موجودی ماه‌های سال جاری قرارداد + مانده اعتبار",
         "operationId": "Companies_Balances",
         "parameters": [
@@ -2099,11 +2557,9 @@
         }
       },
       "put": {
-        "tags": [
-          "Companies"
-        ],
-        "summary": "ذخیرهٔ میانگین‌ها (US-B4)",
-        "description": "فقط کاربر شعبه (شعبهٔ خود) و ادمین. مبلغ قبلی و جدید در گزارش تغییرات.",
+        "tags": ["Companies"],
+        "summary": "ذخیرهٔ میانگین‌ها همراه مستندش (US-B4، US-B5)",
+        "description": "فقط کاربر شعبه (شعبهٔ خود) و ادمین. ⚠ بدنه multipart شد: اگر مبلغی عوض شود، documentTypeId و حداقل یک فایل الزامی است و هر دو در یک تراکنش ثبت می‌شوند. یک مستند همهٔ ماه‌های تغییریافتهٔ همین ذخیره را پوشش می‌دهد. اگر هیچ مبلغی عوض نشود، مستند لازم نیست. مبلغ قبلی و جدید در گزارش تغییرات ثبت می‌شود.",
         "operationId": "Companies_BalancesSave",
         "parameters": [
           {
@@ -2118,19 +2574,58 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateCompanyBalancesCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCompanyBalancesCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCompanyBalancesCommand"
+                "required": ["Months", "RowVersion"],
+                "type": "object",
+                "properties": {
+                  "Months": {
+                    "maxItems": 24,
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReadModels.MonthlyBalanceInput"
+                    }
+                  },
+                  "RowVersion": {
+                    "type": "string"
+                  },
+                  "DocumentTypeId": {
+                    "maximum": 2147483647,
+                    "minimum": 1,
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "DocumentDescription": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "Months": {
+                  "style": "form"
+                },
+                "RowVersion": {
+                  "style": "form"
+                },
+                "DocumentTypeId": {
+                  "style": "form"
+                },
+                "DocumentDescription": {
+                  "style": "form"
+                },
+                "files": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -2165,15 +2660,23 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "مستند نیامده، نوع مستند نامعتبر، ماه خارج از سال جاری قرارداد، یا مبلغ نامعتبر.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/Companies/{id}/Balances/Documents": {
+    "/gateway/facility-management/Companies/{id}/Balances/Documents": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "مستندات میانگین (US-B5)",
         "operationId": "Companies_BalanceDocuments",
         "parameters": [
@@ -2228,9 +2731,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "الصاق یک یا چند مستند",
         "description": "pdf, doc, docx, xls, xlsx, zip, jpg, png؛ هر فایل تا ۵ مگابایت.",
         "operationId": "Companies_BalanceDocumentsUpload",
@@ -2249,9 +2750,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "DocumentTypeId"
-                ],
+                "required": ["DocumentTypeId"],
                 "type": "object",
                 "properties": {
                   "Month": {
@@ -2329,11 +2828,9 @@
         }
       }
     },
-    "/Companies/{id}/Balances/Documents/{documentId}": {
+    "/gateway/facility-management/Companies/{id}/Balances/Documents/{documentId}": {
       "get": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "دانلود مستند",
         "operationId": "Companies_BalanceDocumentDownload",
         "parameters": [
@@ -2380,9 +2877,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "summary": "حذف مستند (فقط ادمین)",
         "operationId": "Companies_BalanceDocumentDelete",
         "parameters": [
@@ -2439,11 +2934,9 @@
         }
       }
     },
-    "/Dashboard": {
+    "/gateway/facility-management/Dashboard": {
       "get": {
-        "tags": [
-          "Dashboard"
-        ],
+        "tags": ["Dashboard"],
         "summary": "KPIها و نمودارها",
         "description": "۴ KPI، وضعیت درخواست‌ها، سهم طرح‌ها، اعتبار در برابر تخصیص، تفاهم‌نامه‌ها به تفکیک ماه، عملکرد ماهانه، شرکت‌های حذف‌شده. همه در دامنهٔ کاربر.",
         "operationId": "Dashboard_Get",
@@ -2516,11 +3009,9 @@
         }
       }
     },
-    "/Dashboard/CompanyRanking": {
+    "/gateway/facility-management/Dashboard/CompanyRanking": {
       "get": {
-        "tags": [
-          "Dashboard"
-        ],
+        "tags": ["Dashboard"],
         "summary": "رتبه‌بندی شرکت‌ها",
         "description": "ماه خالی = تجمعی.",
         "operationId": "Dashboard_Ranking",
@@ -2585,11 +3076,49 @@
         }
       }
     },
-    "/Dashboard/Exports/{report}": {
+    "/gateway/facility-management/Dashboard/Months": {
       "get": {
-        "tags": [
-          "Dashboard"
-        ],
+        "tags": ["Dashboard"],
+        "summary": "ماه‌های دارای داده (برای فیلتر ماه و ترتیب ستون‌ها)",
+        "description": "کلید ماه همیشه قالب 1404/05 دارد؛ همین کلید را به CompanyRanking?month= بدهید. ترتیب: تازه‌ترین اول.",
+        "operationId": "Dashboard_Months",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfIReadOnlyListOfMonthOptionDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/Dashboard/Exports/{report}": {
+      "get": {
+        "tags": ["Dashboard"],
         "summary": "خروجی CSV (۵ دکمه)",
         "description": "Companies، Personnel، LoanRequests، MonthlyAverages، RemovedCompanies — فقط دادهٔ دامنهٔ کاربر.",
         "operationId": "Dashboard_Export",
@@ -2627,11 +3156,9 @@
         }
       }
     },
-    "/Internal/Companies/Lookup": {
+    "/gateway/facility-management/Internal/Companies/Lookup": {
       "get": {
-        "tags": [
-          "InternalCompanies"
-        ],
+        "tags": ["InternalCompanies"],
         "summary": "Lookup همهٔ شرکت‌ها برای Identity",
         "description": "هدر X-Api-Key لازم است.",
         "operationId": "Internal_CompanyLookup",
@@ -2678,11 +3205,9 @@
         }
       }
     },
-    "/Companies/{companyId}/Credit": {
+    "/gateway/facility-management/Companies/{companyId}/Credit": {
       "get": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "اعتبار طرح‌ها و بنر وضعیت (US-E4، D2)",
         "description": "بنر: مهلت معرفی نرسیده / امروز روز مجاز انتقال نیست / مجاز است. جدول اعتبار هر طرح تفاهم‌نامه.",
         "operationId": "Loans_Credit",
@@ -2739,13 +3264,11 @@
         }
       }
     },
-    "/Companies/{companyId}/LoanRequests/Preview": {
+    "/gateway/facility-management/Companies/{companyId}/LoanRequests/Preview": {
       "post": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "هینت‌های زندهٔ فرم (US-E5، D6)",
-        "description": "مجموع، مجاز بودن، «حداکثر تا N نفر با این مبلغ»، هشدار تجاوز از اعتبار. چیزی ذخیره نمی‌شود.",
+        "description": "مجموع، مجاز بودن، «حداکثر تا N نفر با این مبلغ»، هشدار تجاوز از اعتبار، و repeatAllocations: افرادی که در همین ماه قبلاً وام گرفته‌اند. repeatAllocations هشدار است نه خطا — isAllowed را عوض نمی‌کند و ثبت را قفل نمی‌کند؛ فرانت فهرست را نشان می‌دهد و تأیید دوباره می‌گیرد. چیزی ذخیره نمی‌شود.",
         "operationId": "Loans_Preview",
         "parameters": [
           {
@@ -2811,11 +3334,9 @@
         }
       }
     },
-    "/Companies/{companyId}/LoanRequests": {
+    "/gateway/facility-management/Companies/{companyId}/LoanRequests": {
       "post": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "ثبت درخواست برای پرسنل انتخاب‌شده (US-D3)",
         "description": "مبلغ یکسان یا متفاوت؛ مجموع ≤ مانده اعتبار طرح؛ تاریخ مبنا در یک ماه گذشته بر اساس روز افتتاح حساب. درخواست‌ها به صف «تأیید مدیر شرکت» می‌روند.",
         "operationId": "Loans_Create",
@@ -2879,15 +3400,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "قاعدهٔ کسب‌وکار رد شد: مجموع مبالغ بیشتر از مانده اعتبار طرح، تاریخ مبنا خارج از بازهٔ مجاز (baseDateMin تا baseDateMax در سرویس اعتبار)، امروز روز مجاز انتقال اعتبار نیست، قرارداد فعال نیست، مهلت معرفی پرسنل نرسیده، پرسنل تأییدنشده یا تکراری. پیام فارسی در message است.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "شرکت یا پرسنل در دامنهٔ شما یافت نشد.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfObject"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/LoanRequests": {
+    "/gateway/facility-management/LoanRequests": {
       "get": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "درخواست‌های وام",
         "description": "همهٔ درخواست‌های دامنهٔ کاربر؛ برای «درخواست‌های وام این شرکت» CompanyId بده. با تاریخ ثبت، تاریخ تأیید/رد و وضعیت.",
         "operationId": "Loans_Search",
@@ -3004,11 +3543,9 @@
         }
       }
     },
-    "/LoanRequests/{id}": {
+    "/gateway/facility-management/LoanRequests/{id}": {
       "get": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "جزئیات درخواست و تاریخچهٔ تصمیم‌ها",
         "operationId": "Loans_Get",
         "parameters": [
@@ -3056,11 +3593,9 @@
         }
       }
     },
-    "/LoanBatches/{batchId}/Members": {
+    "/gateway/facility-management/LoanBatches/{batchId}/Members": {
       "post": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "افزودن فرد به درخواست (US-D4)",
         "description": "قبل از تأیید اعتبارات.",
         "operationId": "Loans_AddMember",
@@ -3128,11 +3663,9 @@
         }
       }
     },
-    "/LoanBatches/{batchId}/Members/{requestId}": {
+    "/gateway/facility-management/LoanBatches/{batchId}/Members/{requestId}": {
       "delete": {
-        "tags": [
-          "Loans"
-        ],
+        "tags": ["Loans"],
         "summary": "حذف فرد از درخواست (US-D4)",
         "description": "قبل از هر تصمیم.",
         "operationId": "Loans_RemoveMember",
@@ -3190,11 +3723,59 @@
         }
       }
     },
-    "/LoanRequests/{id}/Cancel": {
-      "post": {
-        "tags": [
-          "Loans"
+    "/gateway/facility-management/LoanRequests/{id}/Documents/{fileId}": {
+      "get": {
+        "tags": ["Loans"],
+        "summary": "دانلود مستند درخواست",
+        "description": "fileId همان id عضوهای documents در ردیف فهرست است.",
+        "operationId": "Loans_DocumentDownload",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
         ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/LoanRequests/{id}/Cancel": {
+      "post": {
+        "tags": ["Loans"],
         "summary": "لغو درخواست یک نفر (US-D5)",
         "description": "فقط قبل از تأیید اعتبارات؛ دلیل از فهرست + توضیح.",
         "operationId": "Loans_Cancel",
@@ -3262,11 +3843,49 @@
         }
       }
     },
-    "/Companies/{companyId}/Personnel": {
+    "/gateway/facility-management/Lookups/Enums": {
       "get": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Lookups"],
+        "summary": "عنوان همهٔ enumها. کلیدی لازم ندارد چون چیزی از دادهٔ شرکت‌ها نمی‌گوید — ولی\r\n[RequireFacilityPermission] بدون کلید هست، پس نشست معتبر لازم است و مسیر\r\nاز قاعدهٔ «هر مسیر باید تعیین تکلیف شده باشد» بیرون نمی‌افتد.",
+        "description": "فرانت یک بار می‌خواند و کش می‌کند؛ عنوان وضعیت‌ها را در کد خودش تکرار نمی‌کند.",
+        "operationId": "Lookups_Enums",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityBaseMessageResponseOfEnumCatalogDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/facility-management/Companies/{companyId}/Personnel": {
+      "get": {
+        "tags": ["Personnel"],
         "summary": "پرسنل یک شرکت",
         "description": "جستجو در نام، کد ملی، موبایل، کد پرسنلی + بازهٔ تاریخ استخدام. مرتب بر اساس اولویت. در انتظار/ردشده فقط برای ادمین، منابع انسانی و مدیر همان شرکت.",
         "operationId": "Personnel_Search",
@@ -3365,9 +3984,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "افزودن پرسنل",
         "description": "با وضعیت «در انتظار تأیید مدیر شرکت» ثبت می‌شود.",
         "operationId": "Personnel_Create",
@@ -3435,11 +4052,9 @@
         }
       }
     },
-    "/Personnel/{id}": {
+    "/gateway/facility-management/Personnel/{id}": {
       "get": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "جزئیات و تاریخچهٔ وضعیت (US-E3)",
         "operationId": "Personnel_Get",
         "parameters": [
@@ -3487,9 +4102,7 @@
         }
       },
       "put": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "ویرایش یا اصلاح و ارسال دوباره",
         "description": "برای فرد ردشده وضعیت دوباره «در انتظار تأیید مدیر» می‌شود. فرد استفاده‌شده در وام قفل است.",
         "operationId": "Personnel_Update",
@@ -3557,11 +4170,9 @@
         }
       }
     },
-    "/Personnel/{id}/Delete": {
+    "/gateway/facility-management/Personnel/{id}/Delete": {
       "post": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "حذف پرسنل",
         "description": "توضیح و فایل الزامی. POST چون فایل دارد.",
         "operationId": "Personnel_Delete",
@@ -3580,9 +4191,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "Description"
-                ],
+                "required": ["Description"],
                 "type": "object",
                 "properties": {
                   "Description": {
@@ -3641,11 +4250,9 @@
         }
       }
     },
-    "/Personnel/Import/Template": {
+    "/gateway/facility-management/Personnel/Import/Template": {
       "get": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "دانلود نمونه فایل اکسل",
         "operationId": "Personnel_ImportTemplate",
         "responses": {
@@ -3672,11 +4279,9 @@
         }
       }
     },
-    "/Companies/{companyId}/Personnel/Import": {
+    "/gateway/facility-management/Companies/{companyId}/Personnel/Import": {
       "post": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "بارگذاری گروهی (US-E2)",
         "description": "xlsx, xls, csv تا ۱۰ مگابایت. خطای هر ردیف برمی‌گردد.",
         "operationId": "Personnel_Import",
@@ -3745,11 +4350,9 @@
         }
       }
     },
-    "/Personnel/Import/{batchId}": {
+    "/gateway/facility-management/Personnel/Import/{batchId}": {
       "get": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "نتیجهٔ یک بارگذاری",
         "operationId": "Personnel_ImportResult",
         "parameters": [
@@ -3797,11 +4400,9 @@
         }
       }
     },
-    "/Personnel/Decisions": {
+    "/gateway/facility-management/Personnel/Decisions": {
       "post": {
-        "tags": [
-          "Personnel"
-        ],
+        "tags": ["Personnel"],
         "summary": "تأیید/رد افراد معرفی‌شده (US-D1)",
         "description": "تکی یا گروهی، در یک تراکنش.",
         "operationId": "Personnel_Decide",
@@ -3862,9 +4463,7 @@
   "components": {
     "schemas": {
       "AddLoanBatchMemberCommand": {
-        "required": [
-          "item"
-        ],
+        "required": ["item"],
         "type": "object",
         "properties": {
           "item": {
@@ -3874,27 +4473,12 @@
         "additionalProperties": false
       },
       "AllocationMode": {
-        "enum": [
-          1,
-          2
-        ],
-        "type": "integer",
-        "format": "int32"
-      },
-      "ApprovalStage": {
-        "enum": [
-          1,
-          2,
-          3
-        ],
+        "enum": [1, 2],
         "type": "integer",
         "format": "int32"
       },
       "CancelLoanRequestCommand": {
-        "required": [
-          "description",
-          "reasonId"
-        ],
+        "required": ["description", "reasonId"],
         "type": "object",
         "properties": {
           "reasonId": {
@@ -3912,12 +4496,7 @@
         "additionalProperties": false
       },
       "ChangeLogCategory": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
@@ -4082,17 +4661,129 @@
           },
           "canCancel": {
             "type": "boolean"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.StoredFileDto"
+            }
           }
         },
         "additionalProperties": false
       },
       "Common.DecisionType": {
-        "enum": [
-          1,
-          2
-        ],
+        "enum": [1, 2],
         "type": "integer",
         "format": "int32"
+      },
+      "Common.EnumCatalogDto": {
+        "type": "object",
+        "properties": {
+          "companyStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "personnelStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "loanRequestStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "postApprovalStage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "allocationMode": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "eligibilityStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "approvalStage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "decisionType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "contractType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "reasonType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "changeLogCategory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "companyRankingSort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "dashboardExport": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          },
+          "hintLevel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.EnumValueDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Common.EnumValueDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "requiresReason": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
       },
       "Common.FacilityLookupItemDto": {
         "type": "object",
@@ -4202,23 +4893,26 @@
         },
         "additionalProperties": false
       },
-      "Common.FileUpload": {
+      "Common.FacilityPagedResponseOfSchemeListItemDto": {
         "type": "object",
         "properties": {
-          "content": {
-            "type": "string",
-            "format": "byte"
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.SchemeListItemDto"
+            }
           },
-          "fileName": {
-            "type": "string"
-          },
-          "contentType": {
-            "type": "string"
-          },
-          "length": {
+          "totalCount": {
             "type": "integer",
-            "format": "int64",
-            "readOnly": true
+            "format": "int32"
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -4273,30 +4967,17 @@
         "additionalProperties": false
       },
       "CompanyStatus": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
       "ContractType": {
-        "enum": [
-          1,
-          2
-        ],
+        "enum": [1, 2],
         "type": "integer",
         "format": "int32"
       },
       "CreateLoanRequestsCommand": {
-        "required": [
-          "baseDate",
-          "items",
-          "mode",
-          "planId"
-        ],
+        "required": ["baseDate", "items", "mode", "planId"],
         "type": "object",
         "properties": {
           "planId": {
@@ -4382,10 +5063,7 @@
         "additionalProperties": false
       },
       "CreateReasonCommand": {
-        "required": [
-          "title",
-          "type"
-        ],
+        "required": ["title", "type"],
         "type": "object",
         "properties": {
           "type": {
@@ -4400,10 +5078,7 @@
         "additionalProperties": false
       },
       "DecideLoanRequestsCommand": {
-        "required": [
-          "decision",
-          "requestIds"
-        ],
+        "required": ["decision", "requestIds"],
         "type": "object",
         "properties": {
           "requestIds": {
@@ -4428,15 +5103,20 @@
             "minLength": 0,
             "type": "string",
             "nullable": true
+          },
+          "postStage": {
+            "$ref": "#/components/schemas/PostApprovalStage"
+          },
+          "postStageReasonId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "DecidePersonnelCommand": {
-        "required": [
-          "decision",
-          "personnelIds"
-        ],
+        "required": ["decision", "personnelIds"],
         "type": "object",
         "properties": {
           "personnelIds": {
@@ -4466,9 +5146,7 @@
         "additionalProperties": false
       },
       "DeleteCompanyCommand": {
-        "required": [
-          "description"
-        ],
+        "required": ["description"],
         "type": "object",
         "properties": {
           "description": {
@@ -4480,12 +5158,7 @@
         "additionalProperties": false
       },
       "EligibilityStatus": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
@@ -4678,6 +5351,27 @@
         },
         "additionalProperties": false
       },
+      "FacilityBaseMessageResponseOfEnumCatalogDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Common.EnumCatalogDto"
+          },
+          "isSuccess": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "FacilityBaseMessageResponseOfFacilityPagedResponseOfChangeLogItemDto": {
         "type": "object",
         "properties": {
@@ -4733,6 +5427,27 @@
           },
           "data": {
             "$ref": "#/components/schemas/Common.FacilityPagedResponseOfPersonnelListItemDto"
+          },
+          "isSuccess": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FacilityBaseMessageResponseOfFacilityPagedResponseOfSchemeListItemDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Common.FacilityPagedResponseOfSchemeListItemDto"
           },
           "isSuccess": {
             "type": "boolean",
@@ -4816,7 +5531,7 @@
         },
         "additionalProperties": false
       },
-      "FacilityBaseMessageResponseOfIReadOnlyListOfPlanDto": {
+      "FacilityBaseMessageResponseOfIReadOnlyListOfMonthOptionDto": {
         "type": "object",
         "properties": {
           "statusCode": {
@@ -4830,7 +5545,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ReadModels.PlanDto"
+              "$ref": "#/components/schemas/ReadModels.MonthOptionDto"
             },
             "nullable": true
           },
@@ -4856,6 +5571,31 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            },
+            "nullable": true
+          },
+          "isSuccess": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FacilityBaseMessageResponseOfIReadOnlyListOfRegistrarDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Common.RegistrarDto"
             },
             "nullable": true
           },
@@ -4997,6 +5737,27 @@
         },
         "additionalProperties": false
       },
+      "FacilityBaseMessageResponseOfObject": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "nullable": true
+          },
+          "isSuccess": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "FacilityBaseMessageResponseOfPendingCountsDto": {
         "type": "object",
         "properties": {
@@ -5060,6 +5821,27 @@
         },
         "additionalProperties": false
       },
+      "FacilityBaseMessageResponseOfPlanListDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReadModels.PlanListDto"
+          },
+          "isSuccess": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "FacilityBaseMessageResponseOfReasonDto": {
         "type": "object",
         "properties": {
@@ -5081,55 +5863,49 @@
         },
         "additionalProperties": false
       },
+      "FacilityBaseMessageResponseOfSchemeFormDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReadModels.SchemeFormDto"
+          },
+          "isSuccess": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "HintLevel": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
       "LoanRequestStatus": {
-        "enum": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8
-        ],
+        "enum": [1, 2, 3, 4, 5, 6, 7, 8],
         "type": "integer",
         "format": "int32"
       },
       "PersonnelStatus": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
       "PostApprovalStage": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
       "PreviewLoanRequestQuery": {
-        "required": [
-          "mode",
-          "planId"
-        ],
+        "required": ["mode", "planId"],
         "type": "object",
         "properties": {
           "planId": {
@@ -5187,7 +5963,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ReadModels.BalanceDocumentDto": {
         "type": "object",
@@ -5364,6 +6140,18 @@
             "items": {
               "$ref": "#/components/schemas/ReadModels.PlanCreditDto"
             }
+          },
+          "baseDateDefault": {
+            "type": "string",
+            "format": "date"
+          },
+          "baseDateMin": {
+            "type": "string",
+            "format": "date"
+          },
+          "baseDateMax": {
+            "type": "string",
+            "format": "date"
           }
         },
         "additionalProperties": false
@@ -5469,6 +6257,15 @@
           },
           "branchCode": {
             "type": "string"
+          },
+          "cancelDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "cancelReasonTitle": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5511,12 +6308,7 @@
         "additionalProperties": false
       },
       "ReadModels.CompanyRankingSort": {
-        "enum": [
-          1,
-          2,
-          3,
-          4
-        ],
+        "enum": [1, 2, 3, 4],
         "type": "integer",
         "format": "int32"
       },
@@ -5597,6 +6389,9 @@
               "$ref": "#/components/schemas/ReadModels.CreditVsAllocatedDto"
             }
           },
+          "creditVsAllocatedGroupKind": {
+            "$ref": "#/components/schemas/ReadModels.DashboardGroupKind"
+          },
           "contractsByMonth": {
             "type": "array",
             "items": {
@@ -5619,13 +6414,12 @@
         "additionalProperties": false
       },
       "ReadModels.DashboardExport": {
-        "enum": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ],
+        "enum": [1, 2, 3, 4, 5],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ReadModels.DashboardGroupKind": {
+        "enum": [1, 2],
         "type": "integer",
         "format": "int32"
       },
@@ -5664,6 +6458,15 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "canRegisterLoan": {
+            "type": "boolean"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -5735,9 +6538,7 @@
         "additionalProperties": false
       },
       "ReadModels.LoanRequestItemInput": {
-        "required": [
-          "personnelId"
-        ],
+        "required": ["personnelId"],
         "type": "object",
         "properties": {
           "personnelId": {
@@ -5795,6 +6596,24 @@
             "items": {
               "$ref": "#/components/schemas/ReadModels.HintDto"
             }
+          },
+          "repeatAllocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.RepeatAllocationDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReadModels.MonthOptionDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5849,14 +6668,16 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "usedCredit": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "additionalProperties": false
       },
       "ReadModels.MonthlyBalanceInput": {
-        "required": [
-          "month"
-        ],
+        "required": ["month"],
         "type": "object",
         "properties": {
           "month": {
@@ -6144,6 +6965,22 @@
         },
         "additionalProperties": false
       },
+      "ReadModels.PlanListDto": {
+        "type": "object",
+        "properties": {
+          "maxPlansPerCompany": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.PlanDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ReadModels.PlanRefDto": {
         "type": "object",
         "properties": {
@@ -6226,7 +7063,34 @@
           },
           "approvalRate": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
+          },
+          "removalKind": {
+            "$ref": "#/components/schemas/CompanyStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReadModels.RepeatAllocationDto": {
+        "type": "object",
+        "properties": {
+          "personnelId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "personnelName": {
+            "type": "string"
+          },
+          "personnelCode": {
+            "type": "string"
+          },
+          "month": {
+            "type": "string"
+          },
+          "previousAmount": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "additionalProperties": false
@@ -6268,6 +7132,126 @@
         },
         "additionalProperties": false
       },
+      "ReadModels.SchemeFormDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ReadModels.BasicInfoDto"
+          },
+          "reasons": {
+            "$ref": "#/components/schemas/ReadModels.SchemeReasonsDto"
+          },
+          "companyCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReadModels.SchemeListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "qardHasanRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "murabahaRates": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "repaymentTermsMonths": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "contractDurationMonths": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxPlansPerCompany": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "companyCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReadModels.SchemeReasonsDto": {
+        "type": "object",
+        "properties": {
+          "contractCancel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            }
+          },
+          "loanReject": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            }
+          },
+          "remoteGrantDenied": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            }
+          },
+          "documentType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            }
+          },
+          "loanCancel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            }
+          },
+          "personnelReject": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.ReasonDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ReadModels.SkippedRequestDto": {
         "type": "object",
         "properties": {
@@ -6303,21 +7287,12 @@
         "additionalProperties": false
       },
       "ReasonType": {
-        "enum": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ],
+        "enum": [1, 2, 3, 4, 5, 6],
         "type": "integer",
         "format": "int32"
       },
       "RestoreChangeCommand": {
-        "required": [
-          "description"
-        ],
+        "required": ["description"],
         "type": "object",
         "properties": {
           "description": {
@@ -6328,10 +7303,175 @@
         },
         "additionalProperties": false
       },
+      "SaveSchemeCommand": {
+        "required": ["title"],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 100,
+            "minLength": 3,
+            "type": "string"
+          },
+          "code": {
+            "maxLength": 30,
+            "minLength": 2,
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "contractTypes": {
+            "maxItems": 2,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContractType"
+            },
+            "nullable": true
+          },
+          "qardHasanRate": {
+            "maximum": 4,
+            "minimum": 0,
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "murabahaRates": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "nullable": true
+          },
+          "repaymentTermsMonths": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "salaryFromSepahMultiplierYes": {
+            "maximum": 10,
+            "minimum": 0.01,
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "salaryFromSepahMultiplierNo": {
+            "maximum": 10,
+            "minimum": 0.01,
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "contractDurationMonths": {
+            "maximum": 120,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "graceMonthsAfterExpiry": {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxPlansPerCompany": {
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "personnelIntroductionDelayMonths": {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "waitingPeriodDays": {
+            "maximum": 180,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "digitalApprovalEnabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "usableTable": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadModels.UsablePercentDto"
+            },
+            "nullable": true
+          },
+          "contractCancelReasons": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "loanRejectReasons": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "remoteGrantDeniedReasons": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "documentTypes": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "loanCancelReasons": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "personnelRejectReasons": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "rowVersion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "SetPostApprovalStageCommand": {
-        "required": [
-          "stage"
-        ],
+        "required": ["stage"],
         "type": "object",
         "properties": {
           "stage": {
@@ -6352,9 +7492,7 @@
         "additionalProperties": false
       },
       "UpdateBasicInfoCommand": {
-        "required": [
-          "rowVersion"
-        ],
+        "required": ["rowVersion"],
         "type": "object",
         "properties": {
           "contractTypes": {
@@ -6458,28 +7596,6 @@
         },
         "additionalProperties": false
       },
-      "UpdateCompanyBalancesCommand": {
-        "required": [
-          "months",
-          "rowVersion"
-        ],
-        "type": "object",
-        "properties": {
-          "months": {
-            "maxItems": 24,
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReadModels.MonthlyBalanceInput"
-            }
-          },
-          "rowVersion": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "UpdatePersonnelCommand": {
         "required": [
           "fullName",
@@ -6531,9 +7647,7 @@
         "additionalProperties": false
       },
       "UpdateReasonCommand": {
-        "required": [
-          "title"
-        ],
+        "required": ["title"],
         "type": "object",
         "properties": {
           "title": {
@@ -6565,7 +7679,7 @@
   },
   "security": [
     {
-      "cookie": [ ]
+      "cookie": []
     }
   ],
   "tags": [
@@ -6602,6 +7716,10 @@
       "description": "تأییدها"
     },
     {
+      "name": "Lookups",
+      "description": "فهرست‌های ثابت"
+    },
+    {
       "name": "Loans",
       "description": "تب «تخصیص وام»."
     },
@@ -6632,6 +7750,10 @@
     {
       "name": "Approvals",
       "description": "تب‌های «تأیید مدیر شرکت» و «تأیید اعتبارات» و مرحلهٔ «تأیید شعبهٔ دیجیتال»."
+    },
+    {
+      "name": "Lookups",
+      "description": "فهرست‌های ثابت پنل؛ به هیچ تبی وابسته نیست."
     }
   ]
 }

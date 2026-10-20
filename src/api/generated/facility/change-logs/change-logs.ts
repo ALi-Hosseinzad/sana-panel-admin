@@ -25,6 +25,7 @@ import type {
   ChangeLogsSearchParams,
   CommandResponsesChangeLogItemDto,
   CommonFacilityPagedResponseOfChangeLogItemDto,
+  CommonRegistrarDto,
   ProblemDetails,
   RestoreChangeCommand
 } from '../facilityPanelAPI.schemas';
@@ -63,7 +64,7 @@ export const changeLogsSearch = (
 
 
       return apiClient<CommonFacilityPagedResponseOfChangeLogItemDto>(
-      {url: `/ChangeLogs`, method: 'GET',
+      {url: `/gateway/facility-management/ChangeLogs`, method: 'GET',
         params, signal
     },
       options);
@@ -74,7 +75,7 @@ export const changeLogsSearch = (
 
 export const getChangeLogsSearchQueryKey = (params?: ChangeLogsSearchParams,) => {
     return [
-    `/ChangeLogs`, ...(params ? [params] : [])
+    `/gateway/facility-management/ChangeLogs`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -147,7 +148,101 @@ export function useChangeLogsSearch<TData = Awaited<ReturnType<typeof changeLogs
 
 
 /**
- * @summary خروجی اکسل گزارش
+ * فقط کاربرانی که ردیف‌هایشان در دامنهٔ کاربر جاری دیده می‌شود؛ panelUserId همان چیزی است که به فیلتر داده می‌شود.
+ * @summary کاربران دارای ردیف در گزارش (برای سلکت فیلتر)
+ */
+export const changeLogsUsers = (
+
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<CommonRegistrarDto[] | null>(
+      {url: `/gateway/facility-management/ChangeLogs/Users`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getChangeLogsUsersQueryKey = () => {
+    return [
+    `/gateway/facility-management/ChangeLogs/Users`
+    ] as const;
+    }
+
+
+export const getChangeLogsUsersQueryOptions = <TData = Awaited<ReturnType<typeof changeLogsUsers>>, TError = ErrorType<ProblemDetails>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof changeLogsUsers>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChangeLogsUsersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof changeLogsUsers>>> = ({ signal }) => changeLogsUsers(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof changeLogsUsers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChangeLogsUsersQueryResult = NonNullable<Awaited<ReturnType<typeof changeLogsUsers>>>
+export type ChangeLogsUsersQueryError = ErrorType<ProblemDetails>
+
+
+export function useChangeLogsUsers<TData = Awaited<ReturnType<typeof changeLogsUsers>>, TError = ErrorType<ProblemDetails>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof changeLogsUsers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof changeLogsUsers>>,
+          TError,
+          Awaited<ReturnType<typeof changeLogsUsers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChangeLogsUsers<TData = Awaited<ReturnType<typeof changeLogsUsers>>, TError = ErrorType<ProblemDetails>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof changeLogsUsers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof changeLogsUsers>>,
+          TError,
+          Awaited<ReturnType<typeof changeLogsUsers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChangeLogsUsers<TData = Awaited<ReturnType<typeof changeLogsUsers>>, TError = ErrorType<ProblemDetails>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof changeLogsUsers>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary کاربران دارای ردیف در گزارش (برای سلکت فیلتر)
+ */
+
+export function useChangeLogsUsers<TData = Awaited<ReturnType<typeof changeLogsUsers>>, TError = ErrorType<ProblemDetails>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof changeLogsUsers>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChangeLogsUsersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * فیلترها دقیقاً همان فیلترهای لیست‌اند (شامل جستجوی متنی و فیلتر کاربر). ⚠ اگر xlsx لازم است باید تصمیم گرفته شود.
+ * @summary خروجی گزارش (CSV با UTF-8 BOM، قابل باز شدن در Excel)
  */
 export const changeLogsExport = (
     params?: ChangeLogsExportParams,
@@ -155,8 +250,8 @@ export const changeLogsExport = (
 ) => {
 
 
-      return apiClient<unknown>(
-      {url: `/ChangeLogs/Export`, method: 'GET',
+      return apiClient<void>(
+      {url: `/gateway/facility-management/ChangeLogs/Export`, method: 'GET',
         params, signal
     },
       options);
@@ -167,7 +262,7 @@ export const changeLogsExport = (
 
 export const getChangeLogsExportQueryKey = (params?: ChangeLogsExportParams,) => {
     return [
-    `/ChangeLogs/Export`, ...(params ? [params] : [])
+    `/gateway/facility-management/ChangeLogs/Export`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -219,7 +314,7 @@ export function useChangeLogsExport<TData = Awaited<ReturnType<typeof changeLogs
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary خروجی اکسل گزارش
+ * @summary خروجی گزارش (CSV با UTF-8 BOM، قابل باز شدن در Excel)
  */
 
 export function useChangeLogsExport<TData = Awaited<ReturnType<typeof changeLogsExport>>, TError = ErrorType<ProblemDetails>>(
@@ -251,7 +346,7 @@ export const changeLogsRestore = (
 
 
       return apiClient<CommandResponsesChangeLogItemDto>(
-      {url: `/ChangeLogs/${id}/Restore`, method: 'POST',
+      {url: `/gateway/facility-management/ChangeLogs/${id}/Restore`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: restoreChangeCommand, signal
     },

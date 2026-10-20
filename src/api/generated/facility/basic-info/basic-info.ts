@@ -22,12 +22,17 @@ import type {
 
 import type {
   BasicInfoReasonsParams,
+  BasicInfoSchemeReasonsParams,
+  BasicInfoSchemeSearchParams,
+  CommonFacilityPagedResponseOfSchemeListItemDto,
   CreateReasonCommand,
   ProblemDetails,
   ReadModelsBasicInfoDto,
-  ReadModelsPlanDto,
+  ReadModelsPlanListDto,
   ReadModelsReasonDto,
   ReadModelsSchemeDto,
+  ReadModelsSchemeFormDto,
+  SaveSchemeCommand,
   UpdateBasicInfoCommand,
   UpdateReasonCommand
 } from '../facilityPanelAPI.schemas';
@@ -56,7 +61,8 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
- * @summary طرح‌های کلان (نگین میثاق، شجره طیبه، ...)
+ * فقط شناسه و عنوان، برای کشویی فرم شرکت. برای جدول «اطلاعات پایه طرح» از Schemes/Search استفاده کنید.
+ * @summary کشویی طرح‌های کلان (نگین میثاق، شجره طیبه، ...)
  */
 export const basicInfoSchemes = (
 
@@ -65,7 +71,7 @@ export const basicInfoSchemes = (
 
 
       return apiClient<ReadModelsSchemeDto[] | null>(
-      {url: `/BasicInfo/Schemes`, method: 'GET', signal
+      {url: `/gateway/facility-management/BasicInfo/Schemes`, method: 'GET', signal
     },
       options);
     }
@@ -75,7 +81,7 @@ export const basicInfoSchemes = (
 
 export const getBasicInfoSchemesQueryKey = () => {
     return [
-    `/BasicInfo/Schemes`
+    `/gateway/facility-management/BasicInfo/Schemes`
     ] as const;
     }
 
@@ -127,7 +133,7 @@ export function useBasicInfoSchemes<TData = Awaited<ReturnType<typeof basicInfoS
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary طرح‌های کلان (نگین میثاق، شجره طیبه، ...)
+ * @summary کشویی طرح‌های کلان (نگین میثاق، شجره طیبه، ...)
  */
 
 export function useBasicInfoSchemes<TData = Awaited<ReturnType<typeof basicInfoSchemes>>, TError = ErrorType<ProblemDetails>>(
@@ -148,7 +154,398 @@ export function useBasicInfoSchemes<TData = Awaited<ReturnType<typeof basicInfoS
 
 
 /**
- * @summary تنظیمات یک طرح (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده)
+ * code الزامی است و بعداً عوض نمی‌شود. فهرست‌های دلایل به‌صورت آرایهٔ عنوان فرستاده می‌شوند و به همین طرح تعلق می‌گیرند.
+ * @summary ایجاد طرح — همهٔ موارد فرم در یک درخواست
+ */
+export const basicInfoSchemeCreate = (
+    saveSchemeCommand?: BodyType<SaveSchemeCommand>,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<ReadModelsSchemeFormDto>(
+      {url: `/gateway/facility-management/BasicInfo/Schemes`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: saveSchemeCommand, signal
+    },
+      options);
+    }
+
+
+
+
+export const getBasicInfoSchemeCreateMutationKey = () => ['basicInfoSchemeCreate'] as const;
+
+export const getBasicInfoSchemeCreateMutationOptions = <TError = ErrorType<unknown | ProblemDetails>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeCreate>>, TError,BasicInfoSchemeCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeCreate>>, TError,BasicInfoSchemeCreateMutationVariables, TContext> => {
+
+const mutationKey = getBasicInfoSchemeCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof basicInfoSchemeCreate>>, BasicInfoSchemeCreateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  basicInfoSchemeCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BasicInfoSchemeCreateMutationResult = NonNullable<Awaited<ReturnType<typeof basicInfoSchemeCreate>>>
+    export type BasicInfoSchemeCreateMutationBody = BodyType<SaveSchemeCommand> | undefined
+    export type BasicInfoSchemeCreateMutationError = ErrorType<unknown | ProblemDetails>
+    export type BasicInfoSchemeCreateMutationVariables = {data?: BodyType<SaveSchemeCommand>}
+
+    /**
+ * @summary ایجاد طرح — همهٔ موارد فرم در یک درخواست
+ */
+export const useBasicInfoSchemeCreate = <TError = ErrorType<unknown | ProblemDetails>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeCreate>>, TError,BasicInfoSchemeCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof basicInfoSchemeCreate>>,
+        TError,
+        BasicInfoSchemeCreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getBasicInfoSchemeCreateMutationOptions(options), queryClient);
+    }
+    /**
+ * همان ستون‌هایی که در جدول دیده می‌شود: نام، نرخ قرض‌الحسنه، نرخ‌های مرابحه، مدت‌های بازپرداخت، مدت قرارداد، حداکثر طرح، وضعیت و تعداد شرکت. includeInactive فقط برای کسی که اطلاعات پایه را ویرایش می‌کند کار می‌کند.
+ * @summary جدول طرح‌ها (صفحه‌بندی‌شده)
+ */
+export const basicInfoSchemeSearch = (
+    params?: BasicInfoSchemeSearchParams,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<CommonFacilityPagedResponseOfSchemeListItemDto>(
+      {url: `/gateway/facility-management/BasicInfo/Schemes/Search`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getBasicInfoSchemeSearchQueryKey = (params?: BasicInfoSchemeSearchParams,) => {
+    return [
+    `/gateway/facility-management/BasicInfo/Schemes/Search`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getBasicInfoSchemeSearchQueryOptions = <TData = Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError = ErrorType<ProblemDetails>>(params?: BasicInfoSchemeSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getBasicInfoSchemeSearchQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof basicInfoSchemeSearch>>> = ({ signal }) => basicInfoSchemeSearch(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type BasicInfoSchemeSearchQueryResult = NonNullable<Awaited<ReturnType<typeof basicInfoSchemeSearch>>>
+export type BasicInfoSchemeSearchQueryError = ErrorType<ProblemDetails>
+
+
+export function useBasicInfoSchemeSearch<TData = Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError = ErrorType<ProblemDetails>>(
+ params: undefined |  BasicInfoSchemeSearchParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof basicInfoSchemeSearch>>,
+          TError,
+          Awaited<ReturnType<typeof basicInfoSchemeSearch>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBasicInfoSchemeSearch<TData = Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError = ErrorType<ProblemDetails>>(
+ params?: BasicInfoSchemeSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof basicInfoSchemeSearch>>,
+          TError,
+          Awaited<ReturnType<typeof basicInfoSchemeSearch>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBasicInfoSchemeSearch<TData = Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError = ErrorType<ProblemDetails>>(
+ params?: BasicInfoSchemeSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary جدول طرح‌ها (صفحه‌بندی‌شده)
+ */
+
+export function useBasicInfoSchemeSearch<TData = Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError = ErrorType<ProblemDetails>>(
+ params?: BasicInfoSchemeSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeSearch>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getBasicInfoSchemeSearchQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * هویت طرح، تنظیمات (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده) و فهرست‌های دلایل همین طرح، در یک پاسخ.
+ * @summary جزئیات طرح — همهٔ ۱۴ مورد فرم
+ */
+export const basicInfoSchemeGet = (
+    schemeId: number,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<ReadModelsSchemeFormDto>(
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getBasicInfoSchemeGetQueryKey = (schemeId: number,) => {
+    return [
+    `/gateway/facility-management/BasicInfo/Schemes/${schemeId}`
+    ] as const;
+    }
+
+
+export const getBasicInfoSchemeGetQueryOptions = <TData = Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError = ErrorType<ProblemDetails>>(schemeId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getBasicInfoSchemeGetQueryKey(schemeId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof basicInfoSchemeGet>>> = ({ signal }) => basicInfoSchemeGet(schemeId, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: schemeId !== null && schemeId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type BasicInfoSchemeGetQueryResult = NonNullable<Awaited<ReturnType<typeof basicInfoSchemeGet>>>
+export type BasicInfoSchemeGetQueryError = ErrorType<ProblemDetails>
+
+
+export function useBasicInfoSchemeGet<TData = Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof basicInfoSchemeGet>>,
+          TError,
+          Awaited<ReturnType<typeof basicInfoSchemeGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBasicInfoSchemeGet<TData = Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof basicInfoSchemeGet>>,
+          TError,
+          Awaited<ReturnType<typeof basicInfoSchemeGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBasicInfoSchemeGet<TData = Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary جزئیات طرح — همهٔ ۱۴ مورد فرم
+ */
+
+export function useBasicInfoSchemeGet<TData = Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeGet>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getBasicInfoSchemeGetQueryOptions(schemeId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * rowVersion الزامی است (قفل خوش‌بینانه). code نادیده گرفته می‌شود. فهرستی که null بیاید تغییر نمی‌کند؛ فهرستی که بیاید جایگزین می‌شود و موارد برداشته‌شده غیرفعال (نه پاک) می‌شوند.
+ * @summary ویرایش طرح — همهٔ موارد فرم در یک درخواست
+ */
+export const basicInfoSchemeUpdate = (
+    schemeId: number,
+    saveSchemeCommand?: BodyType<SaveSchemeCommand>,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<ReadModelsSchemeFormDto>(
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: saveSchemeCommand, signal
+    },
+      options);
+    }
+
+
+
+
+export const getBasicInfoSchemeUpdateMutationKey = () => ['basicInfoSchemeUpdate'] as const;
+
+export const getBasicInfoSchemeUpdateMutationOptions = <TError = ErrorType<ProblemDetails | unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeUpdate>>, TError,BasicInfoSchemeUpdateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeUpdate>>, TError,BasicInfoSchemeUpdateMutationVariables, TContext> => {
+
+const mutationKey = getBasicInfoSchemeUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof basicInfoSchemeUpdate>>, BasicInfoSchemeUpdateMutationVariables> = (props) => {
+          const {schemeId,data} = props ?? {};
+
+          return  basicInfoSchemeUpdate(schemeId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BasicInfoSchemeUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof basicInfoSchemeUpdate>>>
+    export type BasicInfoSchemeUpdateMutationBody = BodyType<SaveSchemeCommand> | undefined
+    export type BasicInfoSchemeUpdateMutationError = ErrorType<ProblemDetails | unknown>
+    export type BasicInfoSchemeUpdateMutationVariables = {schemeId: number;data?: BodyType<SaveSchemeCommand>}
+
+    /**
+ * @summary ویرایش طرح — همهٔ موارد فرم در یک درخواست
+ */
+export const useBasicInfoSchemeUpdate = <TError = ErrorType<ProblemDetails | unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeUpdate>>, TError,BasicInfoSchemeUpdateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof basicInfoSchemeUpdate>>,
+        TError,
+        BasicInfoSchemeUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getBasicInfoSchemeUpdateMutationOptions(options), queryClient);
+    }
+    /**
+ * آخرین طرح فعال و طرحی که شرکت فعال دارد حذف نمی‌شوند.
+ * @summary حذف طرح (نرم)
+ */
+export const basicInfoSchemeDelete = (
+    schemeId: number,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<boolean>(
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getBasicInfoSchemeDeleteMutationKey = () => ['basicInfoSchemeDelete'] as const;
+
+export const getBasicInfoSchemeDeleteMutationOptions = <TError = ErrorType<unknown | ProblemDetails>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeDelete>>, TError,BasicInfoSchemeDeleteMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeDelete>>, TError,BasicInfoSchemeDeleteMutationVariables, TContext> => {
+
+const mutationKey = getBasicInfoSchemeDeleteMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof basicInfoSchemeDelete>>, BasicInfoSchemeDeleteMutationVariables> = (props) => {
+          const {schemeId} = props ?? {};
+
+          return  basicInfoSchemeDelete(schemeId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BasicInfoSchemeDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof basicInfoSchemeDelete>>>
+
+    export type BasicInfoSchemeDeleteMutationError = ErrorType<unknown | ProblemDetails>
+    export type BasicInfoSchemeDeleteMutationVariables = {schemeId: number}
+
+    /**
+ * @summary حذف طرح (نرم)
+ */
+export const useBasicInfoSchemeDelete = <TError = ErrorType<unknown | ProblemDetails>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoSchemeDelete>>, TError,BasicInfoSchemeDeleteMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof basicInfoSchemeDelete>>,
+        TError,
+        BasicInfoSchemeDeleteMutationVariables,
+        TContext
+      > => {
+      return useMutation(getBasicInfoSchemeDeleteMutationOptions(options), queryClient);
+    }
+    /**
+ * برای فرم طرح از Schemes/{schemeId} استفاده کنید؛ آن یکی هویت طرح و فهرست‌های دلایلش را هم می‌دهد.
+ * @summary فقط تنظیمات یک طرح (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده)
  */
 export const basicInfoGet = (
     schemeId: number,
@@ -157,7 +554,7 @@ export const basicInfoGet = (
 
 
       return apiClient<ReadModelsBasicInfoDto>(
-      {url: `/BasicInfo/${schemeId}`, method: 'GET', signal
+      {url: `/gateway/facility-management/BasicInfo/${schemeId}`, method: 'GET', signal
     },
       options);
     }
@@ -167,7 +564,7 @@ export const basicInfoGet = (
 
 export const getBasicInfoGetQueryKey = (schemeId: number,) => {
     return [
-    `/BasicInfo/${schemeId}`
+    `/gateway/facility-management/BasicInfo/${schemeId}`
     ] as const;
     }
 
@@ -219,7 +616,7 @@ export function useBasicInfoGet<TData = Awaited<ReturnType<typeof basicInfoGet>>
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary تنظیمات یک طرح (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده)
+ * @summary فقط تنظیمات یک طرح (نرخ‌ها، مدت‌ها، ضرایب، جدول درصد قابل استفاده)
  */
 
 export function useBasicInfoGet<TData = Awaited<ReturnType<typeof basicInfoGet>>, TError = ErrorType<ProblemDetails>>(
@@ -240,8 +637,8 @@ export function useBasicInfoGet<TData = Awaited<ReturnType<typeof basicInfoGet>>
 
 
 /**
- * فقط ادمین (پیش‌فرض). همهٔ محاسبات اعتبار از همین‌جا خوانده می‌شود.
- * @summary ذخیرهٔ تنظیمات پایه
+ * فقط ادمین (پیش‌فرض). همهٔ محاسبات اعتبار از همین‌جا خوانده می‌شود. برای ذخیرهٔ کل فرم طرح (با نام و فهرست‌های دلایل) از PUT Schemes/{schemeId} استفاده کنید.
+ * @summary ذخیرهٔ فقط تنظیمات پایه
  */
 export const basicInfoUpdate = (
     schemeId: number,
@@ -251,7 +648,7 @@ export const basicInfoUpdate = (
 
 
       return apiClient<ReadModelsBasicInfoDto>(
-      {url: `/BasicInfo/${schemeId}`, method: 'PUT',
+      {url: `/gateway/facility-management/BasicInfo/${schemeId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateBasicInfoCommand, signal
     },
@@ -296,7 +693,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type BasicInfoUpdateMutationVariables = {schemeId: number;data?: BodyType<UpdateBasicInfoCommand>}
 
     /**
- * @summary ذخیرهٔ تنظیمات پایه
+ * @summary ذخیرهٔ فقط تنظیمات پایه
  */
 export const useBasicInfoUpdate = <TError = ErrorType<ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoUpdate>>, TError,BasicInfoUpdateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
@@ -309,8 +706,8 @@ export const useBasicInfoUpdate = <TError = ErrorType<ProblemDetails>,
       return useMutation(getBasicInfoUpdateMutationOptions(options), queryClient);
     }
     /**
- * برای فرم ثبت شرکت و انتخاب طرح در تخصیص وام.
- * @summary طرح‌های قابل انتخاب (عقد × نرخ × مدت)
+ * برای فرم ثبت شرکت و انتخاب طرح در تخصیص وام. maxPlansPerCompany همان سقفی است که فرانت برای محدود کردن انتخاب لازم دارد.
+ * @summary طرح‌های قابل انتخاب (عقد × نرخ × مدت) + سقف تعداد طرح هر شرکت
  */
 export const basicInfoPlans = (
     schemeId: number,
@@ -318,8 +715,8 @@ export const basicInfoPlans = (
 ) => {
 
 
-      return apiClient<ReadModelsPlanDto[] | null>(
-      {url: `/BasicInfo/${schemeId}/Plans`, method: 'GET', signal
+      return apiClient<ReadModelsPlanListDto>(
+      {url: `/gateway/facility-management/BasicInfo/${schemeId}/Plans`, method: 'GET', signal
     },
       options);
     }
@@ -329,7 +726,7 @@ export const basicInfoPlans = (
 
 export const getBasicInfoPlansQueryKey = (schemeId: number,) => {
     return [
-    `/BasicInfo/${schemeId}/Plans`
+    `/gateway/facility-management/BasicInfo/${schemeId}/Plans`
     ] as const;
     }
 
@@ -381,7 +778,7 @@ export function useBasicInfoPlans<TData = Awaited<ReturnType<typeof basicInfoPla
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary طرح‌های قابل انتخاب (عقد × نرخ × مدت)
+ * @summary طرح‌های قابل انتخاب (عقد × نرخ × مدت) + سقف تعداد طرح هر شرکت
  */
 
 export function useBasicInfoPlans<TData = Awaited<ReturnType<typeof basicInfoPlans>>, TError = ErrorType<ProblemDetails>>(
@@ -402,17 +799,18 @@ export function useBasicInfoPlans<TData = Awaited<ReturnType<typeof basicInfoPla
 
 
 /**
- * دلایل لغو قرارداد، رد وام، عدم اعطای غیرحضوری، لغو درخواست، رد پرسنل، نوع مستند. برای Dropdown مدال‌ها.
- * @summary فهرست‌های داینامیک
+ * دلایل لغو قرارداد، رد وام، عدم اعطای غیرحضوری، لغو درخواست، رد پرسنل، نوع مستند. برای Dropdown مدال‌ها — طرح را از شرکت بگیرید.
+ * @summary یک فهرست داینامیک از یک طرح
  */
-export const basicInfoReasons = (
-    params?: BasicInfoReasonsParams,
+export const basicInfoSchemeReasons = (
+    schemeId: number,
+    params?: BasicInfoSchemeReasonsParams,
  options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
 ) => {
 
 
       return apiClient<ReadModelsReasonDto[] | null>(
-      {url: `/BasicInfo/Reasons`, method: 'GET',
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}/Reasons`, method: 'GET',
         params, signal
     },
       options);
@@ -421,69 +819,75 @@ export const basicInfoReasons = (
 
 
 
-export const getBasicInfoReasonsQueryKey = (params?: BasicInfoReasonsParams,) => {
+export const getBasicInfoSchemeReasonsQueryKey = (schemeId: number,
+    params?: BasicInfoSchemeReasonsParams,) => {
     return [
-    `/BasicInfo/Reasons`, ...(params ? [params] : [])
+    `/gateway/facility-management/BasicInfo/Schemes/${schemeId}/Reasons`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getBasicInfoReasonsQueryOptions = <TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<ProblemDetails>>(params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+export const getBasicInfoSchemeReasonsQueryOptions = <TData = Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError = ErrorType<ProblemDetails>>(schemeId: number,
+    params?: BasicInfoSchemeReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getBasicInfoReasonsQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getBasicInfoSchemeReasonsQueryKey(schemeId,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof basicInfoReasons>>> = ({ signal }) => basicInfoReasons(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof basicInfoSchemeReasons>>> = ({ signal }) => basicInfoSchemeReasons(schemeId,params, requestOptions, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: schemeId !== null && schemeId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type BasicInfoReasonsQueryResult = NonNullable<Awaited<ReturnType<typeof basicInfoReasons>>>
-export type BasicInfoReasonsQueryError = ErrorType<ProblemDetails>
+export type BasicInfoSchemeReasonsQueryResult = NonNullable<Awaited<ReturnType<typeof basicInfoSchemeReasons>>>
+export type BasicInfoSchemeReasonsQueryError = ErrorType<ProblemDetails>
 
 
-export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<ProblemDetails>>(
- params: undefined |  BasicInfoReasonsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>> & Pick<
+export function useBasicInfoSchemeReasons<TData = Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number,
+    params: undefined |  BasicInfoSchemeReasonsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof basicInfoReasons>>,
+          Awaited<ReturnType<typeof basicInfoSchemeReasons>>,
           TError,
-          Awaited<ReturnType<typeof basicInfoReasons>>
+          Awaited<ReturnType<typeof basicInfoSchemeReasons>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<ProblemDetails>>(
- params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>> & Pick<
+export function useBasicInfoSchemeReasons<TData = Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number,
+    params?: BasicInfoSchemeReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof basicInfoReasons>>,
+          Awaited<ReturnType<typeof basicInfoSchemeReasons>>,
           TError,
-          Awaited<ReturnType<typeof basicInfoReasons>>
+          Awaited<ReturnType<typeof basicInfoSchemeReasons>>
         > , 'initialData'
       >, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<ProblemDetails>>(
- params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+export function useBasicInfoSchemeReasons<TData = Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number,
+    params?: BasicInfoSchemeReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary فهرست‌های داینامیک
+ * @summary یک فهرست داینامیک از یک طرح
  */
 
-export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<ProblemDetails>>(
- params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+export function useBasicInfoSchemeReasons<TData = Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError = ErrorType<ProblemDetails>>(
+ schemeId: number,
+    params?: BasicInfoSchemeReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoSchemeReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getBasicInfoReasonsQueryOptions(params,options)
+  const queryOptions = getBasicInfoSchemeReasonsQueryOptions(schemeId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -496,16 +900,17 @@ export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoR
 
 
 /**
- * @summary افزودن دلیل جدید
+ * @summary افزودن یک مورد به فهرست طرح
  */
 export const basicInfoReasonCreate = (
+    schemeId: number,
     createReasonCommand?: BodyType<CreateReasonCommand>,
  options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
 ) => {
 
 
       return apiClient<ReadModelsReasonDto>(
-      {url: `/BasicInfo/Reasons`, method: 'POST',
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}/Reasons`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createReasonCommand, signal
     },
@@ -532,9 +937,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof basicInfoReasonCreate>>, BasicInfoReasonCreateMutationVariables> = (props) => {
-          const {data} = props ?? {};
+          const {schemeId,data} = props ?? {};
 
-          return  basicInfoReasonCreate(data,requestOptions)
+          return  basicInfoReasonCreate(schemeId,data,requestOptions)
         }
 
 
@@ -547,10 +952,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type BasicInfoReasonCreateMutationResult = NonNullable<Awaited<ReturnType<typeof basicInfoReasonCreate>>>
     export type BasicInfoReasonCreateMutationBody = BodyType<CreateReasonCommand> | undefined
     export type BasicInfoReasonCreateMutationError = ErrorType<ProblemDetails>
-    export type BasicInfoReasonCreateMutationVariables = {data?: BodyType<CreateReasonCommand>}
+    export type BasicInfoReasonCreateMutationVariables = {schemeId: number;data?: BodyType<CreateReasonCommand>}
 
     /**
- * @summary افزودن دلیل جدید
+ * @summary افزودن یک مورد به فهرست طرح
  */
 export const useBasicInfoReasonCreate = <TError = ErrorType<ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoReasonCreate>>, TError,BasicInfoReasonCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
@@ -563,9 +968,104 @@ export const useBasicInfoReasonCreate = <TError = ErrorType<ProblemDetails>,
       return useMutation(getBasicInfoReasonCreateMutationOptions(options), queryClient);
     }
     /**
- * @summary ویرایش/غیرفعال کردن دلیل
+ * ⚠ فهرست‌ها دیگر سراسری نیستند. این مسیر تا وقتی فقط یک طرح فعال باشد کار می‌کند و با طرح دوم خطای روشن می‌دهد. مسیر درست: Schemes/{schemeId}/Reasons.
+ * @summary فهرست داینامیک طرح پیش‌فرض (برای سازگاری)
+ */
+export const basicInfoReasons = (
+    params?: BasicInfoReasonsParams,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<ReadModelsReasonDto[] | null>(
+      {url: `/gateway/facility-management/BasicInfo/Reasons`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getBasicInfoReasonsQueryKey = (params?: BasicInfoReasonsParams,) => {
+    return [
+    `/gateway/facility-management/BasicInfo/Reasons`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getBasicInfoReasonsQueryOptions = <TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<unknown | ProblemDetails>>(params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getBasicInfoReasonsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof basicInfoReasons>>> = ({ signal }) => basicInfoReasons(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type BasicInfoReasonsQueryResult = NonNullable<Awaited<ReturnType<typeof basicInfoReasons>>>
+export type BasicInfoReasonsQueryError = ErrorType<unknown | ProblemDetails>
+
+
+export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<unknown | ProblemDetails>>(
+ params: undefined |  BasicInfoReasonsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof basicInfoReasons>>,
+          TError,
+          Awaited<ReturnType<typeof basicInfoReasons>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<unknown | ProblemDetails>>(
+ params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof basicInfoReasons>>,
+          TError,
+          Awaited<ReturnType<typeof basicInfoReasons>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<unknown | ProblemDetails>>(
+ params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary فهرست داینامیک طرح پیش‌فرض (برای سازگاری)
+ */
+
+export function useBasicInfoReasons<TData = Awaited<ReturnType<typeof basicInfoReasons>>, TError = ErrorType<unknown | ProblemDetails>>(
+ params?: BasicInfoReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof basicInfoReasons>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getBasicInfoReasonsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary ویرایش/غیرفعال کردن یک مورد
  */
 export const basicInfoReasonUpdate = (
+    schemeId: number,
     id: number,
     updateReasonCommand?: BodyType<UpdateReasonCommand>,
  options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
@@ -573,7 +1073,7 @@ export const basicInfoReasonUpdate = (
 
 
       return apiClient<ReadModelsReasonDto>(
-      {url: `/BasicInfo/Reasons/${id}`, method: 'PUT',
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}/Reasons/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateReasonCommand, signal
     },
@@ -600,9 +1100,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof basicInfoReasonUpdate>>, BasicInfoReasonUpdateMutationVariables> = (props) => {
-          const {id,data} = props ?? {};
+          const {schemeId,id,data} = props ?? {};
 
-          return  basicInfoReasonUpdate(id,data,requestOptions)
+          return  basicInfoReasonUpdate(schemeId,id,data,requestOptions)
         }
 
 
@@ -615,10 +1115,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type BasicInfoReasonUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof basicInfoReasonUpdate>>>
     export type BasicInfoReasonUpdateMutationBody = BodyType<UpdateReasonCommand> | undefined
     export type BasicInfoReasonUpdateMutationError = ErrorType<ProblemDetails>
-    export type BasicInfoReasonUpdateMutationVariables = {id: number;data?: BodyType<UpdateReasonCommand>}
+    export type BasicInfoReasonUpdateMutationVariables = {schemeId: number;id: number;data?: BodyType<UpdateReasonCommand>}
 
     /**
- * @summary ویرایش/غیرفعال کردن دلیل
+ * @summary ویرایش/غیرفعال کردن یک مورد
  */
 export const useBasicInfoReasonUpdate = <TError = ErrorType<ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoReasonUpdate>>, TError,BasicInfoReasonUpdateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
@@ -631,16 +1131,17 @@ export const useBasicInfoReasonUpdate = <TError = ErrorType<ProblemDetails>,
       return useMutation(getBasicInfoReasonUpdateMutationOptions(options), queryClient);
     }
     /**
- * @summary حذف دلیل (نرم)
+ * @summary حذف یک مورد (نرم)
  */
 export const basicInfoReasonDelete = (
+    schemeId: number,
     id: number,
  options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
 ) => {
 
 
       return apiClient<boolean>(
-      {url: `/BasicInfo/Reasons/${id}`, method: 'DELETE', signal
+      {url: `/gateway/facility-management/BasicInfo/Schemes/${schemeId}/Reasons/${id}`, method: 'DELETE', signal
     },
       options);
     }
@@ -665,9 +1166,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof basicInfoReasonDelete>>, BasicInfoReasonDeleteMutationVariables> = (props) => {
-          const {id} = props ?? {};
+          const {schemeId,id} = props ?? {};
 
-          return  basicInfoReasonDelete(id,requestOptions)
+          return  basicInfoReasonDelete(schemeId,id,requestOptions)
         }
 
 
@@ -680,10 +1181,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type BasicInfoReasonDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof basicInfoReasonDelete>>>
 
     export type BasicInfoReasonDeleteMutationError = ErrorType<ProblemDetails>
-    export type BasicInfoReasonDeleteMutationVariables = {id: number}
+    export type BasicInfoReasonDeleteMutationVariables = {schemeId: number;id: number}
 
     /**
- * @summary حذف دلیل (نرم)
+ * @summary حذف یک مورد (نرم)
  */
 export const useBasicInfoReasonDelete = <TError = ErrorType<ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof basicInfoReasonDelete>>, TError,BasicInfoReasonDeleteMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}

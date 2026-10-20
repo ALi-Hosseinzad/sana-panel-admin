@@ -22,7 +22,8 @@ import type {
   ProblemDetails,
   ReadModelsCompanyRankingDto,
   ReadModelsDashboardDto,
-  ReadModelsDashboardExport
+  ReadModelsDashboardExport,
+  ReadModelsMonthOptionDto
 } from '../facilityPanelAPI.schemas';
 
 import { apiClient } from '../../../../services/http/apiClient';
@@ -59,7 +60,7 @@ export const dashboardGet = (
 
 
       return apiClient<ReadModelsDashboardDto>(
-      {url: `/Dashboard`, method: 'GET',
+      {url: `/gateway/facility-management/Dashboard`, method: 'GET',
         params, signal
     },
       options);
@@ -70,7 +71,7 @@ export const dashboardGet = (
 
 export const getDashboardGetQueryKey = (params?: DashboardGetParams,) => {
     return [
-    `/Dashboard`, ...(params ? [params] : [])
+    `/gateway/facility-management/Dashboard`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -153,7 +154,7 @@ export const dashboardRanking = (
 
 
       return apiClient<ReadModelsCompanyRankingDto[] | null>(
-      {url: `/Dashboard/CompanyRanking`, method: 'GET',
+      {url: `/gateway/facility-management/Dashboard/CompanyRanking`, method: 'GET',
         params, signal
     },
       options);
@@ -164,7 +165,7 @@ export const dashboardRanking = (
 
 export const getDashboardRankingQueryKey = (params?: DashboardRankingParams,) => {
     return [
-    `/Dashboard/CompanyRanking`, ...(params ? [params] : [])
+    `/gateway/facility-management/Dashboard/CompanyRanking`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -237,6 +238,99 @@ export function useDashboardRanking<TData = Awaited<ReturnType<typeof dashboardR
 
 
 /**
+ * کلید ماه همیشه قالب 1404/05 دارد؛ همین کلید را به CompanyRanking?month= بدهید. ترتیب: تازه‌ترین اول.
+ * @summary ماه‌های دارای داده (برای فیلتر ماه و ترتیب ستون‌ها)
+ */
+export const dashboardMonths = (
+
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<ReadModelsMonthOptionDto[] | null>(
+      {url: `/gateway/facility-management/Dashboard/Months`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getDashboardMonthsQueryKey = () => {
+    return [
+    `/gateway/facility-management/Dashboard/Months`
+    ] as const;
+    }
+
+
+export const getDashboardMonthsQueryOptions = <TData = Awaited<ReturnType<typeof dashboardMonths>>, TError = ErrorType<ProblemDetails>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMonths>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDashboardMonthsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dashboardMonths>>> = ({ signal }) => dashboardMonths(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dashboardMonths>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DashboardMonthsQueryResult = NonNullable<Awaited<ReturnType<typeof dashboardMonths>>>
+export type DashboardMonthsQueryError = ErrorType<ProblemDetails>
+
+
+export function useDashboardMonths<TData = Awaited<ReturnType<typeof dashboardMonths>>, TError = ErrorType<ProblemDetails>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMonths>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dashboardMonths>>,
+          TError,
+          Awaited<ReturnType<typeof dashboardMonths>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDashboardMonths<TData = Awaited<ReturnType<typeof dashboardMonths>>, TError = ErrorType<ProblemDetails>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMonths>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dashboardMonths>>,
+          TError,
+          Awaited<ReturnType<typeof dashboardMonths>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDashboardMonths<TData = Awaited<ReturnType<typeof dashboardMonths>>, TError = ErrorType<ProblemDetails>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMonths>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary ماه‌های دارای داده (برای فیلتر ماه و ترتیب ستون‌ها)
+ */
+
+export function useDashboardMonths<TData = Awaited<ReturnType<typeof dashboardMonths>>, TError = ErrorType<ProblemDetails>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dashboardMonths>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDashboardMonthsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
  * Companies، Personnel، LoanRequests، MonthlyAverages، RemovedCompanies — فقط دادهٔ دامنهٔ کاربر.
  * @summary خروجی CSV (۵ دکمه)
  */
@@ -247,7 +341,7 @@ export const dashboardExport = (
 
 
       return apiClient<unknown>(
-      {url: `/Dashboard/Exports/${report}`, method: 'GET', signal
+      {url: `/gateway/facility-management/Dashboard/Exports/${report}`, method: 'GET', signal
     },
       options);
     }
@@ -257,7 +351,7 @@ export const dashboardExport = (
 
 export const getDashboardExportQueryKey = (report: ReadModelsDashboardExport,) => {
     return [
-    `/Dashboard/Exports/${report}`
+    `/gateway/facility-management/Dashboard/Exports/${report}`
     ] as const;
     }
 

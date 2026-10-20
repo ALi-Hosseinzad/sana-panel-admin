@@ -5,4 +5,5 @@ export * from './companies/companies';
 export * from './dashboard/dashboard';
 export * from './internal-companies/internal-companies';
 export * from './loans/loans';
+export * from './lookups/lookups';
 export * from './personnel/personnel';

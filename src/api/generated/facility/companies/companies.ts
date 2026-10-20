@@ -24,6 +24,7 @@ import type {
   CommonFacilityLookupItemDto,
   CompaniesBalanceDocumentsParams,
   CompaniesBalanceDocumentsUploadBody,
+  CompaniesBalancesSaveBody,
   CompaniesCancelContractBody,
   CompaniesCreateBody,
   CompaniesLookupParams,
@@ -34,8 +35,7 @@ import type {
   ReadModelsBalanceDocumentDto,
   ReadModelsCompanyBalancesDto,
   ReadModelsCompanyDetailsDto,
-  ReadModelsCompanySearchResultDto,
-  UpdateCompanyBalancesCommand
+  ReadModelsCompanySearchResultDto
 } from '../facilityPanelAPI.schemas';
 
 import { apiClient } from '../../../../services/http/apiClient';
@@ -72,7 +72,7 @@ export const companiesSearch = (
 
 
       return apiClient<ReadModelsCompanySearchResultDto>(
-      {url: `/Companies`, method: 'GET',
+      {url: `/gateway/facility-management/Companies`, method: 'GET',
         params, signal
     },
       options);
@@ -83,7 +83,7 @@ export const companiesSearch = (
 
 export const getCompaniesSearchQueryKey = (params?: CompaniesSearchParams,) => {
     return [
-    `/Companies`, ...(params ? [params] : [])
+    `/gateway/facility-management/Companies`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -200,7 +200,7 @@ if(companiesCreateBody?.agreementFile !== undefined) {
  }
 
       return apiClient<ReadModelsCompanyDetailsDto>(
-      {url: `/Companies`, method: 'POST',
+      {url: `/gateway/facility-management/Companies`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -268,7 +268,7 @@ export const companiesLookup = (
 
 
       return apiClient<CommonFacilityLookupItemDto[] | null>(
-      {url: `/Companies/Lookup`, method: 'GET',
+      {url: `/gateway/facility-management/Companies/Lookup`, method: 'GET',
         params, signal
     },
       options);
@@ -279,7 +279,7 @@ export const companiesLookup = (
 
 export const getCompaniesLookupQueryKey = (params?: CompaniesLookupParams,) => {
     return [
-    `/Companies/Lookup`, ...(params ? [params] : [])
+    `/gateway/facility-management/Companies/Lookup`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -361,7 +361,7 @@ export const companiesGet = (
 
 
       return apiClient<ReadModelsCompanyDetailsDto>(
-      {url: `/Companies/${id}`, method: 'GET', signal
+      {url: `/gateway/facility-management/Companies/${id}`, method: 'GET', signal
     },
       options);
     }
@@ -371,7 +371,7 @@ export const companiesGet = (
 
 export const getCompaniesGetQueryKey = (id: number,) => {
     return [
-    `/Companies/${id}`
+    `/gateway/facility-management/Companies/${id}`
     ] as const;
     }
 
@@ -482,7 +482,7 @@ if(companiesUpdateBody?.agreementFile !== undefined) {
  }
 
       return apiClient<ReadModelsCompanyDetailsDto>(
-      {url: `/Companies/${id}`, method: 'PUT',
+      {url: `/gateway/facility-management/Companies/${id}`, method: 'PUT',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -551,7 +551,7 @@ export const companiesDelete = (
 
 
       return apiClient<boolean>(
-      {url: `/Companies/${id}`, method: 'DELETE',
+      {url: `/gateway/facility-management/Companies/${id}`, method: 'DELETE',
       headers: {'Content-Type': 'application/json', },
       data: deleteCompanyCommand, signal
     },
@@ -633,7 +633,7 @@ if(companiesCancelContractBody?.letterFile !== undefined) {
  }
 
       return apiClient<ReadModelsCompanyDetailsDto>(
-      {url: `/Companies/${id}/Cancel`, method: 'POST',
+      {url: `/gateway/facility-management/Companies/${id}/Cancel`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -700,7 +700,7 @@ export const companiesAgreementFile = (
 
 
       return apiClient<unknown>(
-      {url: `/Companies/${id}/AgreementFile`, method: 'GET', signal
+      {url: `/gateway/facility-management/Companies/${id}/AgreementFile`, method: 'GET', signal
     },
       options);
     }
@@ -710,7 +710,7 @@ export const companiesAgreementFile = (
 
 export const getCompaniesAgreementFileQueryKey = (id: number,) => {
     return [
-    `/Companies/${id}/AgreementFile`
+    `/gateway/facility-management/Companies/${id}/AgreementFile`
     ] as const;
     }
 
@@ -792,7 +792,7 @@ export const companiesBalances = (
 
 
       return apiClient<ReadModelsCompanyBalancesDto>(
-      {url: `/Companies/${id}/Balances`, method: 'GET', signal
+      {url: `/gateway/facility-management/Companies/${id}/Balances`, method: 'GET', signal
     },
       options);
     }
@@ -802,7 +802,7 @@ export const companiesBalances = (
 
 export const getCompaniesBalancesQueryKey = (id: number,) => {
     return [
-    `/Companies/${id}/Balances`
+    `/gateway/facility-management/Companies/${id}/Balances`
     ] as const;
     }
 
@@ -875,20 +875,36 @@ export function useCompaniesBalances<TData = Awaited<ReturnType<typeof companies
 
 
 /**
- * فقط کاربر شعبه (شعبهٔ خود) و ادمین. مبلغ قبلی و جدید در گزارش تغییرات.
- * @summary ذخیرهٔ میانگین‌ها (US-B4)
+ * فقط کاربر شعبه (شعبهٔ خود) و ادمین. ⚠ بدنه multipart شد: اگر مبلغی عوض شود، documentTypeId و حداقل یک فایل الزامی است و هر دو در یک تراکنش ثبت می‌شوند. یک مستند همهٔ ماه‌های تغییریافتهٔ همین ذخیره را پوشش می‌دهد. اگر هیچ مبلغی عوض نشود، مستند لازم نیست. مبلغ قبلی و جدید در گزارش تغییرات ثبت می‌شود.
+ * @summary ذخیرهٔ میانگین‌ها همراه مستندش (US-B4، US-B5)
  */
 export const companiesBalancesSave = (
     id: number,
-    updateCompanyBalancesCommand?: BodyType<UpdateCompanyBalancesCommand>,
+    companiesBalancesSaveBody?: BodyType<CompaniesBalancesSaveBody>,
  options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
 ) => {
 
+      const formData = new FormData();
+if(companiesBalancesSaveBody?.Months !== undefined) {
+ companiesBalancesSaveBody?.Months.forEach(value => formData.append(`Months`, JSON.stringify(value)));
+ }
+if(companiesBalancesSaveBody?.RowVersion !== undefined) {
+ formData.append(`RowVersion`, companiesBalancesSaveBody.RowVersion);
+ }
+if(companiesBalancesSaveBody?.DocumentTypeId !== undefined) {
+ formData.append(`DocumentTypeId`, companiesBalancesSaveBody.DocumentTypeId.toString())
+ }
+if(companiesBalancesSaveBody?.DocumentDescription !== undefined) {
+ formData.append(`DocumentDescription`, companiesBalancesSaveBody.DocumentDescription);
+ }
+if(companiesBalancesSaveBody?.files !== undefined) {
+ companiesBalancesSaveBody?.files.forEach(value => formData.append(`files`, value));
+ }
 
       return apiClient<ReadModelsCompanyBalancesDto>(
-      {url: `/Companies/${id}/Balances`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCompanyBalancesCommand, signal
+      {url: `/gateway/facility-management/Companies/${id}/Balances`, method: 'PUT',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
     },
       options);
     }
@@ -898,7 +914,7 @@ export const companiesBalancesSave = (
 
 export const getCompaniesBalancesSaveMutationKey = () => ['companiesBalancesSave'] as const;
 
-export const getCompaniesBalancesSaveMutationOptions = <TError = ErrorType<ProblemDetails>,
+export const getCompaniesBalancesSaveMutationOptions = <TError = ErrorType<unknown | ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companiesBalancesSave>>, TError,CompaniesBalancesSaveMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
 ): UseMutationOptions<Awaited<ReturnType<typeof companiesBalancesSave>>, TError,CompaniesBalancesSaveMutationVariables, TContext> => {
 
@@ -926,14 +942,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type CompaniesBalancesSaveMutationResult = NonNullable<Awaited<ReturnType<typeof companiesBalancesSave>>>
-    export type CompaniesBalancesSaveMutationBody = BodyType<UpdateCompanyBalancesCommand> | undefined
-    export type CompaniesBalancesSaveMutationError = ErrorType<ProblemDetails>
-    export type CompaniesBalancesSaveMutationVariables = {id: number;data?: BodyType<UpdateCompanyBalancesCommand>}
+    export type CompaniesBalancesSaveMutationBody = BodyType<CompaniesBalancesSaveBody> | undefined
+    export type CompaniesBalancesSaveMutationError = ErrorType<unknown | ProblemDetails>
+    export type CompaniesBalancesSaveMutationVariables = {id: number;data?: BodyType<CompaniesBalancesSaveBody>}
 
     /**
- * @summary ذخیرهٔ میانگین‌ها (US-B4)
+ * @summary ذخیرهٔ میانگین‌ها همراه مستندش (US-B4، US-B5)
  */
-export const useCompaniesBalancesSave = <TError = ErrorType<ProblemDetails>,
+export const useCompaniesBalancesSave = <TError = ErrorType<unknown | ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof companiesBalancesSave>>, TError,CompaniesBalancesSaveMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof companiesBalancesSave>>,
@@ -954,7 +970,7 @@ export const companiesBalanceDocuments = (
 
 
       return apiClient<ReadModelsBalanceDocumentDto[] | null>(
-      {url: `/Companies/${id}/Balances/Documents`, method: 'GET',
+      {url: `/gateway/facility-management/Companies/${id}/Balances/Documents`, method: 'GET',
         params, signal
     },
       options);
@@ -966,7 +982,7 @@ export const companiesBalanceDocuments = (
 export const getCompaniesBalanceDocumentsQueryKey = (id: number,
     params?: CompaniesBalanceDocumentsParams,) => {
     return [
-    `/Companies/${id}/Balances/Documents`, ...(params ? [params] : [])
+    `/gateway/facility-management/Companies/${id}/Balances/Documents`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -1068,7 +1084,7 @@ if(companiesBalanceDocumentsUploadBody?.files !== undefined) {
  }
 
       return apiClient<ReadModelsBalanceDocumentDto[] | null>(
-      {url: `/Companies/${id}/Balances/Documents`, method: 'POST',
+      {url: `/gateway/facility-management/Companies/${id}/Balances/Documents`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -1136,7 +1152,7 @@ export const companiesBalanceDocumentDownload = (
 
 
       return apiClient<unknown>(
-      {url: `/Companies/${id}/Balances/Documents/${documentId}`, method: 'GET', signal
+      {url: `/gateway/facility-management/Companies/${id}/Balances/Documents/${documentId}`, method: 'GET', signal
     },
       options);
     }
@@ -1147,7 +1163,7 @@ export const companiesBalanceDocumentDownload = (
 export const getCompaniesBalanceDocumentDownloadQueryKey = (id: number,
     documentId: number,) => {
     return [
-    `/Companies/${id}/Balances/Documents/${documentId}`
+    `/gateway/facility-management/Companies/${id}/Balances/Documents/${documentId}`
     ] as const;
     }
 
@@ -1235,7 +1251,7 @@ export const companiesBalanceDocumentDelete = (
 
 
       return apiClient<boolean>(
-      {url: `/Companies/${id}/Balances/Documents/${documentId}`, method: 'DELETE', signal
+      {url: `/gateway/facility-management/Companies/${id}/Balances/Documents/${documentId}`, method: 'DELETE', signal
     },
       options);
     }

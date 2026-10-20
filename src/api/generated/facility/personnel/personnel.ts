@@ -68,7 +68,7 @@ export const personnelSearch = (
 
 
       return apiClient<CommonFacilityPagedResponseOfPersonnelListItemDto>(
-      {url: `/Companies/${companyId}/Personnel`, method: 'GET',
+      {url: `/gateway/facility-management/Companies/${companyId}/Personnel`, method: 'GET',
         params, signal
     },
       options);
@@ -80,7 +80,7 @@ export const personnelSearch = (
 export const getPersonnelSearchQueryKey = (companyId: number,
     params?: PersonnelSearchParams,) => {
     return [
-    `/Companies/${companyId}/Personnel`, ...(params ? [params] : [])
+    `/gateway/facility-management/Companies/${companyId}/Personnel`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -169,7 +169,7 @@ export const personnelCreate = (
 
 
       return apiClient<ReadModelsPersonnelDetailsDto>(
-      {url: `/Companies/${companyId}/Personnel`, method: 'POST',
+      {url: `/gateway/facility-management/Companies/${companyId}/Personnel`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createPersonnelCommand, signal
     },
@@ -236,7 +236,7 @@ export const personnelGet = (
 
 
       return apiClient<ReadModelsPersonnelDetailsDto>(
-      {url: `/Personnel/${id}`, method: 'GET', signal
+      {url: `/gateway/facility-management/Personnel/${id}`, method: 'GET', signal
     },
       options);
     }
@@ -246,7 +246,7 @@ export const personnelGet = (
 
 export const getPersonnelGetQueryKey = (id: number,) => {
     return [
-    `/Personnel/${id}`
+    `/gateway/facility-management/Personnel/${id}`
     ] as const;
     }
 
@@ -330,7 +330,7 @@ export const personnelUpdate = (
 
 
       return apiClient<ReadModelsPersonnelDetailsDto>(
-      {url: `/Personnel/${id}`, method: 'PUT',
+      {url: `/gateway/facility-management/Personnel/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updatePersonnelCommand, signal
     },
@@ -406,7 +406,7 @@ if(personnelDeleteBody?.file !== undefined) {
  }
 
       return apiClient<boolean>(
-      {url: `/Personnel/${id}/Delete`, method: 'POST',
+      {url: `/gateway/facility-management/Personnel/${id}/Delete`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -473,7 +473,7 @@ export const personnelImportTemplate = (
 
 
       return apiClient<unknown>(
-      {url: `/Personnel/Import/Template`, method: 'GET', signal
+      {url: `/gateway/facility-management/Personnel/Import/Template`, method: 'GET', signal
     },
       options);
     }
@@ -483,7 +483,7 @@ export const personnelImportTemplate = (
 
 export const getPersonnelImportTemplateQueryKey = () => {
     return [
-    `/Personnel/Import/Template`
+    `/gateway/facility-management/Personnel/Import/Template`
     ] as const;
     }
 
@@ -571,7 +571,7 @@ if(personnelImportBody?.file !== undefined) {
  }
 
       return apiClient<ReadModelsPersonnelImportResultDto>(
-      {url: `/Companies/${companyId}/Personnel/Import`, method: 'POST',
+      {url: `/gateway/facility-management/Companies/${companyId}/Personnel/Import`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -638,7 +638,7 @@ export const personnelImportResult = (
 
 
       return apiClient<ReadModelsPersonnelImportResultDto>(
-      {url: `/Personnel/Import/${batchId}`, method: 'GET', signal
+      {url: `/gateway/facility-management/Personnel/Import/${batchId}`, method: 'GET', signal
     },
       options);
     }
@@ -648,7 +648,7 @@ export const personnelImportResult = (
 
 export const getPersonnelImportResultQueryKey = (batchId: number,) => {
     return [
-    `/Personnel/Import/${batchId}`
+    `/gateway/facility-management/Personnel/Import/${batchId}`
     ] as const;
     }
 
@@ -731,7 +731,7 @@ export const personnelDecide = (
 
 
       return apiClient<number>(
-      {url: `/Personnel/Decisions`, method: 'POST',
+      {url: `/gateway/facility-management/Personnel/Decisions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: decidePersonnelCommand, signal
     },

@@ -24,7 +24,7 @@ import type {
 } from '../facilityPanelAPI.schemas';
 
 
-export const getCompaniesSearchResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanySearchResultDto, object>> = {}): ReadModelsCompanySearchResultDto => ({page: {items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), name: faker.string.alpha({length: {min: 10, max: 20}}), nationalId: faker.string.alpha({length: {min: 10, max: 20}}), agreementNumber: faker.string.alpha({length: {min: 10, max: 20}}), contractDate: faker.date.past().toISOString().slice(0, 10), planCount: faker.number.int(), registrar: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, status: faker.helpers.arrayElement([1,2,3,4] as const), branchCode: faker.string.alpha({length: {min: 10, max: 20}})})), totalCount: faker.number.int(), page: faker.number.int(), pageSize: faker.number.int()}, activeCount: faker.number.int(), registeredCount: faker.number.int(), ...overrideResponse})
+export const getCompaniesSearchResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanySearchResultDto, object>> = {}): ReadModelsCompanySearchResultDto => ({page: {items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), name: faker.string.alpha({length: {min: 10, max: 20}}), nationalId: faker.string.alpha({length: {min: 10, max: 20}}), agreementNumber: faker.string.alpha({length: {min: 10, max: 20}}), contractDate: faker.date.past().toISOString().slice(0, 10), planCount: faker.number.int(), registrar: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, status: faker.helpers.arrayElement([1,2,3,4] as const), branchCode: faker.string.alpha({length: {min: 10, max: 20}}), cancelDate: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10), null]), cancelReasonTitle: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})), totalCount: faker.number.int(), page: faker.number.int(), pageSize: faker.number.int()}, activeCount: faker.number.int(), registeredCount: faker.number.int(), ...overrideResponse})
 
 export const getCompaniesCreateResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanyDetailsDto, object>> = {}): ReadModelsCompanyDetailsDto => ({id: faker.number.int(), schemeId: faker.number.int(), name: faker.string.alpha({length: {min: 10, max: 20}}), nationalId: faker.string.alpha({length: {min: 10, max: 20}}), agreementNumber: faker.string.alpha({length: {min: 10, max: 20}}), accountNumber: faker.string.alpha({length: {min: 10, max: 20}}), contractDate: faker.date.past().toISOString().slice(0, 10), accountOpeningDate: faker.date.past().toISOString().slice(0, 10), accountOpeningDayOfMonth: faker.number.int(), salaryFromSepah: faker.datatype.boolean(), plans: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({planId: faker.number.int(), title: faker.string.alpha({length: {min: 10, max: 20}})})), agreementFile: {id: faker.number.int(), fileName: faker.string.alpha({length: {min: 10, max: 20}}), size: faker.number.int(), uploadedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', uploadedBy: faker.string.alpha({length: {min: 10, max: 20}})}, registrar: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', status: faker.helpers.arrayElement([1,2,3,4] as const), cancellation: {cancelDate: faker.date.past().toISOString().slice(0, 10), reason: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.string.alpha({length: {min: 10, max: 20}}), file: {id: faker.number.int(), fileName: faker.string.alpha({length: {min: 10, max: 20}}), size: faker.number.int(), uploadedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', uploadedBy: faker.string.alpha({length: {min: 10, max: 20}})}, cancelledBy: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, cancelledAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, branchCode: faker.string.alpha({length: {min: 10, max: 20}}), rowVersion: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -38,9 +38,9 @@ export const getCompaniesDeleteResponseMock = (): boolean => (faker.datatype.boo
 
 export const getCompaniesCancelContractResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanyDetailsDto, object>> = {}): ReadModelsCompanyDetailsDto => ({id: faker.number.int(), schemeId: faker.number.int(), name: faker.string.alpha({length: {min: 10, max: 20}}), nationalId: faker.string.alpha({length: {min: 10, max: 20}}), agreementNumber: faker.string.alpha({length: {min: 10, max: 20}}), accountNumber: faker.string.alpha({length: {min: 10, max: 20}}), contractDate: faker.date.past().toISOString().slice(0, 10), accountOpeningDate: faker.date.past().toISOString().slice(0, 10), accountOpeningDayOfMonth: faker.number.int(), salaryFromSepah: faker.datatype.boolean(), plans: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({planId: faker.number.int(), title: faker.string.alpha({length: {min: 10, max: 20}})})), agreementFile: {id: faker.number.int(), fileName: faker.string.alpha({length: {min: 10, max: 20}}), size: faker.number.int(), uploadedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', uploadedBy: faker.string.alpha({length: {min: 10, max: 20}})}, registrar: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', status: faker.helpers.arrayElement([1,2,3,4] as const), cancellation: {cancelDate: faker.date.past().toISOString().slice(0, 10), reason: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.string.alpha({length: {min: 10, max: 20}}), file: {id: faker.number.int(), fileName: faker.string.alpha({length: {min: 10, max: 20}}), size: faker.number.int(), uploadedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', uploadedBy: faker.string.alpha({length: {min: 10, max: 20}})}, cancelledBy: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, cancelledAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}, branchCode: faker.string.alpha({length: {min: 10, max: 20}}), rowVersion: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
-export const getCompaniesBalancesResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanyBalancesDto, object>> = {}): ReadModelsCompanyBalancesDto => ({companyId: faker.number.int(), months: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({month: faker.string.alpha({length: {min: 10, max: 20}}), averageBalance: faker.helpers.arrayElement([faker.number.int(), null]), remainingCredit: faker.helpers.arrayElement([faker.number.int(), null]), documentCount: faker.number.int(), hasDocuments: faker.datatype.boolean(), lastEditedBy: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, lastEditedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])})), rowVersion: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+export const getCompaniesBalancesResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanyBalancesDto, object>> = {}): ReadModelsCompanyBalancesDto => ({companyId: faker.number.int(), months: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({month: faker.string.alpha({length: {min: 10, max: 20}}), averageBalance: faker.helpers.arrayElement([faker.number.int(), null]), remainingCredit: faker.helpers.arrayElement([faker.number.int(), null]), documentCount: faker.number.int(), hasDocuments: faker.datatype.boolean(), lastEditedBy: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, lastEditedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), usedCredit: faker.number.int()})), rowVersion: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
-export const getCompaniesBalancesSaveResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanyBalancesDto, object>> = {}): ReadModelsCompanyBalancesDto => ({companyId: faker.number.int(), months: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({month: faker.string.alpha({length: {min: 10, max: 20}}), averageBalance: faker.helpers.arrayElement([faker.number.int(), null]), remainingCredit: faker.helpers.arrayElement([faker.number.int(), null]), documentCount: faker.number.int(), hasDocuments: faker.datatype.boolean(), lastEditedBy: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, lastEditedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])})), rowVersion: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+export const getCompaniesBalancesSaveResponseMock = (overrideResponse: Partial<Extract<ReadModelsCompanyBalancesDto, object>> = {}): ReadModelsCompanyBalancesDto => ({companyId: faker.number.int(), months: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({month: faker.string.alpha({length: {min: 10, max: 20}}), averageBalance: faker.helpers.arrayElement([faker.number.int(), null]), remainingCredit: faker.helpers.arrayElement([faker.number.int(), null]), documentCount: faker.number.int(), hasDocuments: faker.datatype.boolean(), lastEditedBy: {panelUserId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), userCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), branchCode: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])}, lastEditedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), usedCredit: faker.number.int()})), rowVersion: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getCompaniesBalanceDocumentsResponseMock = (): ReadModelsBalanceDocumentDto[] | null => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), month: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), documentType: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), file: {id: faker.number.int(), fileName: faker.string.alpha({length: {min: 10, max: 20}}), size: faker.number.int(), uploadedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', uploadedBy: faker.string.alpha({length: {min: 10, max: 20}})}})))
 
@@ -50,7 +50,7 @@ export const getCompaniesBalanceDocumentDeleteResponseMock = (): boolean => (fak
 
 
 export const getCompaniesSearchMockHandler = (overrideResponse?: ReadModelsCompanySearchResultDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ReadModelsCompanySearchResultDto> | ReadModelsCompanySearchResultDto), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -62,7 +62,7 @@ export const getCompaniesSearchMockHandler = (overrideResponse?: ReadModelsCompa
 }
 
 export const getCompaniesCreateMockHandler = (overrideResponse?: ReadModelsCompanyDetailsDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ReadModelsCompanyDetailsDto> | ReadModelsCompanyDetailsDto), options?: RequestHandlerOptions) => {
-  return http.post('*/Companies', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
+  return http.post('*/gateway/facility-management/Companies', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -74,7 +74,7 @@ export const getCompaniesCreateMockHandler = (overrideResponse?: ReadModelsCompa
 }
 
 export const getCompaniesLookupMockHandler = (overrideResponse?: CommonFacilityLookupItemDto[] | null | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommonFacilityLookupItemDto[] | null> | CommonFacilityLookupItemDto[] | null), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies/Lookup', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies/Lookup', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -86,7 +86,7 @@ export const getCompaniesLookupMockHandler = (overrideResponse?: CommonFacilityL
 }
 
 export const getCompaniesGetMockHandler = (overrideResponse?: ReadModelsCompanyDetailsDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ReadModelsCompanyDetailsDto> | ReadModelsCompanyDetailsDto), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies/:id', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies/:id', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -98,7 +98,7 @@ export const getCompaniesGetMockHandler = (overrideResponse?: ReadModelsCompanyD
 }
 
 export const getCompaniesUpdateMockHandler = (overrideResponse?: ReadModelsCompanyDetailsDto | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<ReadModelsCompanyDetailsDto> | ReadModelsCompanyDetailsDto), options?: RequestHandlerOptions) => {
-  return http.put('*/Companies/:id', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {await delay(250);
+  return http.put('*/gateway/facility-management/Companies/:id', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -110,7 +110,7 @@ export const getCompaniesUpdateMockHandler = (overrideResponse?: ReadModelsCompa
 }
 
 export const getCompaniesDeleteMockHandler = (overrideResponse?: boolean | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<boolean> | boolean), options?: RequestHandlerOptions) => {
-  return http.delete('*/Companies/:id', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {await delay(250);
+  return http.delete('*/gateway/facility-management/Companies/:id', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -122,7 +122,7 @@ export const getCompaniesDeleteMockHandler = (overrideResponse?: boolean | ((inf
 }
 
 export const getCompaniesCancelContractMockHandler = (overrideResponse?: ReadModelsCompanyDetailsDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ReadModelsCompanyDetailsDto> | ReadModelsCompanyDetailsDto), options?: RequestHandlerOptions) => {
-  return http.post('*/Companies/:id/Cancel', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
+  return http.post('*/gateway/facility-management/Companies/:id/Cancel', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -134,7 +134,7 @@ export const getCompaniesCancelContractMockHandler = (overrideResponse?: ReadMod
 }
 
 export const getCompaniesAgreementFileMockHandler = (overrideResponse?: unknown | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies/:id/AgreementFile', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies/:id/AgreementFile', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
 
     return new HttpResponse(null,
@@ -144,7 +144,7 @@ export const getCompaniesAgreementFileMockHandler = (overrideResponse?: unknown 
 }
 
 export const getCompaniesBalancesMockHandler = (overrideResponse?: ReadModelsCompanyBalancesDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ReadModelsCompanyBalancesDto> | ReadModelsCompanyBalancesDto), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies/:id/Balances', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies/:id/Balances', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -156,7 +156,7 @@ export const getCompaniesBalancesMockHandler = (overrideResponse?: ReadModelsCom
 }
 
 export const getCompaniesBalancesSaveMockHandler = (overrideResponse?: ReadModelsCompanyBalancesDto | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<ReadModelsCompanyBalancesDto> | ReadModelsCompanyBalancesDto), options?: RequestHandlerOptions) => {
-  return http.put('*/Companies/:id/Balances', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {await delay(250);
+  return http.put('*/gateway/facility-management/Companies/:id/Balances', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -168,7 +168,7 @@ export const getCompaniesBalancesSaveMockHandler = (overrideResponse?: ReadModel
 }
 
 export const getCompaniesBalanceDocumentsMockHandler = (overrideResponse?: ReadModelsBalanceDocumentDto[] | null | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ReadModelsBalanceDocumentDto[] | null> | ReadModelsBalanceDocumentDto[] | null), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies/:id/Balances/Documents', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies/:id/Balances/Documents', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -180,7 +180,7 @@ export const getCompaniesBalanceDocumentsMockHandler = (overrideResponse?: ReadM
 }
 
 export const getCompaniesBalanceDocumentsUploadMockHandler = (overrideResponse?: ReadModelsBalanceDocumentDto[] | null | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ReadModelsBalanceDocumentDto[] | null> | ReadModelsBalanceDocumentDto[] | null), options?: RequestHandlerOptions) => {
-  return http.post('*/Companies/:id/Balances/Documents', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
+  return http.post('*/gateway/facility-management/Companies/:id/Balances/Documents', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
@@ -192,7 +192,7 @@ export const getCompaniesBalanceDocumentsUploadMockHandler = (overrideResponse?:
 }
 
 export const getCompaniesBalanceDocumentDownloadMockHandler = (overrideResponse?: unknown | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown), options?: RequestHandlerOptions) => {
-  return http.get('*/Companies/:id/Balances/Documents/:documentId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
+  return http.get('*/gateway/facility-management/Companies/:id/Balances/Documents/:documentId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {await delay(250);
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
 
     return new HttpResponse(null,
@@ -202,7 +202,7 @@ export const getCompaniesBalanceDocumentDownloadMockHandler = (overrideResponse?
 }
 
 export const getCompaniesBalanceDocumentDeleteMockHandler = (overrideResponse?: boolean | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<boolean> | boolean), options?: RequestHandlerOptions) => {
-  return http.delete('*/Companies/:id/Balances/Documents/:documentId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {await delay(250);
+  return http.delete('*/gateway/facility-management/Companies/:id/Balances/Documents/:documentId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {await delay(250);
 
 
     return json(overrideResponse !== undefined
