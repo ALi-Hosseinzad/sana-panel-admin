@@ -8,19 +8,29 @@ import {
   type SaveSchemeCommand,
 } from '@/api/generated/facility/facilityPanelAPI.schemas';
 import { FACILITY } from '@/constant/endpoints';
-import { type MockReasonKind, type MockScheme, toReasons } from '@/constant/mock';
+import { COMPANY_STATUS, type MockReasonKind, type MockScheme, toReasons } from '@/constant/mock';
 
 import { removeEmpty } from '@/utils/object';
 
 import { logAction } from '../audit';
-import { db } from '../db';
+import { db, primaryScheme, schemePlans } from '../db';
 import { api, json } from '../utils';
 
 const SCHEMES = `${FACILITY}/BasicInfo/Schemes`;
 
 const companyCount = (scheme: MockScheme) =>
-  db.companies.filter((company) => company.schemeId === String(scheme.id) && !company.deleted)
-    .length;
+  db.companies.filter(
+    (company) => company.schemeId === scheme.id && company.status !== COMPANY_STATUS.DELETED,
+  ).length;
+
+/** دلایل یک طرح؛ با type فقط همان نوع */
+const reasonList = (scheme: MockScheme, url: URL) => {
+  const type = Number(url.searchParams.get('type')) || undefined;
+  const includeInactive = url.searchParams.get('includeInactive') === 'true';
+  return Object.values(scheme.reasons)
+    .flat()
+    .filter((reason) => (!type || reason.type === type) && (includeInactive || reason.isActive));
+};
 
 const toListItem = (scheme: MockScheme): ReadModelsSchemeListItemDto => ({
   id: scheme.id,
@@ -122,6 +132,39 @@ const invalid = (body: SaveSchemeCommand) => {
 };
 
 export const baseInfoHandlers = [
+  /** کشویی طرح‌های کلان (فرم شرکت) */
+  http.get(api(SCHEMES), async () => {
+    await delay(150);
+    return json(
+      db.schemes
+        .filter((scheme) => scheme.isActive)
+        .map(({ id, code, title, isActive }) => ({ id, code, title, isActive })),
+    );
+  }),
+
+  /** طرح‌های قابل انتخاب یک طرح کلان + سقف تعداد طرح هر شرکت */
+  http.get(api(`${FACILITY}/BasicInfo/:schemeId/Plans`), async ({ params }) => {
+    await delay(200);
+    const scheme = findScheme(params.schemeId);
+    if (!scheme) return notFound();
+    return json({
+      maxPlansPerCompany: scheme.settings.maxPlansPerCompany,
+      plans: schemePlans(scheme),
+    });
+  }),
+
+  http.get(api(`${SCHEMES}/:schemeId/Reasons`), async ({ params, request }) => {
+    await delay(150);
+    const scheme = findScheme(params.schemeId);
+    return scheme ? json(reasonList(scheme, new URL(request.url))) : notFound();
+  }),
+
+  /** دلایل بدون طرح مشخص (طرح اصلی) */
+  http.get(api(`${FACILITY}/BasicInfo/Reasons`), async ({ request }) => {
+    await delay(150);
+    return json(reasonList(primaryScheme(), new URL(request.url)));
+  }),
+
   http.get(api(`${SCHEMES}/Search`), async ({ request }) => {
     await delay(250);
     const url = new URL(request.url);

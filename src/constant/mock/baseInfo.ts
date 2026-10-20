@@ -107,11 +107,3 @@ export const MOCK_SCHEMES: MockScheme[] = [
     },
   },
 ];
-
-/** مراحل پس از تأیید اعتبارات */
-export const MOCK_POST_APPROVAL_STAGES = [
-  { id: 'ps-1', title: 'تشکیل پرونده در شعبه', requiresReason: false },
-  { id: 'ps-2', title: 'دریافت تسهیلات از امید بانک', requiresReason: false },
-  { id: 'ps-3', title: 'دریافت تسهیلات در شعبه', requiresReason: false },
-  { id: 'ps-4', title: 'عدم اعطای تسهیلات غیرحضوری', requiresReason: true },
-];

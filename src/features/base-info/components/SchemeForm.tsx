@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { toast } from 'sonner';
 
 import {
-  getBasicInfoSchemeSearchQueryKey,
   useBasicInfoSchemeCreate,
   useBasicInfoSchemeGet,
   useBasicInfoSchemeUpdate,
@@ -13,10 +12,9 @@ import { Button } from '@/component/button';
 import { PanelCard } from '@/component/card';
 import { Form } from '@/component/form';
 import { Skeleton } from '@/component/loading';
-import { QUERY_KEYS } from '@/constant/queryKeys';
 
 import { type SchemeDetail, type SchemeFormValues } from '../types';
-import { EMPTY_VALUES, toFormValues, toPayload } from '../utils';
+import { EMPTY_VALUES, invalidateBasicInfo, toFormValues, toPayload } from '../utils';
 
 import { GeneralFields } from './GeneralFields';
 import { NumberListFields } from './NumberListFields';
@@ -30,16 +28,6 @@ interface SchemeFormProps {
   onBack: () => void;
 }
 
-/** لیست‌های کشویی که از اطلاعات پایه طرح ساخته می‌شوند */
-const LOOKUP_KEYS = [
-  QUERY_KEYS.LOOKUPS.PLANS,
-  QUERY_KEYS.LOOKUPS.SCHEMES,
-  QUERY_KEYS.LOOKUPS.CANCEL_REASONS,
-  QUERY_KEYS.LOOKUPS.REJECT_REASONS,
-  QUERY_KEYS.LOOKUPS.NO_GRANT_REASONS,
-  QUERY_KEYS.LOOKUPS.AVG_DOC_TYPES,
-];
-
 /** فرم افزودن/ویرایش طرح (یک سرویس برای کل فرم: BasicInfo/Schemes) */
 export const SchemeForm = ({ schemeId, onBack }: SchemeFormProps) => {
   const queryClient = useQueryClient();
@@ -51,8 +39,7 @@ export const SchemeForm = ({ schemeId, onBack }: SchemeFormProps) => {
   });
 
   const onSaved = (saved: SchemeDetail) => {
-    void queryClient.invalidateQueries({ queryKey: getBasicInfoSchemeSearchQueryKey() });
-    LOOKUP_KEYS.forEach((queryKey) => void queryClient.invalidateQueries({ queryKey }));
+    void invalidateBasicInfo(queryClient);
     toast.success(isEdit ? `طرح «${saved.title}» ویرایش شد.` : `طرح «${saved.title}» ثبت شد.`);
     onBack();
   };
