@@ -1,4 +1,7 @@
+import { type QueryClient } from '@tanstack/react-query';
+
 import { type ReadModelsUsablePercentDto } from '@/api/generated/facility/facilityPanelAPI.schemas';
+import { FACILITY } from '@/constant/endpoints';
 import { removeEmpty } from '@/utils/object';
 
 import {
@@ -7,6 +10,14 @@ import {
   type SchemeFormValues,
   type SchemeTextList,
 } from './types';
+
+/**
+ * بعد از تغییر طرح‌ها همه سرویس‌های اطلاعات پایه (لیست، کشویی طرح‌ها، طرح‌ها و دلایل) دوباره خوانده می‌شوند.
+ */
+export const invalidateBasicInfo = (queryClient: QueryClient) =>
+  queryClient.invalidateQueries({
+    predicate: (query) => String(query.queryKey[0]).startsWith(`${FACILITY}/BasicInfo`),
+  });
 
 /** نوع قرارداد بک‌اند (Lookups/Enums → contractType) */
 const QARD_HASAN = 1;

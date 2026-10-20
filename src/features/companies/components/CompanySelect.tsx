@@ -1,9 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { useCompaniesLookup } from '@/api/generated/facility';
 import { SelectInput } from '@/component/input';
-import { QUERY_KEYS } from '@/constant/queryKeys';
-import { getCompanyOptions } from '@/services/lookup';
 
 interface CompanySelectProps {
   value?: string;
@@ -11,14 +9,11 @@ interface CompanySelectProps {
 }
 
 /**
- * انتخاب شرکت فعال (از سرویس شرکت‌های فعال).
+ * انتخاب شرکت فعال (Companies/Lookup).
  * اگر مقداری انتخاب نشده یا شرکت انتخاب‌شده دیگر فعال نیست، اولین شرکت انتخاب می‌شود.
  */
 export const CompanySelect = ({ value, onChange }: CompanySelectProps) => {
-  const { data: companies, isPending } = useQuery({
-    queryKey: QUERY_KEYS.LOOKUPS.COMPANIES,
-    queryFn: getCompanyOptions,
-  });
+  const { data: companies, isPending } = useCompaniesLookup({ activeOnly: true });
 
   useEffect(() => {
     const first = companies?.[0]?.id;

@@ -6,20 +6,16 @@ import { useState } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import {
-  getBasicInfoSchemeSearchQueryKey,
-  useBasicInfoSchemeDelete,
-  useBasicInfoSchemeSearch,
-} from '@/api/generated/facility';
+import { useBasicInfoSchemeDelete, useBasicInfoSchemeSearch } from '@/api/generated/facility';
 import { Button } from '@/component/button';
 import { PanelCard } from '@/component/card';
 import { StatusChip } from '@/component/status-chip';
 import { Table } from '@/component/table';
-import { QUERY_KEYS } from '@/constant/queryKeys';
 import { ROUTES } from '@/constant/routes';
 import { toPersianDigits } from '@/utils/date';
 
 import { type SchemeListItem } from '../types';
+import { invalidateBasicInfo } from '../utils';
 
 const PAGE_SIZE = 10;
 
@@ -85,9 +81,7 @@ export const SchemesTable = () => {
   const { mutateAsync: remove } = useBasicInfoSchemeDelete({
     mutation: {
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: getBasicInfoSchemeSearchQueryKey() });
-        void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOOKUPS.SCHEMES });
-        void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOOKUPS.PLANS });
+        void invalidateBasicInfo(queryClient);
         toast.success('طرح حذف شد.');
       },
     },

@@ -1,23 +1,25 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { type ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import {
+  getPersonnelSearchQueryKey,
+  usePersonnelDelete,
+  usePersonnelSearch,
+} from '@/api/generated/facility';
 import { Button } from '@/component/button';
 import { DeleteReasonModal, type DeleteReasonValues } from '@/component/delete-modal';
 import { Table } from '@/component/table';
-import { QUERY_KEYS } from '@/constant/queryKeys';
-import { resolveFile } from '@/services/file';
 import { formatJalali, toPersianDigits } from '@/utils/date';
 
-import { deleteStaff, getStaffList } from '../api';
-import { type Staff, type StaffFilters } from '../types';
+import { type Staff, type StaffFilters, toSearchParams } from '../types';
 
 interface StaffTableProps {
-  companyId: string;
+  companyId: number;
   filters: StaffFilters;
-  onEdit: (id: string) => void;
+  onEdit: (id: number) => void;
 }
 
 const PAGE_SIZE = 10;
@@ -27,24 +29,27 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
   const [deleting, setDeleting] = useState<Staff | null>(null);
   const queryClient = useQueryClient();
 
-  const { data, isFetching } = useQuery({
-    queryKey: QUERY_KEYS.STAFF.LIST(companyId, filters, page),
-    queryFn: () => getStaffList(companyId, { ...filters, page, pageSize: PAGE_SIZE }),
+  const { data, isFetching } = usePersonnelSearch(companyId, {
+    ...toSearchParams(filters),
+    Page: page,
+    PageSize: PAGE_SIZE,
   });
 
-  const { mutateAsync: remove } = useMutation({
-    mutationFn: async ({ description, file }: DeleteReasonValues) => {
-      const uploaded = await resolveFile(file);
-      return deleteStaff(companyId, deleting?.id ?? '', {
-        description: description.trim(),
-        fileId: uploaded?.id ?? '',
-      });
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.STAFF.ALL });
-      toast.success('پرسنل حذف شد.');
+  const { mutateAsync: deleteStaff } = usePersonnelDelete({
+    mutation: {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: getPersonnelSearchQueryKey(companyId) });
+        toast.success('پرسنل حذف شد.');
+      },
     },
   });
+
+  /** حذف با توضیح و فایل مستند (هر دو الزامی، multipart) */
+  const remove = ({ description, file }: DeleteReasonValues) =>
+    deleteStaff({
+      id: deleting?.id ?? 0,
+      data: { Description: description.trim(), file: file ?? undefined },
+    });
 
   const columns: ColumnsType<Staff> = [
     {
@@ -54,7 +59,7 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
       render: (value: number) => <b>{toPersianDigits(value)}</b>,
     },
     { title: 'نام', dataIndex: 'fullName' },
-    { title: 'کد ملی', dataIndex: 'nationalId' },
+    { title: 'کد ملی', dataIndex: 'nationalCode' },
     { title: 'موبایل', dataIndex: 'mobile' },
     { title: 'کد پرسنلی', dataIndex: 'personnelCode' },
     {
@@ -71,7 +76,7 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
             variant="outline"
             size="small"
             icon={<EditOutlined />}
-            onClick={() => onEdit(row.id)}
+            onClick={() => onEdit(row.id ?? 0)}
           >
             ویرایش
           </Button>
@@ -91,6 +96,7 @@ export const StaffTable = ({ companyId, filters, onEdit }: StaffTableProps) => {
   return (
     <>
       <Table<Staff>
+        rowKey="id"
         columns={columns}
         dataSource={data?.items}
         loading={isFetching}
