@@ -63,7 +63,7 @@ export const MOCK_MAIN_MENU: MenuItemDto[] = [
     parentId: 28,
     title: 'تایید مدیر شرکت',
     enTitle: 'Base Plan',
-    url: '/facility/base-info',
+    url: '/base-info',
     iconName: 'mdi-clipboard-list',
     actionName: 'Read',
     controllerName: 'Facility',
