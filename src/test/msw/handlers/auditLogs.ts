@@ -6,7 +6,7 @@ import {
   type CommandResponsesChangeLogItemDto,
   type CommonFacilityPagedResponseOfChangeLogItemDto,
 } from '@/api/generated/facility/facilityPanelAPI.schemas';
-import { ENDPOINTS } from '@/constant/endpoints';
+import { ENDPOINTS, FACILITY } from '@/constant/endpoints';
 import { AUDIT_LOG_TYPES, type MockAuditLog, type MockLogType } from '@/constant/mock';
 import { dayjs } from '@/utils/date';
 
@@ -61,7 +61,7 @@ export const auditLogHandlers = [
     return json(CATEGORY_TITLES);
   }),
 
-  http.get(api('/ChangeLogs'), async ({ request }) => {
+  http.get(api(`${FACILITY}/ChangeLogs`), async ({ request }) => {
     await delay(250);
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('Page') ?? 1);
@@ -77,7 +77,7 @@ export const auditLogHandlers = [
     return json(response);
   }),
 
-  http.post(api('/ChangeLogs/:id/Restore'), async ({ params, request }) => {
+  http.post(api(`${FACILITY}/ChangeLogs/:id/Restore`), async ({ params, request }) => {
     await delay(350);
     const { description } = (await request.json()) as { description?: string };
     if (!description?.trim()) {

@@ -71,7 +71,7 @@ export const loansCredit = (
 
 
       return apiClient<ReadModelsCompanyCreditDto>(
-      {url: `/Companies/${companyId}/Credit`, method: 'GET',
+      {url: `/gateway/facility-management/Companies/${companyId}/Credit`, method: 'GET',
         params, signal
     },
       options);
@@ -83,7 +83,7 @@ export const loansCredit = (
 export const getLoansCreditQueryKey = (companyId: number,
     params?: LoansCreditParams,) => {
     return [
-    `/Companies/${companyId}/Credit`, ...(params ? [params] : [])
+    `/gateway/facility-management/Companies/${companyId}/Credit`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -161,7 +161,7 @@ export function useLoansCredit<TData = Awaited<ReturnType<typeof loansCredit>>, 
 
 
 /**
- * مجموع، مجاز بودن، «حداکثر تا N نفر با این مبلغ»، هشدار تجاوز از اعتبار. چیزی ذخیره نمی‌شود.
+ * مجموع، مجاز بودن، «حداکثر تا N نفر با این مبلغ»، هشدار تجاوز از اعتبار، و repeatAllocations: افرادی که در همین ماه قبلاً وام گرفته‌اند. repeatAllocations هشدار است نه خطا — isAllowed را عوض نمی‌کند و ثبت را قفل نمی‌کند؛ فرانت فهرست را نشان می‌دهد و تأیید دوباره می‌گیرد. چیزی ذخیره نمی‌شود.
  * @summary هینت‌های زندهٔ فرم (US-E5، D6)
  */
 export const loansPreview = (
@@ -172,7 +172,7 @@ export const loansPreview = (
 
 
       return apiClient<ReadModelsLoanRequestPreviewDto>(
-      {url: `/Companies/${companyId}/LoanRequests/Preview`, method: 'POST',
+      {url: `/gateway/facility-management/Companies/${companyId}/LoanRequests/Preview`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: previewLoanRequestQuery, signal
     },
@@ -185,7 +185,7 @@ export const loansPreview = (
 export const getLoansPreviewQueryKey = (companyId: number,
     previewLoanRequestQuery?: BodyType<PreviewLoanRequestQuery>,) => {
     return [
-    'POST', `/Companies/${companyId}/LoanRequests/Preview`, previewLoanRequestQuery
+    'POST', `/gateway/facility-management/Companies/${companyId}/LoanRequests/Preview`, previewLoanRequestQuery
     ] as const;
     }
 
@@ -274,7 +274,7 @@ export const loansCreate = (
 
 
       return apiClient<CommandResponsesLoanBatchDto>(
-      {url: `/Companies/${companyId}/LoanRequests`, method: 'POST',
+      {url: `/gateway/facility-management/Companies/${companyId}/LoanRequests`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createLoanRequestsCommand, signal
     },
@@ -286,7 +286,7 @@ export const loansCreate = (
 
 export const getLoansCreateMutationKey = () => ['loansCreate'] as const;
 
-export const getLoansCreateMutationOptions = <TError = ErrorType<ProblemDetails>,
+export const getLoansCreateMutationOptions = <TError = ErrorType<unknown | ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loansCreate>>, TError,LoansCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
 ): UseMutationOptions<Awaited<ReturnType<typeof loansCreate>>, TError,LoansCreateMutationVariables, TContext> => {
 
@@ -315,13 +315,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type LoansCreateMutationResult = NonNullable<Awaited<ReturnType<typeof loansCreate>>>
     export type LoansCreateMutationBody = BodyType<CreateLoanRequestsCommand> | undefined
-    export type LoansCreateMutationError = ErrorType<ProblemDetails>
+    export type LoansCreateMutationError = ErrorType<unknown | ProblemDetails>
     export type LoansCreateMutationVariables = {companyId: number;data?: BodyType<CreateLoanRequestsCommand>}
 
     /**
  * @summary ثبت درخواست برای پرسنل انتخاب‌شده (US-D3)
  */
-export const useLoansCreate = <TError = ErrorType<ProblemDetails>,
+export const useLoansCreate = <TError = ErrorType<unknown | ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loansCreate>>, TError,LoansCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof loansCreate>>,
@@ -342,7 +342,7 @@ export const loansSearch = (
 
 
       return apiClient<CommonFacilityPagedResponseOfLoanRequestListItemDto>(
-      {url: `/LoanRequests`, method: 'GET',
+      {url: `/gateway/facility-management/LoanRequests`, method: 'GET',
         params, signal
     },
       options);
@@ -353,7 +353,7 @@ export const loansSearch = (
 
 export const getLoansSearchQueryKey = (params?: LoansSearchParams,) => {
     return [
-    `/LoanRequests`, ...(params ? [params] : [])
+    `/gateway/facility-management/LoanRequests`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -435,7 +435,7 @@ export const loansGet = (
 
 
       return apiClient<ReadModelsLoanRequestDetailsDto>(
-      {url: `/LoanRequests/${id}`, method: 'GET', signal
+      {url: `/gateway/facility-management/LoanRequests/${id}`, method: 'GET', signal
     },
       options);
     }
@@ -445,7 +445,7 @@ export const loansGet = (
 
 export const getLoansGetQueryKey = (id: number,) => {
     return [
-    `/LoanRequests/${id}`
+    `/gateway/facility-management/LoanRequests/${id}`
     ] as const;
     }
 
@@ -529,7 +529,7 @@ export const loansAddMember = (
 
 
       return apiClient<CommandResponsesLoanBatchDto>(
-      {url: `/LoanBatches/${batchId}/Members`, method: 'POST',
+      {url: `/gateway/facility-management/LoanBatches/${batchId}/Members`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: addLoanBatchMemberCommand, signal
     },
@@ -598,7 +598,7 @@ export const loansRemoveMember = (
 
 
       return apiClient<CommandResponsesLoanBatchDto>(
-      {url: `/LoanBatches/${batchId}/Members/${requestId}`, method: 'DELETE', signal
+      {url: `/gateway/facility-management/LoanBatches/${batchId}/Members/${requestId}`, method: 'DELETE', signal
     },
       options);
     }
@@ -654,6 +654,106 @@ export const useLoansRemoveMember = <TError = ErrorType<ProblemDetails>,
       return useMutation(getLoansRemoveMemberMutationOptions(options), queryClient);
     }
     /**
+ * fileId همان id عضوهای documents در ردیف فهرست است.
+ * @summary دانلود مستند درخواست
+ */
+export const loansDocumentDownload = (
+    id: number,
+    fileId: number,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<unknown>(
+      {url: `/gateway/facility-management/LoanRequests/${id}/Documents/${fileId}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getLoansDocumentDownloadQueryKey = (id: number,
+    fileId: number,) => {
+    return [
+    `/gateway/facility-management/LoanRequests/${id}/Documents/${fileId}`
+    ] as const;
+    }
+
+
+export const getLoansDocumentDownloadQueryOptions = <TData = Awaited<ReturnType<typeof loansDocumentDownload>>, TError = ErrorType<ProblemDetails>>(id: number,
+    fileId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof loansDocumentDownload>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLoansDocumentDownloadQueryKey(id,fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof loansDocumentDownload>>> = ({ signal }) => loansDocumentDownload(id,fileId, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && fileId !== null && fileId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof loansDocumentDownload>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type LoansDocumentDownloadQueryResult = NonNullable<Awaited<ReturnType<typeof loansDocumentDownload>>>
+export type LoansDocumentDownloadQueryError = ErrorType<ProblemDetails>
+
+
+export function useLoansDocumentDownload<TData = Awaited<ReturnType<typeof loansDocumentDownload>>, TError = ErrorType<ProblemDetails>>(
+ id: number,
+    fileId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof loansDocumentDownload>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof loansDocumentDownload>>,
+          TError,
+          Awaited<ReturnType<typeof loansDocumentDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLoansDocumentDownload<TData = Awaited<ReturnType<typeof loansDocumentDownload>>, TError = ErrorType<ProblemDetails>>(
+ id: number,
+    fileId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof loansDocumentDownload>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof loansDocumentDownload>>,
+          TError,
+          Awaited<ReturnType<typeof loansDocumentDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLoansDocumentDownload<TData = Awaited<ReturnType<typeof loansDocumentDownload>>, TError = ErrorType<ProblemDetails>>(
+ id: number,
+    fileId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof loansDocumentDownload>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary دانلود مستند درخواست
+ */
+
+export function useLoansDocumentDownload<TData = Awaited<ReturnType<typeof loansDocumentDownload>>, TError = ErrorType<ProblemDetails>>(
+ id: number,
+    fileId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof loansDocumentDownload>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getLoansDocumentDownloadQueryOptions(id,fileId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
  * فقط قبل از تأیید اعتبارات؛ دلیل از فهرست + توضیح.
  * @summary لغو درخواست یک نفر (US-D5)
  */
@@ -665,7 +765,7 @@ export const loansCancel = (
 
 
       return apiClient<CommandResponsesLoanRequestListItemDto>(
-      {url: `/LoanRequests/${id}/Cancel`, method: 'POST',
+      {url: `/gateway/facility-management/LoanRequests/${id}/Cancel`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: cancelLoanRequestCommand, signal
     },

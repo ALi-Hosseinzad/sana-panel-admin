@@ -69,7 +69,7 @@ export const approvalsManagerQueue = (
 
 
       return apiClient<CommonFacilityPagedResponseOfLoanRequestListItemDto>(
-      {url: `/ManagerApprovals`, method: 'GET',
+      {url: `/gateway/facility-management/ManagerApprovals`, method: 'GET',
         params, signal
     },
       options);
@@ -80,7 +80,7 @@ export const approvalsManagerQueue = (
 
 export const getApprovalsManagerQueueQueryKey = (params?: ApprovalsManagerQueueParams,) => {
     return [
-    `/ManagerApprovals`, ...(params ? [params] : [])
+    `/gateway/facility-management/ManagerApprovals`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -153,7 +153,7 @@ export function useApprovalsManagerQueue<TData = Awaited<ReturnType<typeof appro
 
 
 /**
- * تأیید به manager-approval.approve و رد به manager-approval.reject نیاز دارد. رد: دلیل و توضیح الزامی.
+ * تأیید به manager-approval.approve و رد به manager-approval.reject نیاز دارد. رد: دلیل و توضیح الزامی (از «دلایل رد درخواست وام»، همان فهرست اعتبارات). اجرای ناقص مجاز است: ردیف‌های انجام‌نشده در skipped با دلیل برمی‌گردند.
  * @summary تأیید/رد گروهی یا تکی مدیر شرکت
  */
 export const approvalsManagerDecide = (
@@ -163,7 +163,7 @@ export const approvalsManagerDecide = (
 
 
       return apiClient<CommandResponsesDecisionResultDto>(
-      {url: `/ManagerApprovals/Decisions`, method: 'POST',
+      {url: `/gateway/facility-management/ManagerApprovals/Decisions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: decideLoanRequestsCommand, signal
     },
@@ -231,7 +231,7 @@ export const approvalsCreditQueue = (
 
 
       return apiClient<CommonFacilityPagedResponseOfLoanRequestListItemDto>(
-      {url: `/CreditApprovals`, method: 'GET',
+      {url: `/gateway/facility-management/CreditApprovals`, method: 'GET',
         params, signal
     },
       options);
@@ -242,7 +242,7 @@ export const approvalsCreditQueue = (
 
 export const getApprovalsCreditQueueQueryKey = (params?: ApprovalsCreditQueueParams,) => {
     return [
-    `/CreditApprovals`, ...(params ? [params] : [])
+    `/gateway/facility-management/CreditApprovals`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -315,7 +315,7 @@ export function useApprovalsCreditQueue<TData = Awaited<ReturnType<typeof approv
 
 
 /**
- * همه در یک تراکنش. رد: دلیل از فهرست و توضیح الزامی و برای همه یکسان. پیوست مصوبه اختیاری.
+ * یک تراکنش، ولی اجرای ناقص مجاز است: ردیف‌هایی که در این مرحله نیستند یا خارج از دامنهٔ شمایند در skipped با دلیل برمی‌گردند و processed تعداد انجام‌شده است. رد: دلیل از فهرست و توضیح الزامی و برای همه یکسان. پیوست مصوبه اختیاری. postStage را در همین تصمیم بفرستید تا مرحلهٔ پس از تأیید گروهی ثبت شود (کلید facility.credit-approval.stage لازم است؛ برای عدم اعطای غیرحضوری postStageReasonId الزامی).
  * @summary تأیید/رد اعتبارات، تکی یا گروهی (US-B8)
  */
 export const approvalsCreditDecide = (
@@ -336,12 +336,18 @@ if(approvalsCreditDecideBody?.ReasonId !== undefined) {
 if(approvalsCreditDecideBody?.Description !== undefined) {
  formData.append(`Description`, approvalsCreditDecideBody.Description);
  }
+if(approvalsCreditDecideBody?.PostStage !== undefined) {
+ formData.append(`PostStage`, approvalsCreditDecideBody.PostStage.toString())
+ }
+if(approvalsCreditDecideBody?.PostStageReasonId !== undefined) {
+ formData.append(`PostStageReasonId`, approvalsCreditDecideBody.PostStageReasonId.toString())
+ }
 if(approvalsCreditDecideBody?.attachment !== undefined) {
  formData.append(`attachment`, approvalsCreditDecideBody.attachment);
  }
 
       return apiClient<CommandResponsesDecisionResultDto>(
-      {url: `/CreditApprovals/Decisions`, method: 'POST',
+      {url: `/gateway/facility-management/CreditApprovals/Decisions`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -399,8 +405,8 @@ export const useApprovalsCreditDecide = <TError = ErrorType<ProblemDetails>,
       return useMutation(getApprovalsCreditDecideMutationOptions(options), queryClient);
     }
     /**
- * تشکیل پرونده در شعبه / دریافت تسهیلات از امید بانک / دریافت در شعبه / عدم اعطای غیرحضوری (دلیل الزامی).
- * @summary تغییر مرحلهٔ پس از تأیید
+ * تشکیل پرونده در شعبه / دریافت تسهیلات از امید بانک / دریافت در شعبه / عدم اعطای غیرحضوری (دلیل الزامی). برای ثبت مرحله هم‌زمان با تأیید، postStage را به سرویس تصمیم بدهید؛ این سرویس برای تغییر بعدی است.
+ * @summary تغییر مرحلهٔ پس از تأیید (برای درخواست تأییدشده)
  */
 export const approvalsPostStage = (
     requestId: number,
@@ -410,7 +416,7 @@ export const approvalsPostStage = (
 
 
       return apiClient<CommandResponsesLoanRequestListItemDto>(
-      {url: `/CreditApprovals/${requestId}/PostApprovalStage`, method: 'PUT',
+      {url: `/gateway/facility-management/CreditApprovals/${requestId}/PostApprovalStage`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: setPostApprovalStageCommand, signal
     },
@@ -455,7 +461,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ApprovalsPostStageMutationVariables = {requestId: number;data?: BodyType<SetPostApprovalStageCommand>}
 
     /**
- * @summary تغییر مرحلهٔ پس از تأیید
+ * @summary تغییر مرحلهٔ پس از تأیید (برای درخواست تأییدشده)
  */
 export const useApprovalsPostStage = <TError = ErrorType<ProblemDetails>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approvalsPostStage>>, TError,ApprovalsPostStageMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
@@ -477,7 +483,7 @@ export const approvalsDigitalQueue = (
 
 
       return apiClient<CommonFacilityPagedResponseOfLoanRequestListItemDto>(
-      {url: `/DigitalApprovals`, method: 'GET',
+      {url: `/gateway/facility-management/DigitalApprovals`, method: 'GET',
         params, signal
     },
       options);
@@ -488,7 +494,7 @@ export const approvalsDigitalQueue = (
 
 export const getApprovalsDigitalQueueQueryKey = (params?: ApprovalsDigitalQueueParams,) => {
     return [
-    `/DigitalApprovals`, ...(params ? [params] : [])
+    `/gateway/facility-management/DigitalApprovals`, ...(params ? [params] : [])
     ] as const;
     }
 
@@ -581,12 +587,18 @@ if(approvalsDigitalDecideBody?.ReasonId !== undefined) {
 if(approvalsDigitalDecideBody?.Description !== undefined) {
  formData.append(`Description`, approvalsDigitalDecideBody.Description);
  }
+if(approvalsDigitalDecideBody?.PostStage !== undefined) {
+ formData.append(`PostStage`, approvalsDigitalDecideBody.PostStage.toString())
+ }
+if(approvalsDigitalDecideBody?.PostStageReasonId !== undefined) {
+ formData.append(`PostStageReasonId`, approvalsDigitalDecideBody.PostStageReasonId.toString())
+ }
 if(approvalsDigitalDecideBody?.attachment !== undefined) {
  formData.append(`attachment`, approvalsDigitalDecideBody.attachment);
  }
 
       return apiClient<CommandResponsesDecisionResultDto>(
-      {url: `/DigitalApprovals/Decisions`, method: 'POST',
+      {url: `/gateway/facility-management/DigitalApprovals/Decisions`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData, signal
     },
@@ -654,7 +666,7 @@ export const approvalsPendingCounts = (
 
 
       return apiClient<ReadModelsPendingCountsDto>(
-      {url: `/Approvals/PendingCounts`, method: 'GET', signal
+      {url: `/gateway/facility-management/Approvals/PendingCounts`, method: 'GET', signal
     },
       options);
     }
@@ -664,7 +676,7 @@ export const approvalsPendingCounts = (
 
 export const getApprovalsPendingCountsQueryKey = () => {
     return [
-    `/Approvals/PendingCounts`
+    `/gateway/facility-management/Approvals/PendingCounts`
     ] as const;
     }
 

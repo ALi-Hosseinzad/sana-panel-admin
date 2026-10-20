@@ -11,6 +11,8 @@ export const QUERY_KEYS = {
     NO_GRANT_REASONS: ['lookups', 'no-grant-reasons'],
     AVG_DOC_TYPES: ['lookups', 'avg-doc-types'],
     PLANS: ['lookups', 'plans'],
+    PLANS_OF: (schemeId: string) => ['lookups', 'plans', schemeId],
+    SCHEMES: ['lookups', 'schemes'],
     COMPANIES: ['lookups', 'companies'],
     ALL_COMPANIES: ['lookups', 'companies', 'all'],
     POST_APPROVAL_STAGES: ['lookups', 'post-approval-stages'],

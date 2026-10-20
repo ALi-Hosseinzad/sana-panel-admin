@@ -30,15 +30,6 @@ export const AllocationMode = {
   NUMBER_2: 2,
 } as const;
 
-export type ApprovalStage = typeof ApprovalStage[keyof typeof ApprovalStage];
-
-
-export const ApprovalStage = {
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-  NUMBER_3: 3,
-} as const;
-
 export interface CancelLoanRequestCommand {
   /**
      * @minimum 1
@@ -125,6 +116,14 @@ export const PostApprovalStage = {
   NUMBER_4: 4,
 } as const;
 
+export interface CommonStoredFileDto {
+  id?: number;
+  fileName?: string;
+  size?: number;
+  uploadedAt?: string;
+  uploadedBy?: string;
+}
+
 export interface CommandResponsesLoanRequestListItemDto {
   id?: number;
   batchId?: number;
@@ -146,6 +145,7 @@ export interface CommandResponsesLoanRequestListItemDto {
   description?: string | null;
   documentCount?: number;
   canCancel?: boolean;
+  documents?: CommonStoredFileDto[];
 }
 
 export interface CommandResponsesLoanBatchDto {
@@ -164,6 +164,30 @@ export const CommonDecisionType = {
   NUMBER_1: 1,
   NUMBER_2: 2,
 } as const;
+
+export interface CommonEnumValueDto {
+  value?: number;
+  name?: string;
+  title?: string;
+  requiresReason?: boolean;
+}
+
+export interface CommonEnumCatalogDto {
+  companyStatus?: CommonEnumValueDto[];
+  personnelStatus?: CommonEnumValueDto[];
+  loanRequestStatus?: CommonEnumValueDto[];
+  postApprovalStage?: CommonEnumValueDto[];
+  allocationMode?: CommonEnumValueDto[];
+  eligibilityStatus?: CommonEnumValueDto[];
+  approvalStage?: CommonEnumValueDto[];
+  decisionType?: CommonEnumValueDto[];
+  contractType?: CommonEnumValueDto[];
+  reasonType?: CommonEnumValueDto[];
+  changeLogCategory?: CommonEnumValueDto[];
+  companyRankingSort?: CommonEnumValueDto[];
+  dashboardExport?: CommonEnumValueDto[];
+  hintLevel?: CommonEnumValueDto[];
+}
 
 export interface CommonFacilityLookupItemDto {
   id?: string;
@@ -197,6 +221,10 @@ export interface ReadModelsCompanyListItemDto {
   registrar?: CommonRegistrarDto;
   status?: CompanyStatus;
   branchCode?: string;
+  /** @nullable */
+  cancelDate?: string | null;
+  /** @nullable */
+  cancelReasonTitle?: string | null;
 }
 
 export interface CommonFacilityPagedResponseOfCompanyListItemDto {
@@ -248,19 +276,24 @@ export interface CommonFacilityPagedResponseOfPersonnelListItemDto {
   pageSize?: number;
 }
 
-export interface CommonFileUpload {
-  content?: string;
-  fileName?: string;
-  contentType?: string;
-  readonly length?: number;
+export interface ReadModelsSchemeListItemDto {
+  id?: number;
+  code?: string;
+  title?: string;
+  qardHasanRate?: number;
+  murabahaRates?: number[];
+  repaymentTermsMonths?: number[];
+  contractDurationMonths?: number;
+  maxPlansPerCompany?: number;
+  isActive?: boolean;
+  companyCount?: number;
 }
 
-export interface CommonStoredFileDto {
-  id?: number;
-  fileName?: string;
-  size?: number;
-  uploadedAt?: string;
-  uploadedBy?: string;
+export interface CommonFacilityPagedResponseOfSchemeListItemDto {
+  items?: ReadModelsSchemeListItemDto[];
+  totalCount?: number;
+  page?: number;
+  pageSize?: number;
 }
 
 export type ContractType = typeof ContractType[keyof typeof ContractType];
@@ -365,6 +398,9 @@ export interface DecideLoanRequestsCommand {
      * @nullable
      */
   description?: string | null;
+  postStage?: PostApprovalStage;
+  /** @nullable */
+  postStageReasonId?: number | null;
 }
 
 export interface DecidePersonnelCommand {
@@ -462,6 +498,7 @@ export interface ReadModelsMonthlyBalanceDto {
   lastEditedBy?: CommonRegistrarDto;
   /** @nullable */
   lastEditedAt?: string | null;
+  usedCredit?: number;
 }
 
 export interface ReadModelsCompanyBalancesDto {
@@ -483,6 +520,8 @@ export interface ReadModelsEligibilityBannerDto {
   message?: string;
   /** @nullable */
   allowedDayOfMonth?: number | null;
+  canRegisterLoan?: boolean;
+  messages?: string[];
 }
 
 export interface ReadModelsPlanCreditDto {
@@ -507,6 +546,9 @@ export interface ReadModelsCompanyCreditDto {
   /** @nullable */
   currentMonthAverage?: number | null;
   plans?: ReadModelsPlanCreditDto[];
+  baseDateDefault?: string;
+  baseDateMin?: string;
+  baseDateMax?: string;
 }
 
 export interface FacilityBaseMessageResponseOfCompanyCreditDto {
@@ -600,6 +642,14 @@ export interface ReadModelsCreditVsAllocatedDto {
   allocated?: number;
 }
 
+export type ReadModelsDashboardGroupKind = typeof ReadModelsDashboardGroupKind[keyof typeof ReadModelsDashboardGroupKind];
+
+
+export const ReadModelsDashboardGroupKind = {
+  NUMBER_1: 1,
+  NUMBER_2: 2,
+} as const;
+
 export interface ReadModelsContractsByMonthDto {
   month?: string;
   companyCount?: number;
@@ -622,7 +672,9 @@ export interface ReadModelsRemovedCompanyDto {
   averageBalance?: number | null;
   allocatedTotal?: number;
   requestCount?: number;
-  approvalRate?: number;
+  /** @nullable */
+  approvalRate?: number | null;
+  removalKind?: CompanyStatus;
 }
 
 export interface ReadModelsDashboardDto {
@@ -630,6 +682,7 @@ export interface ReadModelsDashboardDto {
   requestStatus?: ReadModelsRequestStatusChartDto;
   planShare?: ReadModelsPlanShareDto[];
   creditVsAllocated?: ReadModelsCreditVsAllocatedDto[];
+  creditVsAllocatedGroupKind?: ReadModelsDashboardGroupKind;
   contractsByMonth?: ReadModelsContractsByMonthDto[];
   monthlyAllocation?: ReadModelsMonthlyAllocationDto[];
   removedCompanies?: ReadModelsRemovedCompanyDto[];
@@ -648,6 +701,14 @@ export interface FacilityBaseMessageResponseOfDecisionResultDto {
   /** @nullable */
   message?: string | null;
   data?: CommandResponsesDecisionResultDto;
+  readonly isSuccess?: boolean;
+}
+
+export interface FacilityBaseMessageResponseOfEnumCatalogDto {
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  data?: CommonEnumCatalogDto;
   readonly isSuccess?: boolean;
 }
 
@@ -672,6 +733,14 @@ export interface FacilityBaseMessageResponseOfFacilityPagedResponseOfPersonnelLi
   /** @nullable */
   message?: string | null;
   data?: CommonFacilityPagedResponseOfPersonnelListItemDto;
+  readonly isSuccess?: boolean;
+}
+
+export interface FacilityBaseMessageResponseOfFacilityPagedResponseOfSchemeListItemDto {
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  data?: CommonFacilityPagedResponseOfSchemeListItemDto;
   readonly isSuccess?: boolean;
 }
 
@@ -724,21 +793,17 @@ export interface FacilityBaseMessageResponseOfIReadOnlyListOfFacilityLookupItemD
   readonly isSuccess?: boolean;
 }
 
-export interface ReadModelsPlanDto {
-  id?: number;
-  contractType?: ContractType;
-  rate?: number;
-  termMonths?: number;
-  usablePercent?: number;
+export interface ReadModelsMonthOptionDto {
+  key?: string;
   title?: string;
 }
 
-export interface FacilityBaseMessageResponseOfIReadOnlyListOfPlanDto {
+export interface FacilityBaseMessageResponseOfIReadOnlyListOfMonthOptionDto {
   statusCode?: number;
   /** @nullable */
   message?: string | null;
   /** @nullable */
-  data?: ReadModelsPlanDto[] | null;
+  data?: ReadModelsMonthOptionDto[] | null;
   readonly isSuccess?: boolean;
 }
 
@@ -756,6 +821,15 @@ export interface FacilityBaseMessageResponseOfIReadOnlyListOfReasonDto {
   message?: string | null;
   /** @nullable */
   data?: ReadModelsReasonDto[] | null;
+  readonly isSuccess?: boolean;
+}
+
+export interface FacilityBaseMessageResponseOfIReadOnlyListOfRegistrarDto {
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  data?: CommonRegistrarDto[] | null;
   readonly isSuccess?: boolean;
 }
 
@@ -841,6 +915,14 @@ export interface ReadModelsHintDto {
   text?: string;
 }
 
+export interface ReadModelsRepeatAllocationDto {
+  personnelId?: number;
+  personnelName?: string;
+  personnelCode?: string;
+  month?: string;
+  previousAmount?: number;
+}
+
 export interface ReadModelsLoanRequestPreviewDto {
   selectedCount?: number;
   total?: number;
@@ -851,6 +933,7 @@ export interface ReadModelsLoanRequestPreviewDto {
   /** @nullable */
   suggestedMaxAmount?: number | null;
   messages?: ReadModelsHintDto[];
+  repeatAllocations?: ReadModelsRepeatAllocationDto[];
 }
 
 export interface FacilityBaseMessageResponseOfLoanRequestPreviewDto {
@@ -858,6 +941,14 @@ export interface FacilityBaseMessageResponseOfLoanRequestPreviewDto {
   /** @nullable */
   message?: string | null;
   data?: ReadModelsLoanRequestPreviewDto;
+  readonly isSuccess?: boolean;
+}
+
+export interface FacilityBaseMessageResponseOfObject {
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  data?: unknown;
   readonly isSuccess?: boolean;
 }
 
@@ -936,11 +1027,60 @@ export interface FacilityBaseMessageResponseOfPersonnelImportResultDto {
   readonly isSuccess?: boolean;
 }
 
+export interface ReadModelsPlanDto {
+  id?: number;
+  contractType?: ContractType;
+  rate?: number;
+  termMonths?: number;
+  usablePercent?: number;
+  title?: string;
+}
+
+export interface ReadModelsPlanListDto {
+  maxPlansPerCompany?: number;
+  plans?: ReadModelsPlanDto[];
+}
+
+export interface FacilityBaseMessageResponseOfPlanListDto {
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  data?: ReadModelsPlanListDto;
+  readonly isSuccess?: boolean;
+}
+
 export interface FacilityBaseMessageResponseOfReasonDto {
   statusCode?: number;
   /** @nullable */
   message?: string | null;
   data?: ReadModelsReasonDto;
+  readonly isSuccess?: boolean;
+}
+
+export interface ReadModelsSchemeReasonsDto {
+  contractCancel?: ReadModelsReasonDto[];
+  loanReject?: ReadModelsReasonDto[];
+  remoteGrantDenied?: ReadModelsReasonDto[];
+  documentType?: ReadModelsReasonDto[];
+  loanCancel?: ReadModelsReasonDto[];
+  personnelReject?: ReadModelsReasonDto[];
+}
+
+export interface ReadModelsSchemeFormDto {
+  id?: number;
+  code?: string;
+  title?: string;
+  isActive?: boolean;
+  settings?: ReadModelsBasicInfoDto;
+  reasons?: ReadModelsSchemeReasonsDto;
+  companyCount?: number;
+}
+
+export interface FacilityBaseMessageResponseOfSchemeFormDto {
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  data?: ReadModelsSchemeFormDto;
   readonly isSuccess?: boolean;
 }
 
@@ -1017,6 +1157,121 @@ export interface RestoreChangeCommand {
      * @maxLength 500
      */
   description: string;
+}
+
+export interface SaveSchemeCommand {
+  /**
+     * @minLength 3
+     * @maxLength 100
+     */
+  title: string;
+  /**
+     * @minLength 2
+     * @maxLength 30
+     * @nullable
+     */
+  code?: string | null;
+  isActive?: boolean;
+  /**
+     * @minItems 1
+     * @maxItems 2
+     * @nullable
+     */
+  contractTypes?: ContractType[] | null;
+  /**
+     * @minimum 0
+     * @maximum 4
+     * @nullable
+     */
+  qardHasanRate?: number | null;
+  /**
+     * @maxItems 5
+     * @nullable
+     */
+  murabahaRates?: number[] | null;
+  /**
+     * @maxItems 20
+     * @nullable
+     */
+  repaymentTermsMonths?: number[] | null;
+  /**
+     * @minimum 0.01
+     * @maximum 10
+     * @nullable
+     */
+  salaryFromSepahMultiplierYes?: number | null;
+  /**
+     * @minimum 0.01
+     * @maximum 10
+     * @nullable
+     */
+  salaryFromSepahMultiplierNo?: number | null;
+  /**
+     * @minimum 1
+     * @maximum 120
+     * @nullable
+     */
+  contractDurationMonths?: number | null;
+  /**
+     * @minimum 0
+     * @maximum 120
+     * @nullable
+     */
+  graceMonthsAfterExpiry?: number | null;
+  /**
+     * @minimum 1
+     * @maximum 10
+     * @nullable
+     */
+  maxPlansPerCompany?: number | null;
+  /**
+     * @minimum 0
+     * @maximum 120
+     * @nullable
+     */
+  personnelIntroductionDelayMonths?: number | null;
+  /**
+     * @minimum 0
+     * @maximum 180
+     * @nullable
+     */
+  waitingPeriodDays?: number | null;
+  /** @nullable */
+  digitalApprovalEnabled?: boolean | null;
+  /** @nullable */
+  usableTable?: ReadModelsUsablePercentDto[] | null;
+  /**
+     * @maxItems 100
+     * @nullable
+     */
+  contractCancelReasons?: string[] | null;
+  /**
+     * @maxItems 100
+     * @nullable
+     */
+  loanRejectReasons?: string[] | null;
+  /**
+     * @maxItems 100
+     * @nullable
+     */
+  remoteGrantDeniedReasons?: string[] | null;
+  /**
+     * @maxItems 100
+     * @nullable
+     */
+  documentTypes?: string[] | null;
+  /**
+     * @maxItems 100
+     * @nullable
+     */
+  loanCancelReasons?: string[] | null;
+  /**
+     * @maxItems 100
+     * @nullable
+     */
+  personnelRejectReasons?: string[] | null;
+  /** @nullable */
+  rowVersion?: string | null;
 }
 
 export interface SetPostApprovalStageCommand {
@@ -1100,16 +1355,6 @@ export interface UpdateBasicInfoCommand {
   digitalApprovalEnabled?: boolean | null;
   /** @nullable */
   usableTable?: ReadModelsUsablePercentDto[] | null;
-  /** @minLength 1 */
-  rowVersion: string;
-}
-
-export interface UpdateCompanyBalancesCommand {
-  /**
-     * @minItems 1
-     * @maxItems 24
-     */
-  months: ReadModelsMonthlyBalanceInput[];
   /** @minLength 1 */
   rowVersion: string;
 }
@@ -1214,6 +1459,8 @@ export type ApprovalsCreditDecideBody = {
      * @maxLength 1000
      */
   Description?: string;
+  PostStage?: PostApprovalStage;
+  PostStageReasonId?: number;
   attachment?: Blob | File;
 };
 
@@ -1250,7 +1497,33 @@ export type ApprovalsDigitalDecideBody = {
      * @maxLength 1000
      */
   Description?: string;
+  PostStage?: PostApprovalStage;
+  PostStageReasonId?: number;
   attachment?: Blob | File;
+};
+
+export type BasicInfoSchemeSearchParams = {
+IncludeInactive?: boolean;
+/**
+ * @minLength 0
+ * @maxLength 50
+ */
+Term?: string;
+/**
+ * @minimum 1
+ * @maximum 2147483647
+ */
+Page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+PageSize?: number;
+};
+
+export type BasicInfoSchemeReasonsParams = {
+type?: ReasonType;
+includeInactive?: boolean;
 };
 
 export type BasicInfoReasonsParams = {
@@ -1284,8 +1557,10 @@ PageSize?: number;
 export type ChangeLogsExportParams = {
 Category?: ChangeLogCategory;
 CompanyId?: number;
+PanelUserId?: number;
 From?: string;
 To?: string;
+Term?: string;
 };
 
 export type CompaniesSearchParams = {
@@ -1389,6 +1664,26 @@ export type CompaniesCancelContractBody = {
      */
   Description: string;
   letterFile?: Blob | File;
+};
+
+export type CompaniesBalancesSaveBody = {
+  /**
+     * @minItems 1
+     * @maxItems 24
+     */
+  Months: ReadModelsMonthlyBalanceInput[];
+  RowVersion: string;
+  /**
+     * @minimum 1
+     * @maximum 2147483647
+     */
+  DocumentTypeId?: number;
+  /**
+     * @minLength 0
+     * @maxLength 500
+     */
+  DocumentDescription?: string;
+  files?: (Blob | File)[];
 };
 
 export type CompaniesBalanceDocumentsParams = {
