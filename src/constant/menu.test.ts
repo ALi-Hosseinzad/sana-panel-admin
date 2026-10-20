@@ -31,7 +31,7 @@ describe('buildMenu', () => {
 
   it('hides inactive items, unknown urls and empty groups', () => {
     const changed: Record<string, Partial<MenuItemDto>> = {
-      '/facility/base-info': { isActive: false },
+      '/base-info': { isActive: false },
       '/facility/loan-allocation': { url: '/unknown' },
       '/facility/credit-approval': { isActive: false },
     };

@@ -28,7 +28,7 @@ interface PageConfig {
  */
 const PAGES: Record<string, PageConfig> = {
   '/home': { path: ROUTES.HOME, icon: HomeOutlined },
-  '/facility/base-info': { path: ROUTES.BASE_INFO, icon: ControlOutlined },
+  '/base-info': { path: ROUTES.BASE_INFO, icon: ControlOutlined },
   '/facility/management-companies': { path: ROUTES.COMPANIES, icon: ShopOutlined },
   '/facility/personnel': { path: ROUTES.STAFF, icon: TeamOutlined },
   '/facility/loan-allocation': { path: ROUTES.CREDIT, icon: CreditCardOutlined },
