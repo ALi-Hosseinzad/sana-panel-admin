@@ -27,9 +27,8 @@ export const ENDPOINTS = {
     COMPANIES: '/lookups/companies',
     /** مراحل پس از تأیید اعتبارات */
     POST_APPROVAL_STAGES: '/lookups/post-approval-stages',
-    /** انواع عملیات گزارش تغییرات */
+    /** بکند ندارد — عنوان دسته‌های گزارش تغییرات */
     AUDIT_LOG_TYPES: '/lookups/audit-log-types',
-    /** آدرس یک آیتم از لیست (برای ویرایش/حذف) */
   },
   COMPANIES: {
     LIST: '/companies',
@@ -77,12 +76,10 @@ export const ENDPOINTS = {
     LOAN_REQUESTS: '/reports/loan-requests',
     AVERAGES: '/reports/averages',
     REMOVED_COMPANIES: '/reports/removed-companies',
-    AUDIT_LOGS: '/reports/audit-logs',
   },
-  AUDIT_LOGS: {
-    LIST: '/audit-logs',
-    /** بازگردانی یک ویرایش به حالت قبل */
-    ROLLBACK: (id: string) => `/audit-logs/${id}/rollback`,
+  CHANGE_LOGS: {
+    /** خروجی اکسل (لیست و بازگردانی از سرویس‌های تولیدشده) */
+    EXPORT: '/ChangeLogs/Export',
   },
   USER_MANAGEMENT: {
     /** کاربران پنل: لیست و جزئیات در بک‌اند هست؛ ایجاد/ویرایش/حذف را بکند ندارد */

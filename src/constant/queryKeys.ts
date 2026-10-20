@@ -63,10 +63,6 @@ export const QUERY_KEYS = {
     MONTHLY_PERFORMANCE: ['dashboard', 'monthly-performance'],
     REMOVED_COMPANIES: ['dashboard', 'removed-companies'],
   },
-  AUDIT_LOGS: {
-    ALL: ['audit-logs'],
-    LIST: (type: string | undefined, page: number) => ['audit-logs', type ?? 'all', page],
-  },
   USERS: {
     ALL: ['users'],
     LIST: (page: number) => ['users', 'list', page],
