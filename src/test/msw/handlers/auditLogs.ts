@@ -42,7 +42,12 @@ const toItem = (log: MockAuditLog): CommandResponsesChangeLogItemDto => ({
 
 const filterLogs = (url: URL) => {
   const category = Number(url.searchParams.get('Category')) || undefined;
-  return db.auditLogs.filter((log) => !category || CATEGORY[log.type] === category);
+  const panelUserId = Number(url.searchParams.get('PanelUserId')) || undefined;
+  return db.auditLogs.filter(
+    (log) =>
+      (!category || CATEGORY[log.type] === category) &&
+      (!panelUserId || log.user.panelUserId === panelUserId),
+  );
 };
 
 const jalaliDateTime = (iso: string) => dayjs(iso).formatJalali('YYYY/MM/DD HH:mm');
@@ -62,6 +67,12 @@ export const auditLogHandlers = [
       pageSize,
     };
     return json(response);
+  }),
+
+  http.get(api(`${FACILITY}/ChangeLogs/Users`), async () => {
+    await delay(150);
+    const users = new Map(db.auditLogs.map((log) => [log.user.panelUserId, log.user]));
+    return json([...users.values()]);
   }),
 
   http.post(api(`${FACILITY}/ChangeLogs/:id/Restore`), async ({ params, request }) => {
