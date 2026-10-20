@@ -7,8 +7,9 @@ import {
   MOCK_SCHEMES,
   MOCK_STAFF,
   MOCK_USERS,
+  type MockReasonKind,
+  type MockScheme,
 } from '@/constant/mock';
-import type { Scheme, SchemePayload, SchemeTextList } from '@/features/base-info/types';
 import type { PlanOption } from '@/services/lookup/types';
 
 /**
@@ -43,60 +44,76 @@ export const findUserByToken = (authorization: string | null) => {
 };
 
 /** طرح بدون اطلاعات (وقتی همه طرح‌ها حذف شده‌اند) */
-const EMPTY_SCHEME: Scheme = {
-  id: '',
-  name: '',
-  qarzRate: 0,
-  sepahEnabled: false,
-  sepahMultiplier: 1,
-  contractYears: 1,
-  graceMonths: 0,
-  maxPlans: 0,
-  staffDelayMonths: 0,
-  murabahaRates: [],
-  terms: [],
-  usable: [],
-  cancelReasons: [],
-  rejectReasons: [],
-  noGrantReasons: [],
-  avgDocTypes: [],
+const EMPTY_SCHEME: MockScheme = {
+  id: 0,
+  code: '',
+  title: '',
+  isActive: false,
+  settings: {
+    schemeId: 0,
+    contractTypes: [],
+    qardHasanRate: 0,
+    murabahaRates: [],
+    repaymentTermsMonths: [],
+    salaryFromSepahMultiplierYes: 1,
+    salaryFromSepahMultiplierNo: 1,
+    contractDurationMonths: 12,
+    graceMonthsAfterExpiry: 0,
+    maxPlansPerCompany: 0,
+    personnelIntroductionDelayMonths: 0,
+    waitingPeriodDays: 0,
+    usableTable: [],
+    rowVersion: '',
+    digitalApprovalEnabled: false,
+  },
+  reasons: {
+    contractCancel: [],
+    loanReject: [],
+    remoteGrantDenied: [],
+    documentType: [],
+    loanCancel: [],
+    personnelReject: [],
+  },
 };
 
 /** محاسبات شرکت‌ها و وام‌ها فعلاً از اولین طرح خوانده می‌شود */
 export const primaryScheme = () => db.schemes[0] ?? EMPTY_SCHEME;
 
 /** لیست‌های کشویی (دلایل و انواع مستند) از اطلاعات پایه طرح خوانده می‌شوند */
-export const lookupItems = (name: SchemeTextList) =>
-  primaryScheme()[name].map((title, index) => ({ id: String(index), title }));
+export const lookupItems = (kind: MockReasonKind) =>
+  primaryScheme()
+    .reasons[kind].filter((reason) => reason.isActive)
+    .map((reason) => ({ id: String(reason.id), title: reason.title ?? '' }));
 
-export const lookupTitle = (name: SchemeTextList, id: string) =>
-  lookupItems(name).find((item) => item.id === id)?.title;
+export const lookupTitle = (kind: MockReasonKind, id: string) =>
+  lookupItems(kind).find((item) => item.id === id)?.title;
 
-/** اندازه جدول درصد قابل استفاده را با تعداد مدت‌ها و نرخ‌ها هماهنگ می‌کند */
-export const resizeUsable = (scheme: SchemePayload): SchemePayload => ({
-  ...scheme,
-  usable: scheme.terms.map((_term, row) =>
-    Array.from(
-      { length: scheme.murabahaRates.length + 1 },
-      (_value, column) => scheme.usable[row]?.[column] ?? 0,
-    ),
-  ),
-});
-
-/** طرح‌های قابل انتخاب از روی اطلاعات پایه ساخته می‌شوند (همان کاری که بک‌اند انجام می‌دهد) */
 /** طرح کلان یک شرکت (شرکت‌های قدیمی بدون طرح = طرح اول) */
 export const schemeOf = (schemeId?: string) =>
-  db.schemes.find((scheme) => scheme.id === schemeId) ?? primaryScheme();
+  db.schemes.find((scheme) => String(scheme.id) === schemeId) ?? primaryScheme();
 
-export const buildPlanOptions = (scheme: Scheme = primaryScheme()): PlanOption[] => {
-  const { terms, murabahaRates, usable, qarzRate } = scheme;
+/** ضریب حقوق‌بگیر بانک سپه بودن شرکت */
+export const sepahMultiplier = (scheme: MockScheme, sepahSalary: boolean) =>
+  sepahSalary
+    ? scheme.settings.salaryFromSepahMultiplierYes
+    : scheme.settings.salaryFromSepahMultiplierNo;
+
+const usableOf = (scheme: MockScheme, termMonths: number, contractType: 1 | 2, rate: number) =>
+  scheme.settings.usableTable.find(
+    (cell) =>
+      cell.termMonths === termMonths && cell.contractType === contractType && cell.rate === rate,
+  )?.usablePercent ?? 0;
+
+/** طرح‌های قابل انتخاب از روی اطلاعات پایه ساخته می‌شوند (همان کاری که بک‌اند انجام می‌دهد) */
+export const buildPlanOptions = (scheme: MockScheme = primaryScheme()): PlanOption[] => {
+  const { repaymentTermsMonths: terms, murabahaRates, qardHasanRate } = scheme.settings;
   const qarz = terms.map((term, termIndex) => ({
     id: `qarz-${termIndex}`,
     type: 'qarz' as const,
     typeTitle: 'قرض‌الحسنه',
-    rate: qarzRate,
+    rate: qardHasanRate,
     term,
-    usable: usable[termIndex]?.[0] ?? 0,
+    usable: usableOf(scheme, term, 1, qardHasanRate),
   }));
   const murabaha = murabahaRates.flatMap((rate, rateIndex) =>
     terms.map((term, termIndex) => ({
@@ -105,7 +122,7 @@ export const buildPlanOptions = (scheme: Scheme = primaryScheme()): PlanOption[]
       typeTitle: 'مرابحه',
       rate,
       term,
-      usable: usable[termIndex]?.[rateIndex + 1] ?? 0,
+      usable: usableOf(scheme, term, 2, rate),
     })),
   );
   return [...qarz, ...murabaha];

@@ -1,10 +1,5 @@
 export const QUERY_KEYS = {
   PROFILE: ['profile'],
-  BASE_INFO: {
-    ALL: ['base-info'],
-    LIST: (page: number) => ['base-info', 'list', page],
-    DETAIL: (id: string) => ['base-info', 'detail', id],
-  },
   LOOKUPS: {
     CANCEL_REASONS: ['lookups', 'cancel-reasons'],
     REJECT_REASONS: ['lookups', 'reject-reasons'],

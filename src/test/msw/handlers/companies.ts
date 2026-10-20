@@ -20,6 +20,7 @@ import {
   lookupTitle,
   nextId,
   schemeOf,
+  sepahMultiplier,
   today,
 } from '../db';
 import { api, json } from '../utils';
@@ -68,7 +69,7 @@ const buildAverages = (company: MockCompany): MonthlyAverage[] => {
     ? plans.reduce((sum, plan) => sum + plan.usable, 0) / plans.length
     : 0;
   const scheme = schemeOf(company.schemeId);
-  const multiplier = scheme.sepahEnabled && company.sepahSalary ? scheme.sepahMultiplier : 1;
+  const multiplier = sepahMultiplier(scheme, company.sepahSalary);
 
   let cumulative = 0;
   return company.averages.map((average, index) => {
@@ -169,7 +170,7 @@ export const companyHandlers = [
     }
     company.status = 'cancelled';
     company.cancelDate = body.cancelDate;
-    company.cancelReason = lookupTitle('cancelReasons', body.reasonId);
+    company.cancelReason = lookupTitle('contractCancel', body.reasonId);
     logAction(
       request,
       'company',
@@ -196,7 +197,7 @@ export const companyHandlers = [
       id: nextId('d'),
       createdAt: today(),
       months: body.items.map((item) => item.month),
-      docType: lookupTitle('avgDocTypes', body.docTypeId) ?? '—',
+      docType: lookupTitle('documentType', body.docTypeId) ?? '—',
       file: fileOf(body.fileId),
       note: body.note,
       createdBy: userName(request),
