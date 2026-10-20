@@ -1,7 +1,7 @@
 import { DownloadOutlined, RollbackOutlined } from '@ant-design/icons';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { type ColumnsType } from 'antd/es/table';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useChangeLogsSearch } from '@/api/generated/facility';
 import { Button } from '@/component/button';
@@ -9,12 +9,12 @@ import { PanelCard } from '@/component/card';
 import { SelectInput } from '@/component/input';
 import { StatusChip } from '@/component/status-chip';
 import { Table } from '@/component/table';
-import { QUERY_KEYS } from '@/constant/queryKeys';
 import { ROLES } from '@/constant/roles';
+import { useEnums } from '@/services/enums';
 import { useProfileStore } from '@/store/useProfileStore';
 import { dayjs, toPersianDigits } from '@/utils/date';
 
-import { exportChangeLogs, getChangeLogCategories } from '../api';
+import { exportChangeLogs } from '../api';
 import { type ChangeLogCategory, type ChangeLogItem } from '../types';
 
 import { RestoreModal } from './RestoreModal';
@@ -34,14 +34,7 @@ export const ChangeLogTable = () => {
   const [restoring, setRestoring] = useState<ChangeLogItem | null>(null);
   const isAdmin = useProfileStore((state) => state.hasRole(ROLES.ADMIN));
 
-  const { data: categories } = useQuery({
-    queryKey: QUERY_KEYS.LOOKUPS.AUDIT_LOG_TYPES,
-    queryFn: getChangeLogCategories,
-  });
-  const categoryTitle = useMemo(
-    () => new Map((categories ?? []).map((item) => [item.id, item.title])),
-    [categories],
-  );
+  const enums = useEnums();
 
   const filters = { Category: category === ALL ? undefined : (category as ChangeLogCategory) };
   const { data, isFetching } = useChangeLogsSearch({ ...filters, Page: page, PageSize: PAGE_SIZE });
@@ -73,7 +66,7 @@ export const ChangeLogTable = () => {
     {
       title: 'نوع عملیات',
       dataIndex: 'category',
-      render: (value?: number) => (value ? (categoryTitle.get(value) ?? '—') : '—'),
+      render: (value?: number) => enums.title('changeLogCategory', value),
       width: 130,
     },
     { title: 'جزئیات', dataIndex: 'details', className: 'whitespace-normal' },
@@ -100,7 +93,7 @@ export const ChangeLogTable = () => {
             onChange={changeCategory}
             options={[
               { value: ALL, label: 'همه انواع عملیات' },
-              ...(categories ?? []).map((item) => ({ value: item.id, label: item.title })),
+              ...enums.options('changeLogCategory'),
             ]}
           />
           <Button

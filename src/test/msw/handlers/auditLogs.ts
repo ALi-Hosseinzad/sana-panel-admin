@@ -26,13 +26,6 @@ const CATEGORY: Record<MockLogType, ChangeLogCategory> = {
   base: 4,
 };
 
-const CATEGORY_TITLES = [
-  { id: 1, title: 'مربوط به شرکت‌ها' },
-  { id: 2, title: 'مربوط به پرسنل' },
-  { id: 3, title: 'مربوط به تخصیص وام' },
-  { id: 4, title: 'مربوط به کاربران و اطلاعات پایه' },
-];
-
 const toItem = (log: MockAuditLog): CommandResponsesChangeLogItemDto => ({
   id: log.id,
   at: log.createdAt,
@@ -55,12 +48,6 @@ const filterLogs = (url: URL) => {
 const jalaliDateTime = (iso: string) => dayjs(iso).formatJalali('YYYY/MM/DD HH:mm');
 
 export const auditLogHandlers = [
-  // بکند ندارد — عنوان دسته‌ها
-  http.get(api(ENDPOINTS.LOOKUPS.AUDIT_LOG_TYPES), async () => {
-    await delay(150);
-    return json(CATEGORY_TITLES);
-  }),
-
   http.get(api(`${FACILITY}/ChangeLogs`), async ({ request }) => {
     await delay(250);
     const url = new URL(request.url);
