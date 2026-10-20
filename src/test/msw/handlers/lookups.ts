@@ -1,6 +1,7 @@
 import { delay, http } from 'msw';
 
-import { ENDPOINTS } from '@/constant/endpoints';
+import { ENDPOINTS, FACILITY } from '@/constant/endpoints';
+import { MOCK_ENUMS } from '@/constant/mock/enums';
 import { type SchemeTextList } from '@/features/base-info/types';
 
 import { buildPlanOptions, db, lookupItems, schemeOf } from '../db';
@@ -14,6 +15,12 @@ const lookupList = (path: string, name: SchemeTextList) =>
   });
 
 export const lookupHandlers = [
+  // عنوان enumها با داده واقعی‌تر از ماک تولیدشده (تصادفی)
+  http.get(api(`${FACILITY}/Lookups/Enums`), async () => {
+    await delay(150);
+    return json(MOCK_ENUMS);
+  }),
+
   lookupList(ENDPOINTS.LOOKUPS.CANCEL_REASONS, 'cancelReasons'),
   lookupList(ENDPOINTS.LOOKUPS.REJECT_REASONS, 'rejectReasons'),
   lookupList(ENDPOINTS.LOOKUPS.NO_GRANT_REASONS, 'noGrantReasons'),
