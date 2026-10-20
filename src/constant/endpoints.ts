@@ -28,8 +28,6 @@ export const ENDPOINTS = {
     COMPANIES: '/lookups/companies',
     /** مراحل پس از تأیید اعتبارات */
     POST_APPROVAL_STAGES: '/lookups/post-approval-stages',
-    /** بکند ندارد — عنوان دسته‌های گزارش تغییرات */
-    AUDIT_LOG_TYPES: '/lookups/audit-log-types',
   },
   COMPANIES: {
     LIST: '/companies',
