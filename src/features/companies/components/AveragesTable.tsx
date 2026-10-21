@@ -9,6 +9,7 @@ import {
   getCompaniesBalancesQueryKey,
   useCompaniesBalances,
   useCompaniesBalancesSave,
+  useCompaniesGet,
 } from '@/api/generated/facility';
 import { Button } from '@/component/button';
 import { Form, FormItem } from '@/component/form';
@@ -63,6 +64,7 @@ export const AveragesTable = ({ companyId }: { companyId: number }) => {
   const [changedMonths, setChangedMonths] = useState<string[]>([]);
 
   const { data, isFetching } = useCompaniesBalances(companyId);
+  const { data: company } = useCompaniesGet(companyId);
   const months = useMemo(() => data?.months ?? [], [data]);
 
   const initialValues = useMemo(
@@ -149,6 +151,7 @@ export const AveragesTable = ({ companyId }: { companyId: number }) => {
       <AverageDocModal
         open={changedMonths.length > 0}
         months={changedMonths}
+        schemeId={company?.schemeId}
         onSubmit={save}
         onClose={() => setChangedMonths([])}
       />
