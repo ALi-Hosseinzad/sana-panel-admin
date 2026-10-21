@@ -9,6 +9,7 @@ import { ROUTES } from '@/constant/routes';
 import { logout } from '@/features/auth/api';
 import { useMainMenu } from '@/services/menu';
 import { resetSession } from '@/store/session';
+import { useAuthStore } from '@/store/useAuthStore';
 
 import { Skeleton } from '../../loading';
 import { Retry } from '../../retry';
@@ -29,8 +30,10 @@ export const MainLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = useMediaQuery(MOBILE_QUERY);
 
-  // با بزرگ شدن صفحه (خروج از حالت موبایل) دراور منو بسته است و سایدبار ثابت نمایش داده می‌شود
-  const drawerOpen = menuOpen && isMobile;
+  const sessionExpired = useAuthStore((state) => state.sessionExpired);
+  // با بزرگ شدن صفحه (خروج از حالت موبایل) دراور منو بسته است و سایدبار ثابت نمایش داده می‌شود؛
+  // با باز شدن مودال پایان نشست (۴۰۱) هم دراور بسته می‌شود
+  const drawerOpen = menuOpen && isMobile && !sessionExpired;
   const current = findMenuItemByPath(groups, pathname);
   const pageTitle = current?.label ?? DEFAULT_TITLE;
 

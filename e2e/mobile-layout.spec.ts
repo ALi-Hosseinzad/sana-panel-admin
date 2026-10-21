@@ -58,3 +58,20 @@ test('actions drawer: theme keeps it open, logout closes it and asks for confirm
     page.getByText('آیا از خروج از سامانه اطمینان دارید؟', { exact: false }),
   ).toBeVisible();
 });
+
+test('session-expired modal (401) closes open drawers and stays on top', async ({ page }) => {
+  await page.clock.install();
+  await login(page);
+  await page.getByRole('button', { name: 'منو' }).click();
+  await expect(menuDrawer(page)).toBeVisible();
+
+  // درخواست بعدی تعداد در انتظار (هر ۶۰ ثانیه) ۴۰۱ می‌گیرد
+  await page.evaluate(() => localStorage.setItem('mock-fail-once', '401:Approvals/PendingCounts'));
+  await page.clock.fastForward(61_000);
+
+  const modal = page.getByRole('dialog', { name: 'پایان نشست' });
+  await expect(modal).toBeVisible();
+  await expect(menuDrawer(page)).toBeHidden();
+  await modal.getByRole('button', { name: 'متوجه شدم' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+});

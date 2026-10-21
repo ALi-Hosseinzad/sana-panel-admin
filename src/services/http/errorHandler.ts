@@ -68,7 +68,8 @@ export const handleHttpError = (error: HttpError) => {
     customHandler(error);
     return;
   }
-  if (error.config?.silent) return;
+  // silent فقط پیام را حذف می‌کند؛ ۴۰۱ (پایان نشست) همیشه مودال پایان نشست را باز می‌کند
+  if (error.config?.silent && key !== 401) return;
 
   const fallback = defaultErrorHandlers[key] ?? defaultErrorHandlers.default;
   fallback(error);

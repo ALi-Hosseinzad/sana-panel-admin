@@ -10,6 +10,7 @@ import { useState } from 'react';
 
 import logoOmid from '@/assets/images/logo-omid.png';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { dayjs, toPersianDigits } from '@/utils/date';
@@ -88,8 +89,9 @@ export const Header = ({ title, onLogout, onOpenMenu, menuOpen }: HeaderProps) =
   const [actionsOpen, setActionsOpen] = useState(false);
   const isMobile = useMediaQuery(MOBILE_QUERY);
 
-  // با بزرگ شدن صفحه (خروج از حالت موبایل) دراور اکشن‌ها بسته است
-  const drawerOpen = actionsOpen && isMobile;
+  const sessionExpired = useAuthStore((state) => state.sessionExpired);
+  // با بزرگ شدن صفحه (خروج از حالت موبایل) یا باز شدن مودال پایان نشست (۴۰۱) دراور اکشن‌ها بسته است
+  const drawerOpen = actionsOpen && isMobile && !sessionExpired;
 
   return (
     <header className="sana-no-print sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-line bg-[var(--sana-topbar-bg)] px-7 py-3.5 backdrop-blur-md max-[960px]:px-4 max-[960px]:py-3">
