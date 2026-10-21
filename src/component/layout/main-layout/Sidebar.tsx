@@ -3,6 +3,7 @@ import { NavLink } from 'react-router';
 
 import logo from '@/assets/images/logo-sana.png';
 import { type MenuGroup } from '@/services/menu';
+import { toPersianDigits } from '@/utils/date';
 
 import { Skeleton } from '../../loading';
 
@@ -12,6 +13,8 @@ export interface SidebarProps {
   /** منوی کاربر (از سرویس منوی بک‌اند) */
   groups: MenuGroup[];
   loading?: boolean;
+  /** عدد کنار آیتم منو (کلید = مسیر صفحه)، مثل تعداد درخواست‌های در انتظار */
+  badges?: Partial<Record<string, number | null>>;
 }
 
 /** پس‌زمینه گرادینت سایدبار (دسکتاپ و دراور موبایل) */
@@ -33,6 +36,7 @@ export const SidebarContent = ({
   subtitle,
   groups,
   loading,
+  badges,
   onNavigate,
 }: SidebarContentProps) => (
   <>
@@ -70,6 +74,11 @@ export const SidebarContent = ({
             >
               <span className="text-lg leading-none opacity-85">{createElement(item.icon)}</span>
               <span className="truncate">{item.label}</span>
+              {Boolean(badges?.[item.path]) && (
+                <span className="ms-auto rounded-full bg-accent px-2 py-px text-[11px] leading-5 font-bold text-white">
+                  {toPersianDigits(badges?.[item.path] ?? 0)}
+                </span>
+              )}
             </NavLink>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import { Suspense, useState } from 'react';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router';
 
+import { useApprovalsPendingCounts } from '@/api/generated/facility';
 import { env } from '@/config/env';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { findMenuItemByPath } from '@/constant/menu';
@@ -18,6 +19,7 @@ import { LayoutDrawer, MOBILE_QUERY } from './LayoutDrawer';
 import { Sidebar, SIDEBAR_BACKGROUND, SidebarContent } from './Sidebar';
 
 const DEFAULT_TITLE = 'خانه';
+const PENDING_COUNTS_INTERVAL = 60_000;
 
 /** لی‌اوت اصلی (صفحات بعد از لاگین): سایدبار + هدر + محتوا + فوتر */
 export const MainLayout = () => {
@@ -31,6 +33,16 @@ export const MainLayout = () => {
   const drawerOpen = menuOpen && isMobile;
   const current = findMenuItemByPath(groups, pathname);
   const pageTitle = current?.label ?? DEFAULT_TITLE;
+
+  // تعداد در انتظار هر صف تأیید کنار آیتم منو (null = کاربر آن صف را نمی‌بیند)
+  const { data: counts } = useApprovalsPendingCounts({
+    query: { refetchInterval: PENDING_COUNTS_INTERVAL },
+    request: { silent: true },
+  });
+  const badges = {
+    [ROUTES.MANAGER_APPROVE]: counts?.managerApproval,
+    [ROUTES.CREDIT_APPROVE]: counts?.creditApproval,
+  };
 
   // صفحه‌ای که در منوی کاربر نیست با آدرس مستقیم هم باز نمی‌شود (خانه همیشه مجاز است)
   const isBlocked = !isPending && !current && pathname !== ROUTES.HOME;
@@ -50,7 +62,7 @@ export const MainLayout = () => {
 
   return (
     <div className="grid min-h-screen grid-cols-[276px_minmax(0,1fr)] max-[960px]:grid-cols-1">
-      <Sidebar title={env.appTitle} groups={groups} loading={isPending} />
+      <Sidebar title={env.appTitle} groups={groups} loading={isPending} badges={badges} />
       {/* موبایل: منو در دراور سمت راست؛ با کلیک روی هر آیتم بسته می‌شود */}
       <LayoutDrawer
         placement="right"
@@ -65,6 +77,7 @@ export const MainLayout = () => {
             title={env.appTitle}
             groups={groups}
             loading={isPending}
+            badges={badges}
             onNavigate={() => setMenuOpen(false)}
           />
         </div>
