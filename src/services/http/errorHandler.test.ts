@@ -3,17 +3,21 @@ import { toast } from 'sonner';
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import { handleHttpError } from './errorHandler';
+import { ERROR_TOAST_ID, handleHttpError } from './errorHandler';
 import { type ErrorHandlerMap, type HttpError } from './types';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
-const makeError = (status: number | null, config: Partial<InternalAxiosRequestConfig> = {}) => {
+const makeError = (
+  status: number | null,
+  config: Partial<InternalAxiosRequestConfig> = {},
+  code = 'ERR',
+) => {
   const requestConfig = { headers: new AxiosHeaders(), ...config } as InternalAxiosRequestConfig;
   const response = status
     ? { status, statusText: '', data: {}, headers: {}, config: requestConfig }
     : undefined;
-  return new AxiosError('failed', 'ERR', requestConfig, null, response) as HttpError;
+  return new AxiosError('failed', code, requestConfig, null, response) as HttpError;
 };
 
 describe('handleHttpError', () => {
@@ -30,7 +34,9 @@ describe('handleHttpError', () => {
     const on404 = vi.fn();
     handleHttpError(makeError(500, { onError: { 404: on404 } }));
     expect(on404).not.toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith('خطای داخلی سرور رخ داده است.');
+    expect(toast.error).toHaveBeenCalledWith('خطای داخلی سرور رخ داده است.', {
+      id: ERROR_TOAST_ID,
+    });
   });
 
   it('logs out on 401 by default', () => {
@@ -43,6 +49,35 @@ describe('handleHttpError', () => {
     const onNetwork = vi.fn();
     handleHttpError(makeError(null, { onError: { network: onNetwork } }));
     expect(onNetwork).toHaveBeenCalledOnce();
+  });
+
+  it('shows the timeout message when the request times out', () => {
+    handleHttpError(makeError(null, {}, AxiosError.ECONNABORTED));
+    expect(toast.error).toHaveBeenCalledWith(
+      'زمان انتظار برای پاسخ سرور به پایان رسید؛ دوباره تلاش کنید.',
+      { id: ERROR_TOAST_ID },
+    );
+  });
+
+  it('runs the custom timeout handler instead of the network handler', () => {
+    const onTimeout = vi.fn();
+    const onNetwork = vi.fn();
+    handleHttpError(
+      makeError(
+        null,
+        { onError: { timeout: onTimeout, network: onNetwork } },
+        AxiosError.ETIMEDOUT,
+      ),
+    );
+    expect(onTimeout).toHaveBeenCalledOnce();
+    expect(onNetwork).not.toHaveBeenCalled();
+  });
+
+  it('reuses one toast id so a new error replaces the previous one', () => {
+    handleHttpError(makeError(500));
+    handleHttpError(makeError(404));
+    const ids = vi.mocked(toast.error).mock.calls.map(([, options]) => options?.id);
+    expect(ids).toEqual([ERROR_TOAST_ID, ERROR_TOAST_ID]);
   });
 
   it('does nothing by default when silent is set', () => {

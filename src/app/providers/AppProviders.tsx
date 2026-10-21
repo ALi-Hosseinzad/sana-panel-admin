@@ -23,6 +23,7 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
             position="top-left"
             richColors
             closeButton
+            visibleToasts={1}
             theme={mode}
             toastOptions={{ style: { fontFamily: FONT_FAMILY } }}
           />
