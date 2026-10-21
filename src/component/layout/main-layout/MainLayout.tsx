@@ -1,7 +1,8 @@
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router';
 
 import { env } from '@/config/env';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { findMenuItemByPath } from '@/constant/menu';
 import { ROUTES } from '@/constant/routes';
 import { logout } from '@/features/auth/api';
@@ -13,7 +14,8 @@ import { Retry } from '../../retry';
 
 import { Footer } from './Footer';
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
+import { LayoutDrawer, MOBILE_QUERY } from './LayoutDrawer';
+import { Sidebar, SIDEBAR_BACKGROUND, SidebarContent } from './Sidebar';
 
 const DEFAULT_TITLE = 'خانه';
 
@@ -22,6 +24,11 @@ export const MainLayout = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { groups, isPending, isError, isFetching, refetch } = useMainMenu();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isMobile = useMediaQuery(MOBILE_QUERY);
+
+  // با بزرگ شدن صفحه (خروج از حالت موبایل) دراور منو بسته است و سایدبار ثابت نمایش داده می‌شود
+  const drawerOpen = menuOpen && isMobile;
   const current = findMenuItemByPath(groups, pathname);
   const pageTitle = current?.label ?? DEFAULT_TITLE;
 
@@ -44,8 +51,31 @@ export const MainLayout = () => {
   return (
     <div className="grid min-h-screen grid-cols-[276px_minmax(0,1fr)] max-[960px]:grid-cols-1">
       <Sidebar title={env.appTitle} groups={groups} loading={isPending} />
+      {/* موبایل: منو در دراور سمت راست؛ با کلیک روی هر آیتم بسته می‌شود */}
+      <LayoutDrawer
+        placement="right"
+        label="منو"
+        open={drawerOpen}
+        onClose={() => setMenuOpen(false)}
+        className={SIDEBAR_BACKGROUND}
+        closeClassName="!text-white hover:!bg-white/10"
+      >
+        <div className="flex min-h-full flex-col px-4 pt-[22px] pb-4">
+          <SidebarContent
+            title={env.appTitle}
+            groups={groups}
+            loading={isPending}
+            onNavigate={() => setMenuOpen(false)}
+          />
+        </div>
+      </LayoutDrawer>
       <div className="flex min-h-screen min-w-0 flex-col">
-        <Header title={pageTitle} onLogout={() => void handleLogout()} />
+        <Header
+          title={pageTitle}
+          menuOpen={drawerOpen}
+          onOpenMenu={() => setMenuOpen(true)}
+          onLogout={() => void handleLogout()}
+        />
         <main className="flex-1 px-7 pt-6 pb-2 max-[960px]:p-4">
           {/* اسکلتون تا زمان دانلود کد صفحه (lazy) */}
           <Suspense fallback={<Skeleton variant="panel" count={2} rows={4} />}>
