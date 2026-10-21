@@ -8,12 +8,16 @@ import { type ErrorHandlerMap, type HttpError } from './types';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
-const makeError = (status: number | null, config: Partial<InternalAxiosRequestConfig> = {}) => {
+const makeError = (
+  status: number | null,
+  config: Partial<InternalAxiosRequestConfig> = {},
+  code = 'ERR',
+) => {
   const requestConfig = { headers: new AxiosHeaders(), ...config } as InternalAxiosRequestConfig;
   const response = status
     ? { status, statusText: '', data: {}, headers: {}, config: requestConfig }
     : undefined;
-  return new AxiosError('failed', 'ERR', requestConfig, null, response) as HttpError;
+  return new AxiosError('failed', code, requestConfig, null, response) as HttpError;
 };
 
 describe('handleHttpError', () => {
@@ -45,6 +49,28 @@ describe('handleHttpError', () => {
     const onNetwork = vi.fn();
     handleHttpError(makeError(null, { onError: { network: onNetwork } }));
     expect(onNetwork).toHaveBeenCalledOnce();
+  });
+
+  it('shows the timeout message when the request times out', () => {
+    handleHttpError(makeError(null, {}, AxiosError.ECONNABORTED));
+    expect(toast.error).toHaveBeenCalledWith(
+      'زمان انتظار برای پاسخ سرور به پایان رسید؛ دوباره تلاش کنید.',
+      { id: ERROR_TOAST_ID },
+    );
+  });
+
+  it('runs the custom timeout handler instead of the network handler', () => {
+    const onTimeout = vi.fn();
+    const onNetwork = vi.fn();
+    handleHttpError(
+      makeError(
+        null,
+        { onError: { timeout: onTimeout, network: onNetwork } },
+        AxiosError.ETIMEDOUT,
+      ),
+    );
+    expect(onTimeout).toHaveBeenCalledOnce();
+    expect(onNetwork).not.toHaveBeenCalled();
   });
 
   it('reuses one toast id so a new error replaces the previous one', () => {

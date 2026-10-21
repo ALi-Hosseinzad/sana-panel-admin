@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 import { resetSession } from '@/store/session';
 
-import { type HttpError, type StatusErrorHandler } from './types';
+import { type ErrorKey, type HttpError, type StatusErrorHandler } from './types';
 
 /** پیام خطا از فیلد `message` پاسخ (همان قالب پاسخ‌های بک‌اند) خوانده می‌شود */
 export const getErrorMessage = (error: HttpError, fallback: string) => {
@@ -25,7 +25,7 @@ const showError =
   };
 
 /** رفتار پیش‌فرض هر کد وضعیت؛ اگر درخواست هندلر اختصاصی داشته باشد این‌ها اجرا نمی‌شوند */
-export const defaultErrorHandlers: Record<number | 'network' | 'default', StatusErrorHandler> = {
+export const defaultErrorHandlers: Record<ErrorKey, StatusErrorHandler> = {
   400: showError('درخواست نامعتبر است.'),
   401: () => {
     resetSession();
@@ -33,22 +33,36 @@ export const defaultErrorHandlers: Record<number | 'network' | 'default', Status
   },
   403: showError('شما به این بخش دسترسی ندارید.'),
   404: showError('اطلاعات مورد نظر یافت نشد.'),
+  408: showError('مهلت پاسخ‌گویی سرور به پایان رسید؛ دوباره تلاش کنید.'),
   409: showError('این اطلاعات با داده‌های موجود تداخل دارد.'),
   422: showError('اطلاعات وارد شده معتبر نیست.'),
   429: showError('تعداد درخواست‌ها زیاد است؛ کمی بعد تلاش کنید.'),
   500: showError('خطای داخلی سرور رخ داده است.'),
   502: showError('سرور در دسترس نیست.'),
   503: showError('سرویس موقتاً در دسترس نیست.'),
+  504: showError('سرور در زمان مقرر پاسخ نداد؛ دوباره تلاش کنید.'),
+  timeout: () => {
+    showErrorToast('زمان انتظار برای پاسخ سرور به پایان رسید؛ دوباره تلاش کنید.');
+  },
   network: () => {
     showErrorToast('ارتباط با سرور برقرار نشد؛ اتصال اینترنت را بررسی کنید.');
   },
   default: showError('خطای ناشناخته‌ای رخ داد.'),
 };
 
+/** axios برای تمام شدن `timeout` کد ECONNABORTED (یا ETIMEDOUT) برمی‌گرداند و پاسخی ندارد */
+const isTimeout = (error: HttpError) =>
+  error.code === axios.AxiosError.ECONNABORTED || error.code === axios.AxiosError.ETIMEDOUT;
+
+const getErrorKey = (error: HttpError): ErrorKey => {
+  if (error.response) return error.response.status;
+  return isTimeout(error) ? 'timeout' : 'network';
+};
+
 export const handleHttpError = (error: HttpError) => {
   if (axios.isCancel(error)) return;
 
-  const key = error.response ? error.response.status : 'network';
+  const key = getErrorKey(error);
   const custom = error.config?.onError;
   const customHandler = custom?.[key] ?? custom?.default;
 
