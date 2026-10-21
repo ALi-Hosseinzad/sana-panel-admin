@@ -55,7 +55,7 @@ export const CompanyFormModal = ({ open, companyId, onClose }: CompanyFormModalP
   const schemeId = Form.useWatch('schemeId', form);
   const isEdit = Boolean(companyId);
 
-  const { data: schemes, isPending: schemesPending } = useBasicInfoSchemes({
+  const schemesQuery = useBasicInfoSchemes({
     query: { enabled: open },
   });
 
@@ -132,8 +132,9 @@ export const CompanyFormModal = ({ open, companyId, onClose }: CompanyFormModalP
       >
         <SelectInput
           disabled={isEdit}
-          loading={schemesPending}
-          options={schemes?.map((scheme) => ({ value: scheme.id, label: scheme.title }))}
+          loading={schemesQuery.isFetching}
+          onRetry={() => void schemesQuery.refetch()}
+          options={schemesQuery.data?.map((scheme) => ({ value: scheme.id, label: scheme.title }))}
           // با تغییر طرح کلان، طرح‌های انتخاب‌شده (که به طرح قبلی تعلق داشتند) پاک می‌شوند
           onChange={() => form.setFieldValue('planIds', [])}
         />

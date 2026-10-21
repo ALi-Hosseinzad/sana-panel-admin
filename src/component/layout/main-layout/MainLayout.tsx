@@ -9,6 +9,7 @@ import { useMainMenu } from '@/services/menu';
 import { resetSession } from '@/store/session';
 
 import { Skeleton } from '../../loading';
+import { Retry } from '../../retry';
 
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -20,7 +21,7 @@ const DEFAULT_TITLE = 'خانه';
 export const MainLayout = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { groups, isPending } = useMainMenu();
+  const { groups, isPending, isError, isFetching, refetch } = useMainMenu();
   const current = findMenuItemByPath(groups, pathname);
   const pageTitle = current?.label ?? DEFAULT_TITLE;
 
@@ -36,6 +37,9 @@ export const MainLayout = () => {
       void navigate(ROUTES.LOGIN, { replace: true });
     }
   };
+
+  // بدون منو هیچ لی‌اوتی نمایش داده نمی‌شود؛ فقط تلاش مجدد وسط صفحه
+  if (isError) return <Retry fullPage loading={isFetching} onRetry={() => void refetch()} />;
 
   return (
     <div className="grid min-h-screen grid-cols-[276px_minmax(0,1fr)] max-[960px]:grid-cols-1">
