@@ -85,4 +85,10 @@ describe('handleHttpError', () => {
     handleHttpError(makeError(500, { silent: true }));
     expect(toast.error).not.toHaveBeenCalled();
   });
+
+  it('still opens the session-expired modal on 401 for silent requests', () => {
+    useAuthStore.setState({ token: 'abc', sessionExpired: false });
+    handleHttpError(makeError(401, { silent: true }));
+    expect(useAuthStore.getState().sessionExpired).toBe(true);
+  });
 });

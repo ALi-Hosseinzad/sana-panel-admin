@@ -39,9 +39,10 @@ test('tables, charts and selects retry the failed service', async ({ page }) => 
   await expect(page.getByRole('cell', { name: 'شرکت فناوران پارس' })).toBeVisible();
 
   // مودال ویرایش با خطای جزئیات باز نمی‌شود
-  await failOnce(page, 'Companies/1');
+  // شرکت ۲: جزئیات شرکت ۱ را بخش میانگین‌ها از قبل گرفته و در کش است
+  await failOnce(page, 'Companies/2');
   const edit = page
-    .getByRole('row', { name: /فناوران پارس/ })
+    .getByRole('row', { name: /صنایع غذایی آوا/ })
     .getByRole('button', { name: /ویرایش/ });
   await edit.click();
   // بعد از پایان دریافت (دکمه از حالت لودینگ خارج شود) مودال نباید باز شده باشد
