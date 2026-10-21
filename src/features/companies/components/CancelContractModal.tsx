@@ -72,7 +72,11 @@ export const CancelContractModal = ({ company, onClose }: CancelContractModalPro
         <DateInput minDate={MIN_CANCEL_DATE} maxDate={new Date()} />
       </FormItem>
       <FormItem name="reasonId" label="دلیل لغو" required>
-        <SelectInput loading={!detail || reasons.isPending} options={reasons.options} />
+        <SelectInput
+          {...reasons.selectProps}
+          loading={!detail || reasons.selectProps.loading}
+          options={reasons.options}
+        />
       </FormItem>
       <FormItem
         name="description"

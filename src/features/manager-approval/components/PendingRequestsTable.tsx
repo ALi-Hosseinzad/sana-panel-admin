@@ -55,7 +55,7 @@ export const PendingRequestsTable = ({ companyId, onCompanyChange }: PendingRequ
   const queryClient = useQueryClient();
   const { modal } = App.useApp();
 
-  const { data, isFetching } = useApprovalsManagerQueue({
+  const { data, isFetching, isError, refetch } = useApprovalsManagerQueue({
     CompanyId: companyId ? Number(companyId) : undefined,
     Status: isPending ? undefined : status,
     Term: debouncedTerm || undefined,
@@ -160,6 +160,8 @@ export const PendingRequestsTable = ({ companyId, onCompanyChange }: PendingRequ
         })}
         dataSource={data?.items}
         loading={isFetching}
+        error={isError}
+        onRetry={() => void refetch()}
         locale={{
           emptyText: isPending
             ? 'درخواستی در انتظار تأیید مدیر شرکت نیست.'
@@ -184,6 +186,7 @@ export const PendingRequestsTable = ({ companyId, onCompanyChange }: PendingRequ
         target={target}
         allowFile={false}
         rejectReasons={rejectReasons.options}
+        rejectReasonsProps={rejectReasons.selectProps}
         requireRejectNote
         onSubmit={decide}
         onClose={() => setTarget(null)}

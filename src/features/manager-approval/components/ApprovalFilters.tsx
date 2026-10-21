@@ -31,7 +31,7 @@ export const ApprovalFilters = ({
   onStatusChange,
 }: ApprovalFiltersProps) => {
   // برای نقش مدیر شرکت فقط شرکت خودش برمی‌گردد
-  const { data: companies } = useCompaniesLookup({ activeOnly: false });
+  const { data: companies, isFetching, refetch } = useCompaniesLookup({ activeOnly: false });
 
   return (
     <>
@@ -47,6 +47,8 @@ export const ApprovalFilters = ({
         size="small"
         allowClear={false}
         style={{ minWidth: 200 }}
+        loading={isFetching}
+        onRetry={() => void refetch()}
         value={companyId ?? ALL}
         onChange={(value: string) => onCompanyChange(value === ALL ? undefined : value)}
         options={[

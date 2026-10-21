@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
-import { resetSession } from '@/store/session';
+import { useAuthStore } from '@/store/useAuthStore';
 
 import { type ErrorKey, type HttpError, type StatusErrorHandler } from './types';
 
@@ -27,10 +27,8 @@ const showError =
 /** رفتار پیش‌فرض هر کد وضعیت؛ اگر درخواست هندلر اختصاصی داشته باشد این‌ها اجرا نمی‌شوند */
 export const defaultErrorHandlers: Record<ErrorKey, StatusErrorHandler> = {
   400: showError('درخواست نامعتبر است.'),
-  401: () => {
-    resetSession();
-    showErrorToast('نشست شما منقضی شده است؛ لطفاً دوباره وارد شوید.');
-  },
+  // مودال «پایان نشست» باز می‌شود؛ خروج (resetSession) بعد از تأیید کاربر در مودال انجام می‌شود
+  401: () => useAuthStore.getState().expireSession(),
   403: showError('شما به این بخش دسترسی ندارید.'),
   404: showError('اطلاعات مورد نظر یافت نشد.'),
   408: showError('مهلت پاسخ‌گویی سرور به پایان رسید؛ دوباره تلاش کنید.'),

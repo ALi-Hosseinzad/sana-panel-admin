@@ -39,10 +39,11 @@ describe('handleHttpError', () => {
     });
   });
 
-  it('logs out on 401 by default', () => {
-    useAuthStore.setState({ token: 'abc' });
+  it('opens the session-expired modal on 401 and logs out only after the user confirms', () => {
+    useAuthStore.setState({ token: 'abc', sessionExpired: false });
     handleHttpError(makeError(401));
-    expect(useAuthStore.getState().token).toBeNull();
+    expect(useAuthStore.getState().sessionExpired).toBe(true);
+    expect(useAuthStore.getState().token).toBe('abc');
   });
 
   it('uses the network handler when there is no response', () => {

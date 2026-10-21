@@ -38,7 +38,11 @@ export const AverageDocModal = ({
         ماه‌های تغییر یافته: {toPersianDigits(months.join('، '))}
       </p>
       <FormItem name="documentTypeId" label="نوع مستند" required>
-        <SelectInput loading={!schemeId || docTypes.isPending} options={docTypes.options} />
+        <SelectInput
+          {...docTypes.selectProps}
+          loading={!schemeId || docTypes.selectProps.loading}
+          options={docTypes.options}
+        />
       </FormItem>
       <FormItem
         name="file"
