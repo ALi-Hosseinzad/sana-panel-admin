@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router';
 
+import { useApprovalsPendingCounts } from '@/api/generated/facility';
 import { env } from '@/config/env';
 import { findMenuItemByPath } from '@/constant/menu';
 import { ROUTES } from '@/constant/routes';
@@ -16,6 +17,7 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 
 const DEFAULT_TITLE = 'خانه';
+const PENDING_COUNTS_INTERVAL = 60_000;
 
 /** لی‌اوت اصلی (صفحات بعد از لاگین): سایدبار + هدر + محتوا + فوتر */
 export const MainLayout = () => {
@@ -24,6 +26,16 @@ export const MainLayout = () => {
   const { groups, isPending, isError, isFetching, refetch } = useMainMenu();
   const current = findMenuItemByPath(groups, pathname);
   const pageTitle = current?.label ?? DEFAULT_TITLE;
+
+  // تعداد در انتظار هر صف تأیید کنار آیتم منو (null = کاربر آن صف را نمی‌بیند)
+  const { data: counts } = useApprovalsPendingCounts({
+    query: { refetchInterval: PENDING_COUNTS_INTERVAL },
+    request: { silent: true },
+  });
+  const badges = {
+    [ROUTES.MANAGER_APPROVE]: counts?.managerApproval,
+    [ROUTES.CREDIT_APPROVE]: counts?.creditApproval,
+  };
 
   // صفحه‌ای که در منوی کاربر نیست با آدرس مستقیم هم باز نمی‌شود (خانه همیشه مجاز است)
   const isBlocked = !isPending && !current && pathname !== ROUTES.HOME;
@@ -43,7 +55,7 @@ export const MainLayout = () => {
 
   return (
     <div className="grid min-h-screen grid-cols-[276px_minmax(0,1fr)] max-[960px]:grid-cols-1">
-      <Sidebar title={env.appTitle} groups={groups} loading={isPending} />
+      <Sidebar title={env.appTitle} groups={groups} loading={isPending} badges={badges} />
       <div className="flex min-h-screen min-w-0 flex-col">
         <Header title={pageTitle} onLogout={() => void handleLogout()} />
         <main className="flex-1 px-7 pt-6 pb-2 max-[960px]:p-4">

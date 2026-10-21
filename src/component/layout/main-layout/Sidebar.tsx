@@ -3,6 +3,7 @@ import { NavLink } from 'react-router';
 
 import logo from '@/assets/images/logo-sana.png';
 import { type MenuGroup } from '@/services/menu';
+import { toPersianDigits } from '@/utils/date';
 
 import { Skeleton } from '../../loading';
 
@@ -12,12 +13,14 @@ export interface SidebarProps {
   /** منوی کاربر (از سرویس منوی بک‌اند) */
   groups: MenuGroup[];
   loading?: boolean;
+  /** عدد کنار آیتم منو (کلید = مسیر صفحه)، مثل تعداد درخواست‌های در انتظار */
+  badges?: Partial<Record<string, number | null>>;
 }
 
 const ITEM_BASE =
   'relative flex w-full items-center gap-[11px] rounded-[11px] px-3.5 py-[11px] text-[13.5px] transition-colors max-[960px]:w-auto max-[960px]:px-3 max-[960px]:py-[9px] max-[960px]:text-[12.5px]';
 
-export const Sidebar = ({ title, subtitle, groups, loading }: SidebarProps) => {
+export const Sidebar = ({ title, subtitle, groups, loading, badges }: SidebarProps) => {
   return (
     <aside className="sana-no-print sticky top-0 flex h-screen flex-col overflow-y-auto bg-[linear-gradient(180deg,var(--sana-sidebar-from)_0%,var(--sana-sidebar-via)_55%,var(--sana-sidebar-to)_100%)] px-4 pt-[22px] pb-4 text-white max-[960px]:static max-[960px]:h-auto max-[960px]:p-3.5">
       <div className="mb-3.5 flex flex-col items-center gap-3 border-b border-white/10 px-1.5 pt-1.5 pb-5 text-center max-[960px]:flex-row max-[960px]:pb-3 max-[960px]:text-right">
@@ -53,6 +56,11 @@ export const Sidebar = ({ title, subtitle, groups, loading }: SidebarProps) => {
               >
                 <span className="text-lg leading-none opacity-85">{createElement(item.icon)}</span>
                 <span>{item.label}</span>
+                {Boolean(badges?.[item.path]) && (
+                  <span className="ms-auto rounded-full bg-accent px-2 py-px text-[11px] leading-5 font-bold text-white">
+                    {toPersianDigits(badges?.[item.path] ?? 0)}
+                  </span>
+                )}
               </NavLink>
             ))}
           </div>
