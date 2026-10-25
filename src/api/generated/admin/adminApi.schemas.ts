@@ -44,6 +44,33 @@ export interface LoginQuery {
   captchaValue?: string | null;
 }
 
+export interface PanelProfileDto {
+  panelUserId?: number;
+  /** @nullable */
+  userName?: string | null;
+  /** @nullable */
+  fullName?: string | null;
+  /** @nullable */
+  userCode?: string | null;
+  /** @nullable */
+  branchCode?: string | null;
+  /** @nullable */
+  branchName?: string | null;
+  scopeType?: number;
+  /** @nullable */
+  scopeId?: number | null;
+  /** @nullable */
+  keys?: string[] | null;
+}
+
+export interface PanelProfileDtoApiResponse {
+  isSuccess?: boolean;
+  statusCode?: number;
+  /** @nullable */
+  message?: string | null;
+  data?: PanelProfileDto;
+}
+
 export interface ResolveRequest {
   /** @nullable */
   token?: string | null;
