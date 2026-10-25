@@ -1,5 +1,6 @@
 import { ENDPOINTS } from '@/constant/endpoints';
 import { http } from '@/services/http';
+import { useAuthStore } from '@/store/useAuthStore';
 import { type UserProfile } from '@/types/common';
 
 import { type LoginFormValues, type LoginRequest, type LoginResponse } from './types';
@@ -20,9 +21,13 @@ export const login = (values: LoginFormValues) =>
  * (۴۰۱ هم مودال پایان نشست را باز نمی‌کند).
  */
 export const logout = () =>
-  http.get<unknown>(ENDPOINTS.AUTH.LOGOUT, { silent: true, onError: { 401: () => undefined } });
+  http.get<unknown>(ENDPOINTS.AUTH.LOGOUT, {
+    params: { Token: useAuthStore.getState().token },
+    silent: true,
+    onError: { 401: () => undefined },
+  });
 
-/** بکند ندارد — سرویس پروفایل در نسخه بعدی سوئگر منتشر می‌شود (فعلاً از ماک) */
+/** پروفایل کاربر (Panel/Profile) — مدل پاسخ هنوز در سوئگر نیست؛ فعلاً با UserProfile */
 export const getProfile = () => http.get<UserProfile>(ENDPOINTS.AUTH.PROFILE);
 
 // کپچا: به‌خاطر ایراد زیرساختی بک‌اند فعلاً استفاده نمی‌شود

@@ -10,8 +10,8 @@ export const ENDPOINTS = {
     CAPTCHA: '/gateway/identity/Authentication/Generate',
     /** منوی سایدبار کاربر */
     MAIN_MENU: '/gateway/identity/Authentication/MainMenu',
-    /** بکند ندارد — سرویس پروفایل در نسخه بعدی سوئگر منتشر می‌شود */
-    PROFILE: '/auth/profile',
+    /** پروفایل کاربر — مدل پاسخ هنوز در سوئگر نیست */
+    PROFILE: '/gateway/identity/Panel/Profile',
   },
   CHANGE_LOGS: {
     /** خروجی (لیست و بازگردانی از سرویس‌های تولیدشده) */
