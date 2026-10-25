@@ -21,9 +21,10 @@ export const authHandlers = [
     return json({ token: user.token });
   }),
 
-  http.get(api(ENDPOINTS.AUTH.LOGOUT), async () => {
+  http.get(api(ENDPOINTS.AUTH.LOGOUT), async ({ request }) => {
     await delay(150);
-    return json(true);
+    const token = new URL(request.url).searchParams.get('Token');
+    return findUserByToken(`Bearer ${token}`) ? json(true) : unauthorized();
   }),
 
   http.get(api(ENDPOINTS.AUTH.MAIN_MENU), async ({ request }) => {
