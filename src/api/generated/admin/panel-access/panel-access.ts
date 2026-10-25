@@ -16,6 +16,10 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import type {
+  PanelProfileDto
+} from '../adminApi.schemas';
+
 import { apiClient } from '../../../../services/http/apiClient';
 import type { ErrorType } from '../../../../services/http/apiClient';
 
@@ -45,8 +49,8 @@ export const panelProfileGet = (
 ) => {
 
 
-      return apiClient<void>(
-      {url: `/gateway/identity/Panel/Profile`, method: 'GET', signal
+      return apiClient<PanelProfileDto>(
+      {url: `/identity/Panel/Profile`, method: 'GET', signal
     },
       options);
     }
@@ -56,7 +60,7 @@ export const panelProfileGet = (
 
 export const getPanelProfileGetQueryKey = () => {
     return [
-    `/gateway/identity/Panel/Profile`
+    `/identity/Panel/Profile`
     ] as const;
     }
 

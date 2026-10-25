@@ -55,7 +55,7 @@ export const authenticationLoginPost = (
 
 
       return apiClient<void>(
-      {url: `/gateway/identity/Authentication/Login`, method: 'POST',
+      {url: `/identity/Authentication/Login`, method: 'POST',
       headers: {'Content-Type': 'application/json; x-api-version=2', },
       data: loginQuery, signal
     },
@@ -116,7 +116,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       return apiClient<void>(
-      {url: `/gateway/identity/Authentication/Generate`, method: 'GET', signal
+      {url: `/identity/Authentication/Generate`, method: 'GET', signal
     },
       options);
     }
@@ -126,7 +126,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 export const getAuthenticationGenerateGetQueryKey = () => {
     return [
-    `/gateway/identity/Authentication/Generate`
+    `/identity/Authentication/Generate`
     ] as const;
     }
 
@@ -202,7 +202,7 @@ export const authenticationMainMenuGet = (
 
 
       return apiClient<void>(
-      {url: `/gateway/identity/Authentication/MainMenu`, method: 'GET', signal
+      {url: `/identity/Authentication/MainMenu`, method: 'GET', signal
     },
       options);
     }
@@ -212,7 +212,7 @@ export const authenticationMainMenuGet = (
 
 export const getAuthenticationMainMenuGetQueryKey = () => {
     return [
-    `/gateway/identity/Authentication/MainMenu`
+    `/identity/Authentication/MainMenu`
     ] as const;
     }
 
@@ -288,7 +288,7 @@ export const authenticationLogoutGet = (
 
 
       return apiClient<void>(
-      {url: `/gateway/identity/Authentication/Logout`, method: 'GET',
+      {url: `/identity/Authentication/Logout`, method: 'GET',
         params, signal
     },
       options);

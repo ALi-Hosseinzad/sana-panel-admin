@@ -30,7 +30,7 @@ export const internalAuthorizationResolvePost = (
 
 
       return apiClient<void>(
-      {url: `/gateway/identity/Internal/Authorization/Resolve`, method: 'POST',
+      {url: `/identity/Internal/Authorization/Resolve`, method: 'POST',
       headers: {'Content-Type': 'application/json; x-api-version=2', },
       data: resolveRequest, signal
     },

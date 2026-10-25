@@ -13,7 +13,7 @@ import type {
 
 
 export const getInternalAuthorizationResolvePostMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.post('*/gateway/identity/Internal/Authorization/Resolve', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
+  return http.post('*/identity/Internal/Authorization/Resolve', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {await delay(250);
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
 
     return new HttpResponse(null,

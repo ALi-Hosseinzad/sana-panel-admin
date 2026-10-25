@@ -1,7 +1,6 @@
 import { ENDPOINTS } from '@/constant/endpoints';
 import { http } from '@/services/http';
 import { useAuthStore } from '@/store/useAuthStore';
-import { type UserProfile } from '@/types/common';
 
 import { type LoginFormValues, type LoginRequest, type LoginResponse } from './types';
 
@@ -26,9 +25,6 @@ export const logout = () =>
     silent: true,
     onError: { 401: () => undefined },
   });
-
-/** پروفایل کاربر (Panel/Profile) — مدل پاسخ هنوز در سوئگر نیست؛ فعلاً با UserProfile */
-export const getProfile = () => http.get<UserProfile>(ENDPOINTS.AUTH.PROFILE);
 
 // کپچا: به‌خاطر ایراد زیرساختی بک‌اند فعلاً استفاده نمی‌شود
 // export const getCaptcha = () => http.get<unknown>(ENDPOINTS.AUTH.CAPTCHA);
