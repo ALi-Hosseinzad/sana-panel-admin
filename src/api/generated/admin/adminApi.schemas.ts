@@ -44,6 +44,11 @@ export interface LoginQuery {
   captchaValue?: string | null;
 }
 
+export interface ResolveRequest {
+  /** @nullable */
+  token?: string | null;
+}
+
 export interface UpdateAccessCommand {
   id?: number;
   /** @nullable */
@@ -76,6 +81,10 @@ export interface UpdateRoleCommand {
   /** @nullable */
   userNames?: string[] | null;
 }
+
+export type AuthenticationLogoutGetParams = {
+Token?: string;
+};
 
 export type UserManagementAccessesGetParams = {
 term?: string;

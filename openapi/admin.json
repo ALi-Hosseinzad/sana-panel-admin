@@ -195,6 +195,136 @@
         ],
         "parameters": [
           {
+            "name": "Token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DeviceInfo",
+            "in": "header",
+            "description": "DeviceInfo"
+          },
+          {
+            "name": "AppId",
+            "in": "header",
+            "description": "Android : 1; PWA:2"
+          },
+          {
+            "name": "DeviceTypeId",
+            "in": "header",
+            "description": "1"
+          },
+          {
+            "name": "DeviceId",
+            "in": "header",
+            "description": "0912****230"
+          },
+          {
+            "name": "AppLanguage",
+            "in": "header",
+            "description": "fa"
+          },
+          {
+            "name": "DeviceVersion",
+            "in": "header",
+            "description": "1.7"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/gateway/identity/Internal/Authorization/Resolve": {
+      "post": {
+        "tags": [
+          "InternalAuthorization"
+        ],
+        "parameters": [
+          {
+            "name": "x-api-version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DeviceInfo",
+            "in": "header",
+            "description": "DeviceInfo"
+          },
+          {
+            "name": "AppId",
+            "in": "header",
+            "description": "Android : 1; PWA:2"
+          },
+          {
+            "name": "DeviceTypeId",
+            "in": "header",
+            "description": "1"
+          },
+          {
+            "name": "DeviceId",
+            "in": "header",
+            "description": "0912****230"
+          },
+          {
+            "name": "AppLanguage",
+            "in": "header",
+            "description": "fa"
+          },
+          {
+            "name": "DeviceVersion",
+            "in": "header",
+            "description": "1.7"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json; x-api-version=2": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRequest"
+              }
+            },
+            "text/json; x-api-version=2": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRequest"
+              }
+            },
+            "application/*+json; x-api-version=2": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/gateway/identity/Panel/Profile": {
+      "get": {
+        "tags": [
+          "PanelAccess"
+        ],
+        "parameters": [
+          {
             "name": "x-api-version",
             "in": "header",
             "required": true,
@@ -1442,6 +1572,16 @@
             "format": "uuid"
           },
           "captchaValue": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResolveRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
             "type": "string",
             "nullable": true
           }

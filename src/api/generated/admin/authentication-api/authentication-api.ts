@@ -21,6 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AuthenticationLogoutGetParams,
   LoginQuery
 } from '../adminApi.schemas';
 
@@ -281,13 +282,14 @@ export function useAuthenticationMainMenuGet<TData = Awaited<ReturnType<typeof a
 
 
 export const authenticationLogoutGet = (
-
+    params?: AuthenticationLogoutGetParams,
  options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
 ) => {
 
 
       return apiClient<void>(
-      {url: `/gateway/identity/Authentication/Logout`, method: 'GET', signal
+      {url: `/gateway/identity/Authentication/Logout`, method: 'GET',
+        params, signal
     },
       options);
     }
@@ -298,8 +300,8 @@ export const authenticationLogoutGet = (
 export const getAuthenticationLogoutGetMutationKey = () => ['authenticationLogoutGet'] as const;
 
 export const getAuthenticationLogoutGetMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogoutGet>>, TError,void, TContext>, request?: SecondParameter<typeof apiClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof authenticationLogoutGet>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogoutGet>>, TError,AuthenticationLogoutGetMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof authenticationLogoutGet>>, TError,AuthenticationLogoutGetMutationVariables, TContext> => {
 
 const mutationKey = getAuthenticationLogoutGetMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -311,10 +313,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authenticationLogoutGet>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authenticationLogoutGet>>, AuthenticationLogoutGetMutationVariables> = (props) => {
+          const {params} = props ?? {};
 
-
-          return  authenticationLogoutGet(requestOptions)
+          return  authenticationLogoutGet(params,requestOptions)
         }
 
 
@@ -327,14 +329,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AuthenticationLogoutGetMutationResult = NonNullable<Awaited<ReturnType<typeof authenticationLogoutGet>>>
 
     export type AuthenticationLogoutGetMutationError = ErrorType<unknown>
-
+    export type AuthenticationLogoutGetMutationVariables = {params?: AuthenticationLogoutGetParams}
 
     export const useAuthenticationLogoutGet = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogoutGet>>, TError,void, TContext>, request?: SecondParameter<typeof apiClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogoutGet>>, TError,AuthenticationLogoutGetMutationVariables, TContext>, request?: SecondParameter<typeof apiClient>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authenticationLogoutGet>>,
         TError,
-        void,
+        AuthenticationLogoutGetMutationVariables,
         TContext
       > => {
       return useMutation(getAuthenticationLogoutGetMutationOptions(options), queryClient);
