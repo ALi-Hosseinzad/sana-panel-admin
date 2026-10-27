@@ -31,8 +31,6 @@ const PAGES: Record<string, PageConfig> = {
   '/facility/basic-info': { path: ROUTES.BASE_INFO, icon: ControlOutlined },
   '/facility/management-companies': { path: ROUTES.COMPANIES, icon: ShopOutlined },
   '/facility/personnel': { path: ROUTES.STAFF, icon: TeamOutlined },
-  // بک‌اند تأیید مدیر را با دو url در دو گروه («عملیات اعتباری» و «مدیریت») می‌فرستد
-  '/manager-approve': { path: ROUTES.MANAGER_APPROVE, icon: AuditOutlined },
   '/facility/manager-approval': { path: ROUTES.MANAGER_APPROVE, icon: AuditOutlined },
   '/facility/loan-allocation': { path: ROUTES.CREDIT, icon: CreditCardOutlined },
   '/facility/credit-approval': { path: ROUTES.CREDIT_APPROVE, icon: CheckCircleOutlined },

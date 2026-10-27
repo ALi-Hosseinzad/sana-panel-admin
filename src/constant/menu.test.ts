@@ -21,7 +21,7 @@ describe('buildMenu', () => {
       [ROUTES.HOME],
       [ROUTES.BASE_INFO],
       [ROUTES.COMPANIES, ROUTES.STAFF, ROUTES.MANAGER_APPROVE],
-      [ROUTES.MANAGER_APPROVE, ROUTES.CREDIT, ROUTES.CREDIT_APPROVE],
+      [ROUTES.CREDIT, ROUTES.CREDIT_APPROVE],
       [ROUTES.DASHBOARD, ROUTES.USERS, ROUTES.CHANGE_LOG],
     ]);
   });
@@ -50,7 +50,6 @@ describe('buildMenu', () => {
   it('hides inactive items, unknown urls and empty groups', () => {
     const changed: Record<string, Partial<MenuItemDto>> = {
       '/facility/basic-info': { isActive: false },
-      '/manager-approve': { isActive: false },
       '/facility/loan-allocation': { url: '/unknown' },
       '/facility/credit-approval': { isActive: false },
     };
