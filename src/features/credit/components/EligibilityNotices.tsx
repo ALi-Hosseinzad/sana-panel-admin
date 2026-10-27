@@ -13,6 +13,8 @@ export const EligibilityNotices = ({ credit, loading }: EligibilityNoticesProps)
   if (loading && !credit) return <Skeleton variant="panel" rows={1} />;
   const banner = credit?.banner;
   if (!banner) return null;
+  // پیامی که همان پیام اصلی است دوباره (به‌صورت هشدار) نمایش داده نمی‌شود
+  const extra = banner.messages?.filter((text) => text !== banner.message) ?? [];
 
   return (
     <div className="mt-2">
@@ -21,7 +23,7 @@ export const EligibilityNotices = ({ credit, loading }: EligibilityNoticesProps)
           {banner.message}
         </NoticeCard>
       )}
-      {banner.messages?.map((text) => (
+      {extra.map((text) => (
         <NoticeCard key={text} type="warning">
           {text}
         </NoticeCard>

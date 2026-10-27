@@ -69,8 +69,10 @@ export const LoanRequestCard = ({ companyId, date, credit, filters }: LoanReques
 
   // پیش‌نمایش (مجموع، مجاز بودن، پیام‌ها و تخصیص تکراری) بعد از توقف تایپ از سرور گرفته می‌شود
   const body = useDebouncedValue(buildLoanBody(values, selectedIds, date));
+  // فقط وقتی طرح (از سرویس اعتبار) در همان بدنه‌ی debounce‌شده انتخاب شده باشد؛ نه planId خالی (۰)
+  const hasPlan = plans.some((item) => item.planId === body.planId);
   const { data: preview, isError: previewFailed } = useLoansPreview(companyId, body, {
-    query: { enabled: Boolean(plan) && canAllocate },
+    query: { enabled: hasPlan && canAllocate },
   });
 
   const { mutate, isPending } = useLoansCreate({
