@@ -21,7 +21,26 @@ export interface OtpChallenge {
   challengeId: string;
 }
 
-export type LoginResponse = AuthSessionResponse | OtpChallenge;
+export interface PasswordChangeRequired {
+  mustChangePassword: true;
+  otpTracker: string;
+}
+
+export type LoginResponse =
+  | PasswordChangeRequired
+  | ((AuthSessionResponse | OtpChallenge | { otpTracker: string }) & {
+      mustChangePassword?: false;
+      otpTracker?: string;
+    });
+
+export interface ChangePasswordFormValues {
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ChangePasswordRequest extends ChangePasswordFormValues {
+  otpTracker: string;
+}
 
 export interface VerifyOtpRequest extends OtpChallenge {
   code: string;

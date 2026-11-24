@@ -92,3 +92,52 @@ test('a wrong OTP keeps the user on login and back returns to the credentials fo
   await expect(page.getByRole('img', { name: 'تصویر کپچا' })).toBeVisible();
   await expect(page).toHaveURL(/\/login$/);
 });
+
+test('mandatory password change requires signing in again with the new password', async ({
+  page,
+}) => {
+  await page.goto('/login');
+  await page.getByLabel('نام کاربری').fill('branch');
+  await page.getByLabel('رمز عبور').fill('branch');
+  await page.getByLabel('کد امنیتی').fill('24125');
+  const loginButton = page.getByRole('main').getByRole('button', { name: /ورود/ });
+  await loginButton.click();
+
+  const dialog = page.getByRole('dialog', { name: 'تغییر رمز عبور' });
+  await dialog.getByRole('button', { name: 'بازگشت به ورود' }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByLabel('رمز عبور').fill('branch');
+  await page.getByLabel('کد امنیتی').fill('24125');
+  await loginButton.click();
+  const submit = dialog.getByRole('button', { name: 'ثبت رمز جدید' });
+  await submit.click();
+  await expect(dialog.getByText('رمز عبور جدید الزامی است.')).toBeVisible();
+  await dialog.getByLabel('رمز عبور جدید', { exact: true }).fill('new-branch-password');
+  await dialog.getByLabel('تکرار رمز عبور جدید', { exact: true }).fill('different-password');
+  await submit.click();
+  await expect(dialog.getByText('تکرار رمز عبور با رمز جدید یکسان نیست.')).toBeVisible();
+  await dialog.getByLabel('تکرار رمز عبور جدید', { exact: true }).fill('new-branch-password');
+  await page.evaluate(() =>
+    localStorage.setItem('mock-fail-once', 'Authentication/ChangePassword'),
+  );
+  await submit.click();
+  await expect(page.locator('[data-sonner-toast]')).toBeVisible();
+  await expect(dialog).toBeVisible();
+  await expect(otpInputs(page)).toHaveCount(0);
+  await submit.click();
+
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByLabel('رمز عبور')).toHaveValue('');
+  await expect(otpInputs(page)).toHaveCount(0);
+  expect((await page.context().cookies()).map((cookie) => cookie.name)).not.toContain('sana_token');
+  await page.getByLabel('رمز عبور').fill('branch');
+  await page.getByLabel('کد امنیتی').fill('24125');
+  await loginButton.click();
+  await expect(page.getByText('نام کاربری یا رمز عبور اشتباه است.').first()).toBeVisible();
+  await page.getByLabel('رمز عبور').fill('new-branch-password');
+  await loginButton.click();
+  await expect(otpInputs(page)).toHaveCount(6);
+  expect((await page.context().cookies()).map((cookie) => cookie.name)).not.toContain('sana_token');
+  await completeMockOtp(page);
+  await expect(page.getByRole('navigation')).toBeVisible();
+});
