@@ -8,7 +8,6 @@ import { Button } from '@/component/button';
 import { NoticeCard } from '@/component/card';
 import { Form, FormItem } from '@/component/form';
 import { PasswordInput, TextInput } from '@/component/input';
-import { AuthLayout } from '@/component/layout';
 import { Spinner } from '@/component/loading';
 import { Typography } from '@/component/typography';
 import { QUERY_KEYS } from '@/constant/queryKeys';
@@ -44,7 +43,7 @@ export const LoginPage = ({ username, onSubmit }: LoginPageProps) => {
   const invalidCredentials = isAxiosError(error) && error.response?.status === 401;
 
   return (
-    <AuthLayout>
+    <>
       <Typography as="title" level={2} size="xl" color="heading" align="center" className="mb-6">
         ورود به سامانه
       </Typography>
@@ -107,6 +106,6 @@ export const LoginPage = ({ username, onSubmit }: LoginPageProps) => {
           ورود
         </Button>
       </Form>
-    </AuthLayout>
+    </>
   );
 };

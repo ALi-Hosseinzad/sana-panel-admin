@@ -2,14 +2,15 @@ import { expect, test } from '@playwright/test';
 
 import { completeMockOtp, otpInputs } from './helpers/auth';
 
-test('OTP replaces the login page at the same URL before entering the panel', async ({ page }) => {
+test('OTP replaces the form inside the login frame before entering the panel', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveURL(/\/login$/);
 
-  const loginPage = page.getByRole('main', { name: 'ورود به سامانه' });
-  const otpPage = page.getByRole('main', { name: 'تأیید ورود' });
-  await expect(loginPage).toBeVisible();
-  await expect(otpPage).toHaveCount(0);
+  const loginFrame = page.getByRole('main', { name: 'ورود به سامانه' });
+  const otpStep = loginFrame.getByRole('region', { name: 'تأیید ورود' });
+  const logo = loginFrame.getByRole('img', { name: 'سانا', exact: true });
+  await expect(logo).toBeVisible();
+  await expect(otpStep).toHaveCount(0);
   await page.getByLabel('نام کاربری').fill('admin');
   await page.getByLabel('رمز عبور').fill('admin');
   await expect(page.getByRole('img', { name: 'تصویر کپچا' })).toBeVisible();
@@ -18,8 +19,9 @@ test('OTP replaces the login page at the same URL before entering the panel', as
   await expect(page.getByRole('button', { name: /ورود/ })).toBeDisabled();
   await page.getByLabel('کد امنیتی').fill('24125');
   await page.getByRole('button', { name: /ورود/ }).click();
-  await expect(otpPage.getByRole('heading', { name: 'تأیید ورود' })).toBeVisible();
-  await expect(loginPage).toHaveCount(0);
+  await expect(otpStep.getByRole('heading', { name: 'تأیید ورود' })).toBeVisible();
+  await expect(logo).toBeVisible();
+  await expect(loginFrame.getByRole('heading', { name: 'ورود به سامانه' })).toHaveCount(0);
   await expect(page.getByLabel('رمز عبور')).toHaveCount(0);
   await expect(otpInputs(page)).toHaveCount(6);
   await expect(page).toHaveURL(/\/login$/);
@@ -83,7 +85,7 @@ test('a wrong OTP keeps the user on login and back returns to the credentials fo
   await page.getByRole('button', { name: 'بازگشت به ورود' }).click();
 
   await expect(page.getByRole('main', { name: 'ورود به سامانه' })).toBeVisible();
-  await expect(page.getByRole('main', { name: 'تأیید ورود' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'تأیید ورود' })).toHaveCount(0);
   await expect(page.getByLabel('نام کاربری')).toHaveValue('admin');
   await expect(page.getByLabel('رمز عبور')).toHaveValue('');
   await expect(page.getByLabel('کد امنیتی')).toHaveValue('');

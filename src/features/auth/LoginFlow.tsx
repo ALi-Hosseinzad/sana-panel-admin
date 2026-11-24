@@ -4,13 +4,14 @@ import { toast } from 'sonner';
 
 import { panelProfileGet } from '@/api/generated/admin';
 
+import { AuthLayout } from '@/component/layout';
 import { ROUTES } from '@/constant/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 
 import { login, verifyOtp } from './api';
+import { OtpStep } from './components/OtpStep';
 import { LoginPage } from './pages/LoginPage';
-import { OtpPage } from './pages/OtpPage';
 import { type AuthSessionResponse, type LoginRequest } from './types';
 
 export const LoginFlow = () => {
@@ -40,14 +41,16 @@ export const LoginFlow = () => {
     await completeLogin(response);
   };
 
-  if (challengeId !== null) {
-    return (
-      <OtpPage
-        onSubmit={async (code) => completeLogin(await verifyOtp({ challengeId, code }))}
-        onBack={() => setStep({ username, challengeId: null })}
-      />
-    );
-  }
-
-  return <LoginPage username={username} onSubmit={submitCredentials} />;
+  return (
+    <AuthLayout>
+      {challengeId === null ? (
+        <LoginPage username={username} onSubmit={submitCredentials} />
+      ) : (
+        <OtpStep
+          onSubmit={async (code) => completeLogin(await verifyOtp({ challengeId, code }))}
+          onBack={() => setStep({ username, challengeId: null })}
+        />
+      )}
+    </AuthLayout>
+  );
 };
