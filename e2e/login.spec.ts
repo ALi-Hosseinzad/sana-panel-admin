@@ -111,7 +111,7 @@ test('mandatory password change requires signing in again with the new password'
   await loginButton.click();
   const submit = dialog.getByRole('button', { name: 'ثبت رمز جدید' });
   await submit.click();
-  await expect(dialog.getByText('رمز عبور جدید الزامی است.')).toBeVisible();
+  await expect(dialog.getByText('رمز عبور جدید الزامی است.', { exact: true })).toBeVisible();
   await dialog.getByLabel('رمز عبور جدید', { exact: true }).fill('new-branch-password');
   await dialog.getByLabel('تکرار رمز عبور جدید', { exact: true }).fill('different-password');
   await submit.click();
