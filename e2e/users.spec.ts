@@ -1,11 +1,14 @@
 import { expect, test } from '@playwright/test';
 
+import { completeMockOtp } from './helpers/auth';
+
 test('edit user: role comes from roles, success shows the backend message', async ({ page }) => {
   await page.goto('/login');
   await page.getByLabel('نام کاربری').fill('admin');
   await page.getByLabel('رمز عبور').fill('admin');
   await page.getByLabel('کد امنیتی').fill('24125');
   await page.getByRole('button', { name: /ورود/ }).click();
+  await completeMockOtp(page);
   await expect(page.getByRole('navigation')).toBeVisible();
 
   await page.goto('/users');

@@ -1,14 +1,29 @@
+import { env } from '@/config/env';
 import { ENDPOINTS } from '@/constant/endpoints';
-import { http } from '@/services/http';
+import { defaultErrorHandlers, http } from '@/services/http';
 import { useAuthStore } from '@/store/useAuthStore';
 
-import { type CaptchaResponse, type LoginRequest, type LoginResponse } from './types';
+import {
+  type AuthSessionResponse,
+  type CaptchaResponse,
+  type LoginRequest,
+  type LoginResponse,
+  type VerifyOtpRequest,
+} from './types';
 
 export const login = (values: LoginRequest) =>
   http.post<LoginResponse, LoginRequest>(ENDPOINTS.AUTH.LOGIN, values, {
     // خطای ۴۰۱ در صفحه لاگین یعنی نام کاربری/رمز اشتباه — رفتار پیش‌فرض (خروج) اجرا نشود
     onError: { 401: () => undefined },
   });
+
+export const verifyOtp = async (values: VerifyOtpRequest) => {
+  if (!env.enableMock) throw new Error('سرویس تأیید کد یک‌بارمصرف در دسترس نیست.');
+
+  return http.post<AuthSessionResponse, VerifyOtpRequest>(ENDPOINTS.AUTH.VERIFY_OTP, values, {
+    onError: { 401: defaultErrorHandlers.default },
+  });
+};
 
 /**
  * خروج؛ خطای آن نادیده گرفته می‌شود چون اطلاعات کاربر در هر حال پاک می‌شود

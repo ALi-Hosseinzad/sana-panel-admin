@@ -1,7 +1,7 @@
 import { LoginOutlined, ReloadOutlined, UserOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -18,15 +18,18 @@ import { ROUTES } from '@/constant/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 
-import { getCaptcha, login } from '../api';
-import { type LoginFormValues, type LoginRequest } from '../types';
+import { getCaptcha, login, verifyOtp } from '../api';
+import { OtpStep } from '../components/OtpStep';
+import { type AuthSessionResponse, type LoginFormValues } from '../types';
 
 export const LoginPage = () => {
+  const [challengeId, setChallengeId] = useState<string | null>(null);
   const [form] = Form.useForm<LoginFormValues>();
   const captchaValue = Form.useWatch('captchaValue', form)?.trim();
   const captcha = useQuery({
     queryKey: QUERY_KEYS.CAPTCHA,
     queryFn: ({ signal }) => getCaptcha(signal),
+    enabled: challengeId === null,
     gcTime: 0,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -43,19 +46,45 @@ export const LoginPage = () => {
     }
   }, [captcha.errorUpdatedAt]);
 
+  const completeLogin = async ({ token }: AuthSessionResponse) => {
+    setToken(token);
+    const profile = await panelProfileGet();
+    setProfile(profile);
+    toast.success(`${profile.fullName ?? ''} خوش آمدید`);
+    void navigate(ROUTES.HOME, { replace: true });
+  };
+
   const { mutate, isPending, error } = useMutation({
-    mutationFn: async (values: LoginRequest) => {
-      const { token } = await login(values);
-      // توکن در کوکی و استور ست می‌شود و از این به بعد همراه همه درخواست‌ها ارسال می‌شود
-      setToken(token);
-      return panelProfileGet();
-    },
-    onSuccess: (profile) => {
-      setProfile(profile);
-      toast.success(`${profile.fullName ?? ''} خوش آمدید`);
-      void navigate(ROUTES.HOME, { replace: true });
+    mutationFn: login,
+    onSuccess: async (response) => {
+      if ('challengeId' in response) {
+        form.resetFields(['password', 'captchaValue']);
+        setChallengeId(response.challengeId);
+        return;
+      }
+      await completeLogin(response);
     },
   });
+  const otp = useMutation({
+    mutationFn: verifyOtp,
+    onSuccess: completeLogin,
+    onError: (error) => {
+      if (!isAxiosError(error)) toast.error(error.message);
+    },
+  });
+
+  if (challengeId !== null) {
+    return (
+      <OtpStep
+        pending={otp.isPending}
+        onVerify={(code) => otp.mutate({ challengeId, code })}
+        onBack={() => {
+          setChallengeId(null);
+          void captcha.refetch();
+        }}
+      />
+    );
+  }
 
   const invalidCredentials = isAxiosError(error) && error.response?.status === 401;
 

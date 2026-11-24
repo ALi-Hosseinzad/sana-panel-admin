@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { completeMockOtp, otpInputs } from './helpers/auth';
+
 test('admin can log in and sees the main layout', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveURL(/\/login$/);
@@ -12,6 +14,11 @@ test('admin can log in and sees the main layout', async ({ page }) => {
   await expect(page.getByRole('button', { name: /ورود/ })).toBeDisabled();
   await page.getByLabel('کد امنیتی').fill('24125');
   await page.getByRole('button', { name: /ورود/ }).click();
+  await expect(otpInputs(page)).toHaveCount(6);
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('button', { name: 'تأیید و ورود' })).toBeDisabled();
+  expect((await page.context().cookies()).map((cookie) => cookie.name)).not.toContain('sana_token');
+  await completeMockOtp(page, '۱۲۳۴۵۶');
 
   await expect(page.getByRole('navigation')).toBeVisible();
   // عنوان از بک‌اند می‌آید؛ وجود لینک صفحه با مسیر خود ما بررسی می‌شود
@@ -51,4 +58,25 @@ test('login stays disabled when the captcha request fails and until a code is en
 
   await page.getByLabel('کد امنیتی').fill('24125');
   await expect(submit).toBeEnabled();
+});
+
+test('a wrong OTP keeps the user on login and back returns to the credentials form', async ({
+  page,
+}) => {
+  await page.goto('/login');
+  await page.getByLabel('نام کاربری').fill('admin');
+  await page.getByLabel('رمز عبور').fill('admin');
+  await page.getByLabel('کد امنیتی').fill('24125');
+  await page.getByRole('button', { name: /ورود/ }).click();
+  await completeMockOtp(page, '123455');
+
+  await expect(page.getByText('کد یک‌بارمصرف اشتباه است.')).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  expect((await page.context().cookies()).map((cookie) => cookie.name)).not.toContain('sana_token');
+  await page.getByRole('button', { name: 'بازگشت به ورود' }).click();
+
+  await expect(page.getByLabel('رمز عبور')).toHaveValue('');
+  await expect(page.getByLabel('کد امنیتی')).toHaveValue('');
+  await expect(page.getByRole('img', { name: 'تصویر کپچا' })).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
 });
