@@ -59,7 +59,7 @@ test('variable amounts: amount selects the row, unselect clears it; select-all s
   page,
 }) => {
   await openCredit(page);
-  await page.getByText('مبلغ متفاوت برای هرکس').click();
+  await page.getByRole('radio', { name: 'مبلغ متفاوت برای هرشخص', exact: true }).click();
   const table = page.locator('.ant-table').filter({ has: page.getByText('مبلغ وام این نفر') });
   await expect(table.locator('thead').getByRole('checkbox')).toBeDisabled();
 
