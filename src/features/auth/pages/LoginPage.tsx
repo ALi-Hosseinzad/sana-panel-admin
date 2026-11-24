@@ -1,6 +1,7 @@
 import { LoginOutlined, ReloadOutlined, UserOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -35,6 +36,12 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.login);
   const setProfile = useProfileStore((state) => state.setProfile);
+
+  useEffect(() => {
+    if (captcha.errorUpdatedAt) {
+      toast.error('دریافت تصویر کپچا ناموفق بود.', { id: 'captcha-error' });
+    }
+  }, [captcha.errorUpdatedAt]);
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: async (values: LoginRequest) => {
@@ -78,7 +85,7 @@ export const LoginPage = () => {
             placeholder="کد امنیتی"
             disabled={!captchaReady}
             suffix={
-              <>
+              <span className="flex h-8 w-24 items-center justify-center">
                 {captcha.isFetching && <Spinner />}
                 {captchaReady && (
                   <img
@@ -87,18 +94,19 @@ export const LoginPage = () => {
                     className="h-8 w-24 rounded object-contain"
                   />
                 )}
-              </>
+                {captcha.isError && !captcha.isFetching && (
+                  <Button
+                    variant="text"
+                    size="small"
+                    icon={<ReloadOutlined />}
+                    aria-label="تلاش مجدد برای دریافت کپچا"
+                    onClick={() => void captcha.refetch()}
+                  />
+                )}
+              </span>
             }
           />
         </FormItem>
-        {captcha.isError && (
-          <NoticeCard type="error">
-            دریافت تصویر کپچا ناموفق بود.
-            <Button variant="text" icon={<ReloadOutlined />} onClick={() => void captcha.refetch()}>
-              تلاش مجدد
-            </Button>
-          </NoticeCard>
-        )}
         {invalidCredentials && (
           <NoticeCard type="error">نام کاربری یا رمز عبور اشتباه است.</NoticeCard>
         )}

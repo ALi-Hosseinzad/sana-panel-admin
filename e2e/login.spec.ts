@@ -33,12 +33,20 @@ test('login stays disabled when the captcha request fails and until a code is en
   await page.addInitScript(() => localStorage.setItem('mock-fail-once', 'Authentication/Generate'));
   await page.goto('/login');
 
+  const message = 'دریافت تصویر کپچا ناموفق بود.';
   const submit = page.getByRole('button', { name: /ورود/ });
-  await expect(page.getByText('دریافت تصویر کپچا ناموفق بود.')).toBeVisible();
+  const retry = page.getByRole('button', { name: 'تلاش مجدد برای دریافت کپچا' });
+  const image = page.getByRole('img', { name: 'تصویر کپچا' });
+  const toasts = page.locator('[data-sonner-toast]');
+  await expect(toasts).toHaveCount(1);
+  await expect(toasts.getByText(message)).toBeVisible();
+  await expect(page.getByText(message, { exact: true })).toHaveCount(1);
+  await expect(image).toHaveCount(0);
   await expect(submit).toBeDisabled();
 
-  await page.getByRole('button', { name: /تلاش مجدد/ }).click();
-  await expect(page.getByRole('img', { name: 'تصویر کپچا' })).toBeVisible();
+  await retry.click();
+  await expect(image).toBeVisible();
+  await expect(retry).toHaveCount(0);
   await expect(submit).toBeDisabled();
 
   await page.getByLabel('کد امنیتی').fill('24125');
