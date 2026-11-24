@@ -3,7 +3,7 @@ import { delay, http } from 'msw';
 import { ENDPOINTS } from '@/constant/endpoints';
 import { MOCK_ROLES, type MockManagedUser } from '@/constant/mock';
 import { type UserPayload } from '@/features/users/types';
-import { mobileNumberRule, nationalCodeRule } from '@/features/users/validation';
+import { getNationalCodeError, mobileNumberRule } from '@/features/users/validation';
 import { toEnglishDigits } from '@/utils/date';
 
 import { db } from '../db';
@@ -49,8 +49,9 @@ const validateUserNumbers = (body: Pick<UserPayload, 'mobileNumber' | 'nationalC
   if (!mobileNumberRule.pattern.test(body.mobileNumber)) {
     return json({ message: mobileNumberRule.message }, { status: 422 });
   }
-  if (!nationalCodeRule.pattern.test(body.nationalCode)) {
-    return json({ message: nationalCodeRule.message }, { status: 422 });
+  const nationalCodeError = getNationalCodeError(body.nationalCode);
+  if (nationalCodeError) {
+    return json({ message: nationalCodeError }, { status: 422 });
   }
 };
 

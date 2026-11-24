@@ -11,7 +11,7 @@ import { toEnglishDigits } from '@/utils/date';
 
 import { createUser, getRoles, getUser, updateUser } from '../api';
 import { type User, type UserPayload } from '../types';
-import { mobileNumberRule, nationalCodeRule } from '../validation';
+import { getNationalCodeError, mobileNumberRule } from '../validation';
 
 interface UserFormModalProps {
   open: boolean;
@@ -126,7 +126,14 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
         label="کد ملی"
         required
         normalize={toEnglishDigits}
-        rules={[nationalCodeRule]}
+        rules={[
+          {
+            validator: async (_, value: string) => {
+              const error = getNationalCodeError(value);
+              if (error) throw new Error(error);
+            },
+          },
+        ]}
       >
         <TextInput dir="ltr" inputMode="numeric" maxLength={10} />
       </FormItem>

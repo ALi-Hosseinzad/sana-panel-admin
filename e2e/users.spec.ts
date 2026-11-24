@@ -18,7 +18,7 @@ test('edit user: role comes from roles, success shows the backend message', asyn
   const dialog = page.getByRole('dialog', { name: 'ویرایش کاربر' });
   await expect(dialog.getByLabel('نام کاربری')).toHaveValue('branch');
   await expect(dialog.getByLabel('شماره موبایل')).toHaveValue('09120000002');
-  await expect(dialog.getByLabel('کد ملی')).toHaveValue('0012345672');
+  await expect(dialog.getByLabel('کد ملی')).toHaveValue('0012345611');
   await expect(dialog.getByText('کاربر شعبه', { exact: true })).toBeVisible();
 
   await dialog.getByRole('button', { name: 'ذخیره تغییرات' }).click();
@@ -50,13 +50,21 @@ test('mobile number and national code are required and appear in the new user ro
   await expect(dialog.getByText('کد ملی الزامی است.')).toBeVisible();
 
   await dialog.getByLabel('شماره موبایل').fill('۰۹۱۲۱۲۳۴۵۶۷');
-  await dialog.getByLabel('کد ملی').fill('٠٠١٢٣٤٥٦٧٨');
+  const nationalCode = dialog.getByLabel('کد ملی');
+  await nationalCode.fill('0000000000');
+  await submit.click();
+  await expect(dialog.getByText('کد ملی معتبر نیست')).toBeVisible();
+  await nationalCode.fill('0012345678');
+  await submit.click();
+  await expect(dialog.getByText('کد ملی معتبر نیست')).toBeVisible();
+
+  await nationalCode.fill('٠٠١٢٣٤٥٦٧٩');
   await submit.click();
   const row = page.getByRole('row', { name: /new-user/ });
   await expect(row.getByRole('cell', { name: '۰۹۱۲۱۲۳۴۵۶۷' })).toBeVisible();
-  await expect(row.getByRole('cell', { name: '۰۰۱۲۳۴۵۶۷۸' })).toBeVisible();
+  await expect(row.getByRole('cell', { name: '۰۰۱۲۳۴۵۶۷۹' })).toBeVisible();
   await row.getByRole('button', { name: 'ویرایش' }).click();
   const edit = page.getByRole('dialog', { name: 'ویرایش کاربر' });
   await expect(edit.getByLabel('شماره موبایل')).toHaveValue('09121234567');
-  await expect(edit.getByLabel('کد ملی')).toHaveValue('0012345678');
+  await expect(edit.getByLabel('کد ملی')).toHaveValue('0012345679');
 });
