@@ -8,6 +8,7 @@ export interface MockUser {
   profile: PanelProfileDto;
   /** فقط برای ماک: کاربر شعبه بخشی از منو را می‌بیند */
   isBranch?: boolean;
+  mustChangePassword?: boolean;
 }
 
 export const MOCK_USERS: MockUser[] = [
@@ -32,6 +33,7 @@ export const MOCK_USERS: MockUser[] = [
     password: 'branch',
     token: 'mock-token-branch',
     isBranch: true,
+    mustChangePassword: true,
     profile: {
       panelUserId: 2,
       userName: 'branch',

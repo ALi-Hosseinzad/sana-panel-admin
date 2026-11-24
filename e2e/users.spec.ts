@@ -54,6 +54,10 @@ test('mobile number and national code are required and appear in the new user ro
 
   await dialog.getByLabel('شماره موبایل').fill('۰۹۱۲۱۲۳۴۵۶۷');
   const nationalCode = dialog.getByLabel('کد ملی');
+  await nationalCode.fill('۱۲۳');
+  await expect(dialog.getByText('کد ملی باید ۱۰ رقم باشد', { exact: true })).toBeVisible();
+  await nationalCode.fill('12a');
+  await expect(dialog.getByText('کد ملی باید فقط شامل اعداد باشد', { exact: true })).toBeVisible();
   await nationalCode.fill('0000000000');
   await submit.click();
   await expect(dialog.getByText('کد ملی معتبر نیست')).toBeVisible();

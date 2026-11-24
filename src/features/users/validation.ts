@@ -4,7 +4,9 @@ export const mobileNumberRule = {
 };
 
 export const getNationalCodeError = (value: string): string | undefined => {
-  if (!/^\d{10}$/.test(value)) return 'کد ملی باید فقط شامل اعداد باشد';
+  if (!value) return 'کد ملی الزامی است.';
+  if (/\D/.test(value)) return 'کد ملی باید فقط شامل اعداد باشد';
+  if (value.length !== 10) return 'کد ملی باید ۱۰ رقم باشد';
 
   const invalidCode = 'کد ملی معتبر نیست';
   if (/^(\d)\1{9}$/.test(value)) return invalidCode;

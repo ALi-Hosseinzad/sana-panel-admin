@@ -39,7 +39,12 @@ export const LoginPage = ({ username, onSubmit }: LoginPageProps) => {
     }
   }, [captcha.errorUpdatedAt]);
 
-  const { mutate, isPending, error } = useMutation({ mutationFn: onSubmit });
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: onSubmit,
+    onError: (error) => {
+      if (!isAxiosError(error)) toast.error(error.message);
+    },
+  });
   const invalidCredentials = isAxiosError(error) && error.response?.status === 401;
 
   return (
