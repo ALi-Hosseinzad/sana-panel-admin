@@ -13,7 +13,16 @@ export interface CaptchaResponse {
   image: string;
 }
 
-/** ساختار پاسخ ورود در سوئگر تعریف نشده؛ فرض: توکن داخل data برمی‌گردد */
-export interface LoginResponse {
+export interface AuthSessionResponse {
   token: string;
+}
+
+export interface OtpChallenge {
+  challengeId: string;
+}
+
+export type LoginResponse = AuthSessionResponse | OtpChallenge;
+
+export interface VerifyOtpRequest extends OtpChallenge {
+  code: string;
 }
