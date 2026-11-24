@@ -24,6 +24,7 @@ export const logout = () =>
 export const getCaptcha = async (signal?: AbortSignal) => {
   const captcha = await http.get<CaptchaResponse>(ENDPOINTS.AUTH.CAPTCHA, {
     signal,
+    silent: true,
     onError: { 401: () => undefined },
   });
   if (!captcha?.captchaToken || !captcha.image) {
