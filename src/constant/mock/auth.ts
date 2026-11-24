@@ -15,6 +15,7 @@ export const MOCK_USERS: MockUser[] = [
   {
     username: 'admin',
     password: 'admin',
+    mustChangePassword: import.meta.env.VITE_VERCEL_ENV === 'preview',
     token: 'mock-token-admin',
     profile: {
       panelUserId: 1,
