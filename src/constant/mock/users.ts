@@ -10,6 +10,8 @@ export const MOCK_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 1,
     userName: 'admin',
+    mobileNumber: '09120000001',
+    nationalCode: '0012345671',
     password: 'admin',
     email: null,
     personId: null,
@@ -25,6 +27,8 @@ export const MOCK_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 2,
     userName: 'branch',
+    mobileNumber: '09120000002',
+    nationalCode: '0012345672',
     password: 'branch',
     email: null,
     personId: null,
