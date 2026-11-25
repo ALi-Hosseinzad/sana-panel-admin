@@ -9,8 +9,8 @@ export interface LoginRequest {
 export type LoginFormValues = Omit<LoginRequest, 'captchaToken'>;
 
 export interface CaptchaResponse {
-  captchaToken: string;
-  image: string;
+  token: string;
+  base64Image: string;
 }
 
 export interface AuthSessionResponse {
