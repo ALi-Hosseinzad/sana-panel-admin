@@ -1,4 +1,4 @@
-import { env } from '@/config/env';
+import { type PanelProfileDto } from './profile';
 import { ENDPOINTS } from '@/constant/endpoints';
 import { defaultErrorHandlers, http } from '@/services/http';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -18,21 +18,31 @@ export const login = (values: LoginRequest) =>
     onError: { 401: () => undefined },
   });
 
-export const changePassword = async (values: ChangePasswordRequest) => {
-  if (!env.enableMock) throw new Error('سرویس تغییر رمز عبور در دسترس نیست.');
+const preLoginConfig = { onError: { 401: defaultErrorHandlers.default } };
 
-  return http.post<boolean, ChangePasswordRequest>(ENDPOINTS.AUTH.CHANGE_PASSWORD, values, {
-    onError: { 401: defaultErrorHandlers.default },
-  });
-};
+export const getProfile = (signal?: AbortSignal) =>
+  http.get<PanelProfileDto>('/identity/Panel/Profile', { signal });
+
+export const changePassword = (values: ChangePasswordRequest) =>
+  http.post(ENDPOINTS.AUTH.CHANGE_PASSWORD, values, preLoginConfig);
 
 export const verifyOtp = async (values: VerifyOtpRequest) => {
-  if (!env.enableMock) throw new Error('سرویس تأیید کد یک‌بارمصرف در دسترس نیست.');
-
-  return http.post<AuthSessionResponse, VerifyOtpRequest>(ENDPOINTS.AUTH.VERIFY_OTP, values, {
-    onError: { 401: defaultErrorHandlers.default },
-  });
+  const data = await http.post<AuthSessionResponse | string>(
+    ENDPOINTS.AUTH.VERIFY_OTP,
+    values,
+    preLoginConfig,
+  );
+  const token = typeof data === 'string' ? data : data?.token;
+  if (!token?.trim()) throw new Error('توکن تأیید ورود دریافت نشد.');
+  return { token };
 };
+
+export const resendOtp = (otpTracker: string) =>
+  http.post<Partial<LoginResponse> | null>(
+    ENDPOINTS.AUTH.RESEND_OTP,
+    { otpTracker },
+    preLoginConfig,
+  );
 
 /**
  * خروج؛ خطای آن نادیده گرفته می‌شود چون اطلاعات کاربر در هر حال پاک می‌شود
