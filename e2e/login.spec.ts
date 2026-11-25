@@ -15,6 +15,13 @@ test('OTP replaces the form inside the login frame before entering the panel', a
   await page.getByLabel('نام کاربری').fill('admin');
   await page.getByLabel('رمز عبور').fill('admin');
   await expect(page.getByRole('img', { name: 'تصویر کپچا' })).toBeVisible();
+  await expect
+    .poll(() =>
+      page
+        .getByRole('img', { name: 'تصویر کپچا' })
+        .evaluate((image) => (image as { naturalWidth: number }).naturalWidth),
+    )
+    .toBe(96);
   await expect(page.getByRole('button', { name: /ورود/ })).toBeDisabled();
   await page.getByLabel('کد امنیتی').fill('   ');
   await expect(page.getByRole('button', { name: /ورود/ })).toBeDisabled();

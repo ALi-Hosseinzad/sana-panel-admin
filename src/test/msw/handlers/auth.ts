@@ -30,18 +30,16 @@ const issueOtp = (username: string) => {
   return { otpTracker, otpExpireTime: new Date(expiresAt).toISOString() };
 };
 
-const captchaSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="32" viewBox="0 0 96 32">
-  <rect width="96" height="32" rx="4" fill="#FBF3DF"/>
-  <path d="M0 22L96 7M0 9L96 27" stroke="#E8C56A"/>
-  <text x="48" y="23" text-anchor="middle" fill="#0E2B47" font-family="monospace" font-size="20" letter-spacing="3">${CAPTCHA_VALUE}</text>
-</svg>`;
+// PNG fixture showing the mock captcha value 24125.
+const captchaPng =
+  'iVBORw0KGgoAAAANSUhEUgAAAGAAAAAgEAAAAACYO/7LAAABFElEQVRYw+1YWw7DIAyj0y7ChfjYUbkQJ5m0j2oqjyQ4wISqxV+opU7skAj1eL/crfHYnYAJ2J2ACdidwN8LeCKbfPyuUpB25G/5b7g313M5VgmgAjmxj3UYKjT1BGfTAarA5QUaMAUfU6D3S2yY6zmACvBHQBLFpdJj+4EAOS0fR3yTRWoAHaEyXTqVESf53sGlDYzRetZwZ13P1jeqhaoCcktqwbewj86dQ6APdQXoWT+KnO1anyuMXSGgbteZ9u19jfPCR4gOWLqES5oTnwOswLqAq9mUd6EcbTescx/vLvguJIfE/cRTwzhVPcBTS9c5yoCWbXSidSswPyoxtlJgCmhND/utYgJMwL1hAnbDBOzGB32Ba4NyqExoAAAAAElFTkSuQmCC';
 
 export const authHandlers = [
   http.get(api(ENDPOINTS.AUTH.CAPTCHA), async () => {
     await delay(300);
     return json({
-      captchaToken: CAPTCHA_TOKEN,
-      image: `data:image/svg+xml,${encodeURIComponent(captchaSvg)}`,
+      token: CAPTCHA_TOKEN,
+      base64Image: captchaPng,
     } satisfies CaptchaResponse);
   }),
 

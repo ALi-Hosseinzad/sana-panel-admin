@@ -1,6 +1,6 @@
 import { type PanelProfileDto } from './profile';
 import { ENDPOINTS } from '@/constant/endpoints';
-import { defaultErrorHandlers, http } from '@/services/http';
+import { defaultErrorHandlers, http, httpClient } from '@/services/http';
 import { useAuthStore } from '@/store/useAuthStore';
 
 import {
@@ -56,13 +56,20 @@ export const logout = () =>
   });
 
 export const getCaptcha = async (signal?: AbortSignal) => {
-  const captcha = await http.get<CaptchaResponse>(ENDPOINTS.AUTH.CAPTCHA, {
-    signal,
-    silent: true,
-    onError: { 401: () => undefined },
-  });
-  if (!captcha?.captchaToken || !captcha.image) {
+  const { data: body } = await httpClient.get<CaptchaResponse | { data: CaptchaResponse }>(
+    ENDPOINTS.AUTH.CAPTCHA,
+    {
+      signal,
+      silent: true,
+      onError: { 401: () => undefined },
+    },
+  );
+  const captcha = body && 'data' in body ? body.data : body;
+  if (!captcha?.token?.trim() || !captcha.base64Image?.trim()) {
     throw new Error('پاسخ سرویس کپچا نامعتبر است.');
   }
-  return captcha;
+  return {
+    captchaToken: captcha.token,
+    image: `data:image/png;base64,${captcha.base64Image.trim()}`,
+  };
 };
