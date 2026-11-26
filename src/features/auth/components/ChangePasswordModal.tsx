@@ -7,6 +7,8 @@ import { FormItem } from '@/component/form';
 import { PasswordInput } from '@/component/input';
 import { FormModal } from '@/component/modal';
 
+import { newPasswordRule } from '@/utils/validation';
+
 import { type ChangePasswordFormValues } from '../types';
 
 type ChangePasswordModalProps = {
@@ -51,7 +53,16 @@ export const ChangePasswordModal = (props: ChangePasswordModalProps) => {
           <PasswordInput autoComplete="current-password" />
         </FormItem>
       )}
-      <FormItem name="newPassword" label="رمز عبور جدید" required>
+      <FormItem
+        name="newPassword"
+        label="رمز عبور جدید"
+        required
+        dependencies={isAccount ? ['currentPassword'] : undefined}
+        rules={[
+          ({ getFieldValue }) =>
+            newPasswordRule(isAccount ? getFieldValue('currentPassword') : undefined),
+        ]}
+      >
         <PasswordInput autoComplete="new-password" />
       </FormItem>
       <FormItem
