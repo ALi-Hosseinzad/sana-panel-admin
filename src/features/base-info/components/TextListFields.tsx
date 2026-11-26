@@ -38,7 +38,7 @@ export const TextListFields = ({
                   {toPersianDigits(index + 1)}
                 </span>
                 <FormItem name={field.name} className="mb-2 flex-1">
-                  <TextInput placeholder={placeholder} />
+                  <TextInput maxLength={50} placeholder={placeholder} />
                 </FormItem>
                 {fields.length > 1 && (
                   <Button

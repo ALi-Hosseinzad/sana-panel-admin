@@ -39,7 +39,7 @@ export const ApprovalFilters = ({
         size="small"
         style={{ width: 200 }}
         placeholder="جستجوی نام یا کد پرسنلی"
-        maxLength={50}
+        maxLength={30}
         value={term}
         onChange={(event) => onTermChange(event.target.value)}
       />

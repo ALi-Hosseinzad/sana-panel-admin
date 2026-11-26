@@ -7,7 +7,7 @@ import { type StaffFilters } from '../types';
 export const StaffSearch = () => (
   <Form<StaffFilters> layout="inline">
     <FormItem name="q" label="جستجو (نام، کد ملی، موبایل، کد پرسنلی)">
-      <TextInput placeholder="جستجو..." />
+      <TextInput maxLength={30} placeholder="جستجو..." />
     </FormItem>
     <FormItem name="hireFrom" label="از تاریخ استخدام">
       <DateInput />

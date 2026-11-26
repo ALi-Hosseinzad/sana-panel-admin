@@ -68,13 +68,19 @@ export const LoginPage = ({ username, onSubmit }: LoginPageProps) => {
         requiredMark={false}
       >
         <FormItem name="username" label="نام کاربری" required>
-          <TextInput prefix={<UserOutlined />} placeholder="نام کاربری" autoComplete="username" />
+          <TextInput
+            maxLength={50}
+            prefix={<UserOutlined />}
+            placeholder="نام کاربری"
+            autoComplete="username"
+          />
         </FormItem>
         <FormItem name="password" label="رمز عبور" required>
           <PasswordInput />
         </FormItem>
         <FormItem name="captchaValue" label="کد امنیتی" required>
           <TextInput
+            maxLength={10}
             placeholder="کد امنیتی"
             disabled={!captchaReady}
             suffix={

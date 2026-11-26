@@ -97,7 +97,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
       onSubmit={mutateAsync}
     >
       <FormItem name="userName" label="نام کاربری" required>
-        <TextInput autoComplete="off" dir="ltr" />
+        <TextInput maxLength={50} autoComplete="off" dir="ltr" />
       </FormItem>
       <FormItem
         name="password"
@@ -115,7 +115,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
         <TextInput maxLength={51} />
       </FormItem>
       <FormItem name="userCode" label="کد کاربر" required>
-        <TextInput inputMode="numeric" placeholder="مثلاً ۳۹۹" />
+        <TextInput inputMode="numeric" maxLength={10} placeholder="مثلاً ۳۹۹" />
       </FormItem>
       <FormItem
         name="mobileNumber"
@@ -136,7 +136,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
         <TextInput dir="ltr" inputMode="numeric" maxLength={10} />
       </FormItem>
       <FormItem name="branchName" label="نام شعبه" required>
-        <TextInput placeholder="مثلاً شعبه بازار تهران" />
+        <TextInput maxLength={50} placeholder="مثلاً شعبه بازار تهران" />
       </FormItem>
       <FormItem name="branchCode" label="کد شعبه" required>
         <TextInput inputMode="numeric" maxLength={10} placeholder="مثلاً ۱۵۰۰۰۲" />

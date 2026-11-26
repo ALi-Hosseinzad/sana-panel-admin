@@ -51,6 +51,7 @@ test('mobile number and national code are required and appear in the new user ro
   await branchCode.fill('123456789012');
   await expect(branchCode).toHaveValue('1234567890');
   await branchCode.fill('150003');
+  await expect(dialog.getByLabel('نقش کاربر')).toHaveAttribute('maxlength', '30');
   await dialog.getByLabel('نقش کاربر').click();
   await page.locator('.ant-select-item-option').filter({ hasText: 'کاربر شعبه' }).click();
   await submit.click();

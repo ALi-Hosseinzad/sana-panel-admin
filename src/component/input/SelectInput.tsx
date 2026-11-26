@@ -24,6 +24,7 @@ export const SelectInput = <V = unknown,>({
     placeholder={placeholder}
     allowClear={allowClear}
     showSearch={showSearch}
+    components={showSearch ? { input: <input maxLength={30} /> } : undefined}
     notFoundContent={notFoundContent}
     onOpenChange={(open) => {
       if (open && !rest.loading && (error || !rest.options?.length)) onRetry?.();

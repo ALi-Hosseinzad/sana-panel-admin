@@ -21,9 +21,9 @@ export const GeneralFields = ({ isEdit }: { isEdit: boolean }) => {
           name="title"
           label="نام طرح"
           required
-          rules={[{ min: 3, max: 100, message: 'نام طرح باید بین ۳ تا ۱۰۰ حرف باشد.' }]}
+          rules={[{ min: 3, max: 50, message: 'نام طرح باید بین ۳ تا ۵۰ حرف باشد.' }]}
         >
-          <TextInput maxLength={100} placeholder="مثلاً نگین میثاق" />
+          <TextInput maxLength={50} placeholder="مثلاً نگین میثاق" />
         </FormItem>
         <FormItem<SchemeFormValues>
           name="code"
