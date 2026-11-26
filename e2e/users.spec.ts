@@ -42,9 +42,13 @@ test('mobile number and national code are required and appear in the new user ro
   await page.getByRole('button', { name: 'افزودن کاربر' }).click();
   const dialog = page.getByRole('dialog', { name: 'افزودن کاربر' });
   const submit = dialog.getByRole('button', { name: 'ثبت کاربر' });
-  await dialog.getByLabel('نام کاربری').fill('new-user');
+  await dialog.getByLabel('نام کاربری').fill('new.user');
   await dialog.getByLabel('رمز عبور').fill('test-password1');
-  await dialog.getByLabel('نام و نام خانوادگی کاربر').fill('کاربر آزمایشی');
+  const fullName = dialog.getByLabel('نام و نام خانوادگی کاربر');
+  await fullName.fill('کاربر123');
+  await expect(submit).toBeDisabled();
+  await fullName.fill('كاربر آزمايشی');
+  await expect(fullName).toHaveValue('کاربر آزمایشی');
   await dialog.getByLabel('کد کاربر').fill('400');
   await dialog.getByLabel('نام شعبه').fill('شعبه تست');
   const branchCode = dialog.getByLabel('کد شعبه');
@@ -73,7 +77,7 @@ test('mobile number and national code are required and appear in the new user ro
 
   await nationalCode.fill('٠٠١٢٣٤٥٦٧٩');
   await submit.click();
-  const row = page.getByRole('row', { name: /new-user/ });
+  const row = page.getByRole('row', { name: /new\.user/ });
   await expect(row.getByRole('cell', { name: '۰۹۱۲۱۲۳۴۵۶۷' })).toBeVisible();
   await expect(row.getByRole('cell', { name: '۰۰۱۲۳۴۵۶۷۹' })).toBeVisible();
   await row.getByRole('button', { name: 'ویرایش' }).click();

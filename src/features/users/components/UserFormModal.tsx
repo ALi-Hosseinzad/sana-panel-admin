@@ -1,3 +1,10 @@
+import {
+  fullNameRule,
+  normalizeText,
+  numericCodeRule,
+  organizationNameRule,
+  usernameRule,
+} from '@/utils/inputRules';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useMemo } from 'react';
@@ -24,12 +31,12 @@ interface UserFormModalProps {
 /** نقش فعلی کاربر = اولین مورد roles */
 const toFormValues = (user: User): UserPayload => ({
   userName: user.userName,
-  fullName: user.fullName,
-  userCode: user.userCode,
+  fullName: normalizeText(user.fullName ?? ''),
+  userCode: normalizeText(user.userCode ?? ''),
   mobileNumber: toEnglishDigits(user.mobileNumber ?? ''),
   nationalCode: toEnglishDigits(user.nationalCode ?? ''),
-  branchName: user.branchName,
-  branchCode: user.branchCode,
+  branchName: normalizeText(user.branchName ?? ''),
+  branchCode: normalizeText(user.branchCode ?? ''),
   roleId: user.roles[0]?.roleId ?? null,
 });
 
@@ -41,6 +48,7 @@ const SAVE_CONFIG = { successToast: true, onError: { 409: () => undefined } };
 
 export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => {
   const [form] = Form.useForm<UserPayload>();
+  const fullName = Form.useWatch('fullName', form);
   const queryClient = useQueryClient();
   const isEdit = Boolean(userId);
 
@@ -86,6 +94,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
   return (
     <FormModal<UserPayload>
       form={form}
+      okButtonProps={{ disabled: Boolean(fullName && !fullNameRule.pattern.test(fullName)) }}
       title={isEdit ? 'ویرایش کاربر' : 'افزودن کاربر'}
       okText={isEdit ? 'ذخیره تغییرات' : 'ثبت کاربر'}
       open={open}
@@ -96,8 +105,14 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
       onCancel={onClose}
       onSubmit={mutateAsync}
     >
-      <FormItem name="userName" label="نام کاربری" required>
-        <TextInput maxLength={50} autoComplete="off" dir="ltr" />
+      <FormItem
+        name="userName"
+        rules={[usernameRule]}
+        extra={usernameRule.message}
+        label="نام کاربری"
+        required
+      >
+        <TextInput maxLength={20} autoComplete="off" dir="ltr" />
       </FormItem>
       <FormItem
         name="password"
@@ -111,10 +126,22 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
           placeholder={isEdit ? 'بدون تغییر' : 'رمز عبور'}
         />
       </FormItem>
-      <FormItem name="fullName" label="نام و نام خانوادگی کاربر" required>
+      <FormItem
+        name="fullName"
+        normalize={normalizeText}
+        rules={[fullNameRule]}
+        label="نام و نام خانوادگی کاربر"
+        required
+      >
         <TextInput maxLength={51} />
       </FormItem>
-      <FormItem name="userCode" label="کد کاربر" required>
+      <FormItem
+        name="userCode"
+        normalize={normalizeText}
+        rules={[numericCodeRule]}
+        label="کد کاربر"
+        required
+      >
         <TextInput inputMode="numeric" maxLength={10} placeholder="مثلاً ۳۹۹" />
       </FormItem>
       <FormItem
@@ -135,10 +162,22 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
       >
         <TextInput dir="ltr" inputMode="numeric" maxLength={10} />
       </FormItem>
-      <FormItem name="branchName" label="نام شعبه" required>
+      <FormItem
+        name="branchName"
+        normalize={normalizeText}
+        rules={[organizationNameRule]}
+        label="نام شعبه"
+        required
+      >
         <TextInput maxLength={50} placeholder="مثلاً شعبه بازار تهران" />
       </FormItem>
-      <FormItem name="branchCode" label="کد شعبه" required>
+      <FormItem
+        name="branchCode"
+        normalize={normalizeText}
+        rules={[numericCodeRule]}
+        label="کد شعبه"
+        required
+      >
         <TextInput inputMode="numeric" maxLength={10} placeholder="مثلاً ۱۵۰۰۰۲" />
       </FormItem>
       <FormItem name="roleId" label="نقش کاربر" required requiredMessage="انتخاب نقش الزامی است.">
