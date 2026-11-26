@@ -14,6 +14,7 @@ test('edit user: role comes from roles, success shows the backend message', asyn
 
   await page.goto('/users');
   await expect(page.getByRole('cell', { name: 'branch', exact: true })).toBeVisible();
+  await expect(page.getByText('تعداد کل: ۲ رکورد', { exact: true })).toBeVisible();
   await page
     .getByRole('row', { name: /کاربر شعبه/ })
     .getByRole('button', { name: /ویرایش/ })
@@ -46,7 +47,10 @@ test('mobile number and national code are required and appear in the new user ro
   await dialog.getByLabel('نام و نام خانوادگی کاربر').fill('کاربر آزمایشی');
   await dialog.getByLabel('کد کاربر').fill('400');
   await dialog.getByLabel('نام شعبه').fill('شعبه تست');
-  await dialog.getByLabel('کد شعبه').fill('150003');
+  const branchCode = dialog.getByLabel('کد شعبه');
+  await branchCode.fill('123456789012');
+  await expect(branchCode).toHaveValue('1234567890');
+  await branchCode.fill('150003');
   await dialog.getByLabel('نقش کاربر').click();
   await page.locator('.ant-select-item-option').filter({ hasText: 'کاربر شعبه' }).click();
   await submit.click();

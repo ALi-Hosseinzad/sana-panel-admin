@@ -81,7 +81,7 @@ export const StaffFormModal = ({ open, companyId, staffId, onClose }: StaffFormM
       onSubmit={submit}
     >
       <FormItem name="fullName" label="نام و نام خانوادگی" required>
-        <TextInput />
+        <TextInput maxLength={51} />
       </FormItem>
       <FormItem
         name="nationalCode"

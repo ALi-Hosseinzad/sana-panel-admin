@@ -112,7 +112,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
         />
       </FormItem>
       <FormItem name="fullName" label="نام و نام خانوادگی کاربر" required>
-        <TextInput />
+        <TextInput maxLength={51} />
       </FormItem>
       <FormItem name="userCode" label="کد کاربر" required>
         <TextInput inputMode="numeric" placeholder="مثلاً ۳۹۹" />
@@ -139,7 +139,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
         <TextInput placeholder="مثلاً شعبه بازار تهران" />
       </FormItem>
       <FormItem name="branchCode" label="کد شعبه" required>
-        <TextInput inputMode="numeric" placeholder="مثلاً ۱۵۰۰۰۲" />
+        <TextInput inputMode="numeric" maxLength={10} placeholder="مثلاً ۱۵۰۰۰۲" />
       </FormItem>
       <FormItem name="roleId" label="نقش کاربر" required requiredMessage="انتخاب نقش الزامی است.">
         <SelectInput

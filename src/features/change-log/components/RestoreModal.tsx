@@ -42,7 +42,7 @@ export const RestoreModal = ({ log, onClose }: RestoreModalProps) => {
     >
       <p className="mt-0 mb-4 text-[12.5px] text-ink-soft">{log?.details}</p>
       <FormItem name="description" label="توضیح بازگردانی" required>
-        <TextAreaInput rows={3} />
+        <TextAreaInput rows={3} maxLength={500} />
       </FormItem>
     </FormModal>
   );

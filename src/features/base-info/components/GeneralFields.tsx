@@ -23,7 +23,7 @@ export const GeneralFields = ({ isEdit }: { isEdit: boolean }) => {
           required
           rules={[{ min: 3, max: 100, message: 'نام طرح باید بین ۳ تا ۱۰۰ حرف باشد.' }]}
         >
-          <TextInput placeholder="مثلاً نگین میثاق" />
+          <TextInput maxLength={100} placeholder="مثلاً نگین میثاق" />
         </FormItem>
         <FormItem<SchemeFormValues>
           name="code"
@@ -32,7 +32,7 @@ export const GeneralFields = ({ isEdit }: { isEdit: boolean }) => {
           rules={[{ min: 2, max: 30, message: 'کد طرح باید بین ۲ تا ۳۰ حرف باشد.' }]}
           extra={isEdit ? 'کد طرح بعد از ثبت قابل تغییر نیست.' : undefined}
         >
-          <TextInput placeholder="مثلاً NM-01" disabled={isEdit} />
+          <TextInput maxLength={30} placeholder="مثلاً NM-01" disabled={isEdit} />
         </FormItem>
         <FormItem<SchemeFormValues> name="isActive" label="وضعیت طرح">
           <Switch label={isActive ? 'فعال' : 'غیرفعال'} />
