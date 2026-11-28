@@ -2,8 +2,8 @@ import { toEnglishDigits } from '@/utils/date';
 
 const letters = 'آابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیءأؤئۀ';
 
-export const normalizeText = (value: string) =>
-  toEnglishDigits(value.replace(/ي/g, 'ی').replace(/ك/g, 'ک'));
+export const normalizeLetters = (value: string) => value.replace(/ي/g, 'ی').replace(/ك/g, 'ک');
+export const normalizeText = (value: string) => toEnglishDigits(normalizeLetters(value));
 
 export const usernameRule = {
   pattern: /^[A-Za-z\d.]{1,20}$/,
@@ -18,7 +18,7 @@ export const fullNameRule = {
   message: 'نام و نام خانوادگی را فقط با حروف فارسی، فاصله و نیم‌فاصله وارد کنید.',
 };
 export const organizationNameRule = {
-  pattern: new RegExp(`^(?=.*[${letters}])[${letters}0-9 ‌]+$`, 'u'),
+  pattern: new RegExp(`^(?=.*[${letters}])[${letters}0-9۰-۹٠-٩ ‌]+$`, 'u'),
   message: 'نام باید حداقل یک حرف فارسی داشته باشد و فقط شامل حروف فارسی، فاصله و رقم باشد.',
 };
 export const numericCodeRule = { pattern: /^\d{1,10}$/, message: 'کد باید ۱ تا ۱۰ رقم باشد.' };
@@ -31,7 +31,10 @@ export const agreementRule = {
   message: 'شماره تفاهم‌نامه فقط شامل حرف فارسی یا انگلیسی، رقم، نقطه، خط تیره و / است.',
 };
 export const titleRule = {
-  pattern: new RegExp(`^(?=.*[${letters}A-Za-z0-9])[${letters}A-Za-z0-9 ‌()-]{1,50}$`, 'u'),
+  pattern: new RegExp(
+    `^(?=.*[${letters}A-Za-z0-9۰-۹٠-٩])[${letters}A-Za-z0-9۰-۹٠-٩ ‌()-]{1,50}$`,
+    'u',
+  ),
   message: 'عنوان باید شامل حرف یا رقم باشد. فاصله، نیم‌فاصله، خط تیره و پرانتز هم مجازند.',
 };
 export const schemeCodeRule = {

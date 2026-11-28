@@ -9,6 +9,8 @@ import { getStaffDateError, type StaffFilters } from '../types';
 /** جستجوی پرسنل — مقادیر در کوئری آدرس نوشته می‌شوند */
 export const StaffSearch = () => {
   const [form] = Form.useForm<StaffFilters>();
+  const term = Form.useWatch('q', form);
+  const invalidTerm = !searchRule.pattern.test(term ?? '');
   const { params } = useQueryParams();
   useEffect(() => {
     const values = {
@@ -29,6 +31,8 @@ export const StaffSearch = () => {
         name="q"
         normalize={normalizeText}
         rules={[searchRule]}
+        help={invalidTerm ? searchRule.message : undefined}
+        validateStatus={invalidTerm ? 'error' : undefined}
         label="جستجو (نام، کد ملی، موبایل، کد پرسنلی)"
       >
         <TextInput maxLength={30} placeholder="جستجو..." />

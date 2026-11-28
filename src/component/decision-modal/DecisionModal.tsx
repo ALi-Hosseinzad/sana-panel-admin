@@ -1,4 +1,4 @@
-import { descriptionHint, descriptionRule, normalizeText } from '@/utils/inputRules';
+import { descriptionHint, descriptionRule, normalizeLetters } from '@/utils/inputRules';
 import { type ReactNode } from 'react';
 
 import { type PostApprovalStage } from '@/api/generated/facility/facilityPanelAPI.schemas';
@@ -104,7 +104,7 @@ export const DecisionModal = ({
       {!isReject && approveFields}
       <FormItem
         name="description"
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         extra={descriptionHint}
         label={noteRequired ? 'توضیحات' : 'توضیحات (اختیاری)'}
         required={noteRequired}

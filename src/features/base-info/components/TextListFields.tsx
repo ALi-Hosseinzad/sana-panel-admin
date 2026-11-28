@@ -1,4 +1,4 @@
-import { descriptionRule, normalizeText, titleRule } from '@/utils/inputRules';
+import { descriptionRule, normalizeLetters, titleRule } from '@/utils/inputRules';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
 
@@ -40,7 +40,7 @@ export const TextListFields = ({
                 </span>
                 <FormItem
                   name={field.name}
-                  normalize={normalizeText}
+                  normalize={normalizeLetters}
                   rules={[name === 'documentTypes' ? titleRule : descriptionRule]}
                   className="mb-2 flex-1"
                 >

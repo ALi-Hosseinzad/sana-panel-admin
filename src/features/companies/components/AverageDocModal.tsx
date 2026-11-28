@@ -1,4 +1,4 @@
-import { descriptionHint, descriptionRule, normalizeText } from '@/utils/inputRules';
+import { descriptionHint, descriptionRule, normalizeLetters } from '@/utils/inputRules';
 import { FormItem } from '@/component/form';
 import { FileInput, SelectInput, TextAreaInput } from '@/component/input';
 import { FormModal } from '@/component/modal';
@@ -56,7 +56,7 @@ export const AverageDocModal = ({
       <FormItem
         name="description"
         rules={[descriptionRule]}
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         extra={descriptionHint}
         label="توضیحات (اختیاری)"
       >

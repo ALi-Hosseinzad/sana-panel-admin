@@ -1,4 +1,9 @@
-import { normalizeText, personnelCodeRule, fullNameRule } from '@/utils/inputRules';
+import {
+  normalizeLetters,
+  normalizeText,
+  personnelCodeRule,
+  fullNameRule,
+} from '@/utils/inputRules';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { toast } from 'sonner';
@@ -29,7 +34,7 @@ interface StaffFormModalProps {
 }
 
 const toFormValues = (staff: StaffDetail): StaffFormValues => ({
-  fullName: normalizeText(staff.fullName ?? ''),
+  fullName: normalizeLetters(staff.fullName ?? ''),
   nationalCode: toEnglishDigits(staff.nationalCode ?? ''),
   mobile: normalizeText(staff.mobile ?? ''),
   personnelCode: normalizeText(staff.personnelCode ?? ''),
@@ -86,7 +91,7 @@ export const StaffFormModal = ({ open, companyId, staffId, onClose }: StaffFormM
     >
       <FormItem
         name="fullName"
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         rules={[fullNameRule]}
         label="نام و نام خانوادگی"
         required

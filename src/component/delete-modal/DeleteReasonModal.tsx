@@ -1,4 +1,4 @@
-import { descriptionHint, descriptionRule, normalizeText } from '@/utils/inputRules';
+import { descriptionHint, descriptionRule, normalizeLetters } from '@/utils/inputRules';
 import { FormItem } from '../form';
 import { FileInput, TextAreaInput } from '../input';
 import { FormModal } from '../modal';
@@ -39,7 +39,7 @@ export const DeleteReasonModal = ({
     {message && <p className="mt-0 mb-4 text-[12.5px] text-ink-soft">{message}</p>}
     <FormItem
       name="description"
-      normalize={normalizeText}
+      normalize={normalizeLetters}
       extra={descriptionHint}
       label="توضیحات حذف"
       required

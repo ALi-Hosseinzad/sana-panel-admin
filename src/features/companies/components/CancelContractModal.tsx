@@ -1,4 +1,4 @@
-import { descriptionHint, descriptionRule, normalizeText } from '@/utils/inputRules';
+import { descriptionHint, descriptionRule, normalizeLetters } from '@/utils/inputRules';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -82,7 +82,7 @@ export const CancelContractModal = ({ company, onClose }: CancelContractModalPro
       </FormItem>
       <FormItem
         name="description"
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         extra={descriptionHint}
         label="توضیحات"
         required

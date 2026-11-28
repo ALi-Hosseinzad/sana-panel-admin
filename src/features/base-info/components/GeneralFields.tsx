@@ -1,4 +1,4 @@
-import { normalizeText, titleRule, schemeCodeRule } from '@/utils/inputRules';
+import { normalizeLetters, normalizeText, titleRule, schemeCodeRule } from '@/utils/inputRules';
 import { Form } from 'antd';
 
 import { FormItem } from '@/component/form';
@@ -20,7 +20,7 @@ export const GeneralFields = ({ isEdit }: { isEdit: boolean }) => {
       <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2 xl:grid-cols-3">
         <FormItem<SchemeFormValues>
           name="title"
-          normalize={normalizeText}
+          normalize={normalizeLetters}
           label="نام طرح"
           required
           rules={[titleRule, { min: 3, max: 50, message: 'نام طرح باید بین ۳ تا ۵۰ حرف باشد.' }]}

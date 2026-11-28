@@ -1,5 +1,6 @@
 import {
   fullNameRule,
+  normalizeLetters,
   normalizeText,
   numericCodeRule,
   organizationNameRule,
@@ -31,11 +32,11 @@ interface UserFormModalProps {
 /** نقش فعلی کاربر = اولین مورد roles */
 const toFormValues = (user: User): UserPayload => ({
   userName: user.userName,
-  fullName: normalizeText(user.fullName ?? ''),
+  fullName: normalizeLetters(user.fullName ?? ''),
   userCode: normalizeText(user.userCode ?? ''),
   mobileNumber: toEnglishDigits(user.mobileNumber ?? ''),
   nationalCode: toEnglishDigits(user.nationalCode ?? ''),
-  branchName: normalizeText(user.branchName ?? ''),
+  branchName: normalizeLetters(user.branchName ?? ''),
   branchCode: normalizeText(user.branchCode ?? ''),
   roleId: user.roles[0]?.roleId ?? null,
 });
@@ -128,7 +129,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
       </FormItem>
       <FormItem
         name="fullName"
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         rules={[fullNameRule]}
         label="نام و نام خانوادگی کاربر"
         required
@@ -164,7 +165,7 @@ export const UserFormModal = ({ open, userId, onClose }: UserFormModalProps) => 
       </FormItem>
       <FormItem
         name="branchName"
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         rules={[organizationNameRule]}
         label="نام شعبه"
         required

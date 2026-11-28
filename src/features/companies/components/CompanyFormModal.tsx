@@ -1,4 +1,9 @@
-import { agreementRule, normalizeText, organizationNameRule } from '@/utils/inputRules';
+import {
+  agreementRule,
+  normalizeLetters,
+  normalizeText,
+  organizationNameRule,
+} from '@/utils/inputRules';
 import { useQueryClient } from '@tanstack/react-query';
 import { Form } from 'antd';
 import { useMemo } from 'react';
@@ -39,7 +44,7 @@ const EMPTY_VALUES: Partial<CompanyFormValues> = { salaryFromSepah: false, planI
 
 const toFormValues = (detail: CompanyDetail): CompanyFormValues => ({
   schemeId: detail.schemeId,
-  name: normalizeText(detail.name ?? ''),
+  name: normalizeLetters(detail.name ?? ''),
   nationalId: normalizeText(detail.nationalId ?? ''),
   agreementNumber: normalizeText(detail.agreementNumber ?? ''),
   accountNumber: normalizeText(detail.accountNumber ?? ''),
@@ -148,7 +153,7 @@ export const CompanyFormModal = ({ open, companyId, onClose }: CompanyFormModalP
       </FormItem>
       <FormItem
         name="name"
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         label="نام شرکت"
         required
         rules={[

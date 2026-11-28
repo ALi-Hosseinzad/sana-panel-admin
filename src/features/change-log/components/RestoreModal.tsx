@@ -1,4 +1,4 @@
-import { descriptionHint, descriptionRule, normalizeText } from '@/utils/inputRules';
+import { descriptionHint, descriptionRule, normalizeLetters } from '@/utils/inputRules';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -45,7 +45,7 @@ export const RestoreModal = ({ log, onClose }: RestoreModalProps) => {
       <FormItem
         name="description"
         rules={[descriptionRule]}
-        normalize={normalizeText}
+        normalize={normalizeLetters}
         extra={descriptionHint}
         label="توضیح بازگردانی"
         required
