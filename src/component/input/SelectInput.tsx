@@ -41,7 +41,8 @@ export const SelectInput = <V = unknown,>({
           },
         }
       }
-      components={showSearch ? { input: <input maxLength={30} /> } : undefined}
+      // Select renders its own placeholder alongside the search input.
+      components={showSearch ? { input: <input maxLength={30} placeholder="" /> } : undefined}
       notFoundContent={notFoundContent}
       onOpenChange={(open) => {
         if (!open) setSearch('');
