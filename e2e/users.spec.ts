@@ -55,8 +55,24 @@ test('mobile number and national code are required and appear in the new user ro
   await branchCode.fill('123456789012');
   await expect(branchCode).toHaveValue('1234567890');
   await branchCode.fill('150003');
-  await expect(dialog.getByLabel('نقش کاربر')).toHaveAttribute('maxlength', '30');
-  await dialog.getByLabel('نقش کاربر').click();
+  const role = dialog.getByLabel('نقش کاربر');
+  const roleSelect = dialog
+    .locator('.ant-select')
+    .filter({ has: page.getByRole('combobox', { name: 'نقش کاربر' }) });
+  await expect(role).toHaveJSProperty('maxLength', -1);
+  await expect(roleSelect.getByText('انتخاب نقش')).toBeVisible();
+  const longSearch = 'شعبه'.repeat(12);
+  await role.fill(longSearch);
+  await expect(role).toHaveValue(longSearch);
+  await role.fill('شعبه');
+  await page.locator('.ant-select-item-option').filter({ hasText: 'کاربر شعبه' }).click();
+  await expect(roleSelect.getByText('کاربر شعبه')).toBeVisible();
+  await expect(role).toHaveJSProperty('placeholder', '');
+  await expect(roleSelect.getByText('انتخاب نقش')).toBeHidden();
+  await roleSelect.hover();
+  await roleSelect.locator('.ant-select-clear').click();
+  await expect(roleSelect.getByText('انتخاب نقش')).toBeVisible();
+  await role.click();
   await page.locator('.ant-select-item-option').filter({ hasText: 'کاربر شعبه' }).click();
   await submit.click();
   await expect(dialog.getByText('شماره موبایل الزامی است.')).toBeVisible();
