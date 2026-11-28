@@ -59,8 +59,11 @@ test('mobile number and national code are required and appear in the new user ro
   const roleSelect = dialog
     .locator('.ant-select')
     .filter({ has: page.getByRole('combobox', { name: 'نقش کاربر' }) });
-  await expect(role).toHaveAttribute('maxlength', '30');
+  await expect(role).toHaveJSProperty('maxLength', -1);
   await expect(roleSelect.getByText('انتخاب نقش')).toBeVisible();
+  const longSearch = 'شعبه'.repeat(12);
+  await role.fill(longSearch);
+  await expect(role).toHaveValue(longSearch);
   await role.fill('شعبه');
   await page.locator('.ant-select-item-option').filter({ hasText: 'کاربر شعبه' }).click();
   await expect(roleSelect.getByText('کاربر شعبه')).toBeVisible();

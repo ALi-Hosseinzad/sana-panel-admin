@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { normalizeText, searchRule } from '@/utils/inputRules';
+import { normalizeText, selectSearchPattern } from '@/utils/inputRules';
 import { Select, type SelectProps } from 'antd';
 
 export interface SelectInputProps<V = unknown> extends SelectProps<V> {
@@ -34,15 +34,13 @@ export const SelectInput = <V = unknown,>({
           searchValue: options.searchValue ?? search,
           onSearch: (input) => {
             const value = normalizeText(input);
-            if (searchRule.pattern.test(value)) {
+            if (selectSearchPattern.test(value)) {
               setSearch(value);
               options.onSearch?.(value);
             }
           },
         }
       }
-      // Select renders its own placeholder alongside the search input.
-      components={showSearch ? { input: <input maxLength={30} placeholder="" /> } : undefined}
       notFoundContent={notFoundContent}
       onOpenChange={(open) => {
         if (!open) setSearch('');

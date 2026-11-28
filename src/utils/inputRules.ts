@@ -47,7 +47,9 @@ export const descriptionRule = {
   message: 'توضیح را با حروف، اعداد و نشانه‌های نگارشی مجاز، حداکثر در ۳۰۰ کاراکتر وارد کنید.',
 };
 export const descriptionHint = 'حداکثر ۳۰۰ کاراکتر';
+const searchCharacters = `[${letters}A-Za-z0-9 ‌-]`;
+export const selectSearchPattern = new RegExp(`^${searchCharacters}*$`, 'u');
 export const searchRule = {
-  pattern: new RegExp(`^[${letters}A-Za-z0-9 ‌-]{0,30}$`, 'u'),
+  pattern: new RegExp(`^${searchCharacters}{0,30}$`, 'u'),
   message: 'جستجو حداکثر ۳۰ کاراکتر است. فقط حروف، رقم، فاصله، نیم‌فاصله و خط تیره مجازند.',
 };
